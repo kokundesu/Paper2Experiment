@@ -1,0 +1,44 @@
+# CORE-Bench v1.1 task as a ReproSpec: what agents see. No answers.
+id: cb-5496369
+title: Metabolomic machine learning predictor for diagnosis and prognosis of gastric
+  cancer
+objective: 'Test the computational reproducibility of a scientific capsule (CORE-Bench,
+  Hard level): run its code and answer the questions from the output.'
+task_prompt: Execute GC-diagnosis-model/run.ipynb. Save the results in html format
+  in ../results. Execute GC-prognosis-model/run.ipynb. Save the results in html format
+  in ../results. For both runs, disable the cell execution timeout and allow errors.
+language: Python
+paper: null
+code:
+  repo_url: null
+  capsule: capsule-5496369
+questions:
+- id: q1
+  text: fig For the GC diagnosis model's AUROC curve of test data, report the Lasso
+    AUROC of the test data.
+  answer_type: any
+  metric: ''
+  direction: ''
+  unit: ''
+  locator: program output
+  setting: ''
+  runs: 1
+  evidence: either
+- id: q2
+  text: fig From the GC prognosis model's AUROC curve, report the Lasso AUROC of the
+    test data.
+  answer_type: any
+  metric: ''
+  direction: ''
+  unit: ''
+  locator: program output
+  setting: ''
+  runs: 1
+  evidence: either
+origin:
+  source: corebench
+  reference: core-bench (original) core_train.json sha256:3df47f1b3fa1cb60045018eb1a0f1ad4ecf6a53f72318c845a879ce0313b0730
+  prompt: ''
+  drafted_by: []
+  checked_by: []
+  user_confirmed: false

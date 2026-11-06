@@ -1,0 +1,83 @@
+# Reference re-runs of the official code (hidden).
+id: ngboost
+recipe_status: draft
+commit: 6aadc1fc49311606c9abc808c2a1f100880120c5
+run_dir: /Users/allenhuw/Documents/Projects/Paper2Exp/Base/runs/reference/20261017-234417_ngboost
+n: 5
+setup_logs:
+- cmd_001_setup.log
+- cmd_002_setup.log
+- cmd_003_setup.log
+- cmd_004_setup.log
+runs:
+- i: 0
+  seed: 0
+  threads: default
+  exit: 0
+  wall_s: 290.0
+  log: cmd_005_ref_0.log
+  values:
+    concrete_ngboost_nll: 3.1296
+    concrete_ngboost_rmse: 5.5806
+- i: 1
+  seed: 1
+  threads: '1'
+  exit: 0
+  wall_s: 265.7
+  log: cmd_006_ref_1.log
+  values:
+    concrete_ngboost_nll: 3.0897
+    concrete_ngboost_rmse: 5.4453
+- i: 2
+  seed: 2
+  threads: default
+  exit: 0
+  wall_s: 259.9
+  log: cmd_007_ref_2.log
+  values:
+    concrete_ngboost_nll: 3.0943
+    concrete_ngboost_rmse: 5.5132
+- i: 3
+  seed: 3
+  threads: '1'
+  exit: 0
+  wall_s: 261.7
+  log: cmd_008_ref_3.log
+  values:
+    concrete_ngboost_nll: 3.0571
+    concrete_ngboost_rmse: 5.4032
+- i: 4
+  seed: 4
+  threads: default
+  exit: 0
+  wall_s: 260.5
+  log: cmd_009_ref_4.log
+  values:
+    concrete_ngboost_nll: 3.0523
+    concrete_ngboost_rmse: 5.4491
+values:
+  concrete_ngboost_nll:
+  - 3.1296
+  - 3.0897
+  - 3.0943
+  - 3.0571
+  - 3.0523
+  concrete_ngboost_rmse:
+  - 5.5806
+  - 5.4453
+  - 5.5132
+  - 5.4032
+  - 5.4491
+printed_places:
+  concrete_ngboost_nll: 4
+  concrete_ngboost_rmse: 4
+manifest:
+  cmd_001_setup.log: 13ff138068ab3ae11ee4bbc5393dd7c07b5acb981547ae69ed5b14ae266c309d
+  cmd_002_setup.log: 65394a6ccbde1910aba9cf7ea8f9eb8911d975523e213308ae9a68ccac9fbe2a
+  cmd_003_setup.log: b6f39bd76ddd8a59c89bce2dc881f596a14169c7f92cd34919235be022e949ed
+  cmd_004_setup.log: acc2e7d9204ab04ccffea7a602cb1b673337e7d6ef0e5202843637b0dfae12f2
+  cmd_005_ref_0.log: f2c71a4cc786dc0d0708439c542f09bfad116a8e27883369e2bcb1a8facc02ff
+  cmd_006_ref_1.log: 08ee8623dd2312d61829d32c9b93439fa3f488db60da1fed5f003605540793dd
+  cmd_007_ref_2.log: dc50567173d96fb22e526d2ef14cefa0bfc5001a1985d2e4794bad4ff3f2219f
+  cmd_008_ref_3.log: c529ef5833af2dd043acb513a3aa89937aeda143703b4d233d3736eae4bd0aac
+  cmd_009_ref_4.log: 67e52ae13860005d9d91b8c364c2442ad099792d7f6385dd56e139c03c839530

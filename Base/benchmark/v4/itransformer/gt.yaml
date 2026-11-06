@@ -1,0 +1,102 @@
+# Hidden ground truth from the paper (GT stage). Tolerances follow after the reference re-runs.
+id: itransformer
+extractors:
+- haiku55
+- luna
+values:
+  exchange_96_96_mse:
+    paper_value: 0.086
+    printed: '0.086'
+    precision: 3
+    quote: 'Exchange
+
+      96 0.086 0.206 0.093 0.217 0.088 0.205 0.256 0.367'
+    page: 23
+    reported_spread: null
+    spread_kind: none
+    spread_over: none
+    n_runs: null
+    status: agreed
+    votes:
+      haiku55:
+        value: 0.086
+        verified: true
+        why: ''
+        printed: '0.086'
+        quote: 'Exchange
+
+          96 0.086 0.206 0.093 0.217 0.088 0.205 0.256 0.367'
+        page: 23
+        spread: null
+        spread_kind: none
+        spread_over: none
+        n_runs: null
+        note: Table 10 (Full results of the long-term forecasting task), Exchange
+          block, horizon 96, iTransformer (Ours) MSE column. No ± printed in Table
+          10. Table 5 (appendix, five seeds) reports 0.088±0.001 for the same setting,
+          which differs from Table 10; the question asks for Table 10, so 0.086 is
+          used.
+      luna:
+        value: 0.086
+        verified: true
+        why: ''
+        printed: '0.086'
+        quote: 'Exchange
+
+          96 0.086 0.206 0.093 0.217 0.088 0.205 0.256 0.367 0.094 0.218 0.107 0.234
+          0.088 0.218 0.267 0.396 0.148 0.278 0.111 0.237 0.197 0.323'
+        page: 23
+        spread: null
+        spread_kind: none
+        spread_over: none
+        n_runs: null
+        note: Table 10 lists iTransformer first under the MSE/MAE columns; the 96
+          row is the 96-step prediction horizon with input length 96. No ± spread
+          is printed for this result.
+  exchange_96_96_mae:
+    paper_value: 0.206
+    printed: '0.206'
+    precision: 3
+    quote: 'Exchange
+
+      96 0.086 0.206 0.093 0.217 0.088 0.205 0.256 0.367'
+    page: 23
+    reported_spread: null
+    spread_kind: none
+    spread_over: none
+    n_runs: null
+    status: agreed
+    votes:
+      haiku55:
+        value: 0.206
+        verified: true
+        why: ''
+        printed: '0.206'
+        quote: 'Exchange
+
+          96 0.086 0.206 0.093 0.217 0.088 0.205 0.256 0.367'
+        page: 23
+        spread: null
+        spread_kind: none
+        spread_over: none
+        n_runs: null
+        note: Table 10, Exchange block, horizon 96, iTransformer (Ours) MAE column.
+          No ± printed in Table 10. Table 5 reports 0.209±0.001 for this setting (five
+          seeds), which differs from Table 10; Table 10 value 0.206 is used.
+      luna:
+        value: 0.206
+        verified: true
+        why: ''
+        printed: '0.206'
+        quote: 'Exchange
+
+          96 0.086 0.206 0.093 0.217 0.088 0.205 0.256 0.367 0.094 0.218 0.107 0.234
+          0.088 0.218 0.267 0.396 0.148 0.278 0.111 0.237 0.197 0.323'
+        page: 23
+        spread: null
+        spread_kind: none
+        spread_over: none
+        n_runs: null
+        note: Table 10 lists iTransformer first under the MSE/MAE columns; the 96
+          row is the 96-step prediction horizon with input length 96. No ± spread
+          is printed for this result.

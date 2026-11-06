@@ -1,0 +1,33 @@
+# CORE-Bench v1.1 task as a ReproSpec: what agents see. No answers.
+id: cb-5136217
+title: 'Partisan Enclaves and Information Bazaars: Mapping Selective Exposure to Online
+  News'
+objective: 'Test the computational reproducibility of a scientific capsule (CORE-Bench,
+  Hard level): run its code and answer the questions from the output.'
+task_prompt: 'Make the following subfolders in the ../results directory: tables, figures,
+  for_publication/tables, for_publication/figures. Run all the .R scripts in the ../code
+  folder using Rscript with ''source'' and set echo to ''TRUE''.'
+language: R
+paper: null
+code:
+  repo_url: null
+  capsule: capsule-5136217
+questions:
+- id: q1
+  text: fig From figure 3 from the figures for publication, report the name of the
+    party ID with the lowest share of political news from portals.
+  answer_type: any
+  metric: ''
+  direction: ''
+  unit: ''
+  locator: program output
+  setting: ''
+  runs: 1
+  evidence: either
+origin:
+  source: corebench
+  reference: core-bench-v1.1-mainline core_test.json sha256:d4aa5ebb984df7f293e04f2dd120722f172fddea6fcb54a0c928e09bc6ef837d
+  prompt: ''
+  drafted_by: []
+  checked_by: []
+  user_confirmed: false

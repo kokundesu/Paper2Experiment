@@ -1,0 +1,14 @@
+# Upstream clone (re-create with: git clone --depth 1 https://github.com/KalmanNet/KalmanNet_TSP repos/KalmanNet_TSP; commit 828a2cf)
+repos/
+# Patched copy (re-create: copy repos/KalmanNet_TSP without .git, then `git apply ../kalmannet_cpu_fixes.patch` inside it)
+manual/KalmanNet_TSP/
+# Paper PDF (re-download: curl -L -o paper/2107.10043.pdf https://arxiv.org/pdf/2107.10043v3)
+paper/*.pdf
+__pycache__/
+# manual/*.patch, manual/run_seeds.sh and results/ are kept
+# Old-code copy for DISCREPANCY.md (re-create: git clone https://github.com/KalmanNet/KalmanNet_TSP repos/KalmanNet_TSP_full;
+#   mkdir manual/KalmanNet_TSP_old; (cd repos/KalmanNet_TSP_full && git archive origin/architecture-#2 | tar -x -C ../../manual/KalmanNet_TSP_old);
+#   (cd manual/KalmanNet_TSP_old && patch -p1 < ../../discrepancy/old_code_fixes.patch))
+manual/KalmanNet_TSP_old/
+# Authors' Dec-2021 checkpoints extracted from git history (see DISCREPANCY.md, "Files")
+manual/scratch_old/

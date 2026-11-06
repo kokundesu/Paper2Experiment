@@ -1,0 +1,46 @@
+# The user's answers to clarifications.md, confirmed 2026-10-17 ("7 处待确认按你的建议定（以候选清单为准，appnp 用论文
+# 表 2，patchtst 用仓库脚本的 104，mc_dropout 用论文表 1）"). `revise` replaces questions; their values are re-extracted
+# by the GT extractors (the values never come from this file or from the candidate list).
+confirmed_by: user
+date: "2026-10-17"
+papers:
+  doc2vecc:
+    decision: 表 1 的 include test 列（表示学习时包含测试文档）；草稿已是这一列，不改。
+  pinn_gradpath:
+    decision: 表 2 的 "50 units / 3 hidden layers" 这一行（草稿选的是 50 × 5，改掉）。
+    revise:
+      helmholtz2d_m1_relative_l2_50x5:
+        id: helmholtz2d_m1_relative_l2_50x3
+        text: 二维 Helmholtz 方程实验中，采用每层 50 个单元、3 个隐藏层的 M1 原始 PINN，表 2 所报告的预测解相对 L2 误差是多少？
+        locator: 表 2（Helmholtz equation），行“50 units / 3 hidden layers”，列“M1”
+        setting: 二维 Helmholtz 方程；解析解 u(x,y)=sin(πx)sin(4πy)；M1 为原始全连接 PINN，不使用自适应损失权重；50 units / 3 hidden layers；40,000 次 Adam 更新。
+      helmholtz2d_m2_relative_l2_50x5:
+        id: helmholtz2d_m2_relative_l2_50x3
+        text: 二维 Helmholtz 方程实验中，采用每层 50 个单元、3 个隐藏层的 M2 PINN（学习率退火算法），表 2 所报告的预测解相对 L2 误差是多少？
+        locator: 表 2（Helmholtz equation），行“50 units / 3 hidden layers”，列“M2”
+        setting: 二维 Helmholtz 方程；解析解 u(x,y)=sin(πx)sin(4πy)；M2 为常规全连接 PINN 加自适应学习率退火/损失权重调整；50 units / 3 hidden layers；40,000 次 Adam 更新。
+  set_transformer:
+    decision: 表 3 的 LL0/data（不经 EM 更新）；草稿已是这一列，不改。
+  nngp:
+    decision: 表 1 MNIST:1k 的 ReLU 列；草稿已是这一列，不改。
+  appnp:
+    decision: 以论文表 2 的数值为目标；作者的 PyTorch 实现只是运行环境。
+  patchtst:
+    decision: 回看窗口用 104（附录表 9 和仓库 illness.sh）；草稿的 setting 已写明，不改。
+  mc_dropout:
+    decision: 以论文表 1 为目标（论文的调参协议）；仓库 README 里的重跑值只作参考，不计分。
+# Second decision, 2026-10-17 ("一次运行 = 论文完整协议（20 次划分的那几篇照跑），GPR-GNN 和 APPNP 这种 100 次划分的取
+# 10 次；agent 每题交 3 个 seed"). `update` changes fields that do not touch the paper value: no re-extraction.
+protocol:
+  decision: >
+    Every question: the agent submits 3 runs (seeds). Where the paper averages over data splits, one run is the
+    paper's full split protocol (its mean over the splits); GPR-GNN and APPNP use 10 splits instead of 100. Where the
+    paper averages over seeds or initialisations, one run is one seed.
+  all_questions: {runs: 3}
+  splits:
+    gprgnn: "一次运行 = 10 个随机 60/20/20 划分上的平均（论文为 100 个划分）。"
+    appnp: "一次运行 = 10 个随机划分上的平均（论文为 100 次）。"
+    ngboost: "一次运行 = 论文的完整协议：20 个随机 90/10 划分上的平均。"
+    svgd: "一次运行 = 论文的完整协议：20 个随机训练/测试划分上的平均。"
+    mc_dropout: "一次运行 = 论文的完整协议：仓库里 20 个固定划分上的平均。"
+    ecod: "一次运行 = 论文的完整协议：10 个随机 60/40 划分上的平均。"

@@ -1,0 +1,56 @@
+# Hidden: tolerances from the reference re-runs (pre-registered before any workflow runs).
+id: ecod
+rule: docs/benchmark-redesign.md section 3.3
+reference_run_dir: /Users/allenhuw/Documents/Projects/Paper2Exp/Base/runs/reference/20261017-095315_ecod
+questions:
+  cardio_ecod_roc_auc:
+    status: paper_mismatch
+    paper_value: 0.897
+    ref_mean: 0.9355496000000001
+    ref_s: 0.0018773884254463867
+    n: 5
+    m: 3
+    h: 0.0038060366129726276
+    term: noise
+    noise: 0.0038060366129726276
+    precision: 0.0005
+    floor: 9.355496000000001e-06
+    h_paper: 0.004306036612972628
+    paper_gap: 0.03854960000000007
+    justification: h = max(noise 0.00381 [t(4)=2.776, s=0.00188, n=5, m=3], precision
+      0.0005 [3 places], floor 9.36e-06) = 0.00381 (noise); paper gap 0.0385 vs h
+      + h_paper 0.00811
+  breastw_ecod_roc_auc:
+    status: scored
+    paper_value: 0.994
+    ref_mean: 0.99154
+    ref_s: 0.0005567589244906726
+    n: 5
+    m: 3
+    h: 0.0011287194607620514
+    term: noise
+    noise: 0.0011287194607620514
+    precision: 0.0005
+    floor: 9.9154e-06
+    h_paper: 0.0016287194607620514
+    paper_gap: 0.0024600000000000177
+    justification: h = max(noise 0.00113 [t(4)=2.776, s=0.000557, n=5, m=3], precision
+      0.0005 [3 places], floor 9.92e-06) = 0.00113 (noise); paper gap 0.00246 vs h
+      + h_paper 0.00276
+  mammography_ecod_roc_auc:
+    status: paper_mismatch
+    paper_value: 0.894
+    ref_mean: 0.9085822
+    ref_s: 0.003219088178351126
+    n: 5
+    m: 3
+    h: 0.006526069566173337
+    term: noise
+    noise: 0.006526069566173337
+    precision: 0.0005
+    floor: 9.085822e-06
+    h_paper: 0.007026069566173337
+    paper_gap: 0.01458219999999999
+    justification: h = max(noise 0.00653 [t(4)=2.776, s=0.00322, n=5, m=3], precision
+      0.0005 [3 places], floor 9.09e-06) = 0.00653 (noise); paper gap 0.0146 vs h
+      + h_paper 0.0136

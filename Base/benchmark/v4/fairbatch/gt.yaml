@@ -1,0 +1,85 @@
+# Hidden ground truth from the paper (GT stage). Tolerances follow after the reference re-runs.
+id: fairbatch
+extractors:
+- haiku55
+- luna
+values:
+  synthetic_fairbatch_eo_accuracy:
+    paper_value: 0.855
+    printed: '.855'
+    precision: 3
+    quote: FairBatch .855±.000 .012±.001 300 .681 ±.001 .022±.005 100 .844 ±.001 .011±.003
+      400
+    page: 7
+    reported_spread: 0.0
+    spread_kind: unknown
+    spread_over: seeds
+    n_runs: 10
+    status: agreed
+    votes:
+      haiku55:
+        value: 0.855
+        verified: true
+        why: ''
+        printed: '.855'
+        quote: FairBatch .855±.000 .012±.001 300 .681 ±.001 .022±.005 100 .844 ±.001
+          .011±.003 400
+        page: 7
+        spread: 0.0
+        spread_kind: unknown
+        spread_over: seeds
+        n_runs: 10
+        note: Table 1, FairBatch row, Synthetic Acc. column, printed as .855±.000.
+          Experiments repeated 10 times (different random seeds); the spread type
+          (std/sem) is not specified.
+      luna:
+        value: 0.855
+        verified: true
+        why: ''
+        printed: '.855'
+        quote: FairBatch .855±.000 .012±.001 300
+        page: 7
+        spread: 0.0
+        spread_kind: unknown
+        spread_over: runs
+        n_runs: 10
+        note: 跨 10 次实验的平均 accuracy；论文未说明表中 ± 表示哪种统计量。
+  synthetic_fairbatch_eo_disparity:
+    paper_value: 0.012
+    printed: '.012'
+    precision: 3
+    quote: FairBatch .855±.000 .012±.001 300 .681 ±.001 .022±.005 100 .844 ±.001 .011±.003
+      400
+    page: 7
+    reported_spread: 0.001
+    spread_kind: unknown
+    spread_over: seeds
+    n_runs: 10
+    status: agreed
+    votes:
+      haiku55:
+        value: 0.012
+        verified: true
+        why: ''
+        printed: '.012'
+        quote: FairBatch .855±.000 .012±.001 300 .681 ±.001 .022±.005 100 .844 ±.001
+          .011±.003 400
+        page: 7
+        spread: 0.001
+        spread_kind: unknown
+        spread_over: seeds
+        n_runs: 10
+        note: Table 1, FairBatch row, Synthetic EO Disp. column, printed as .012±.001.
+          Experiments repeated 10 times; spread type not specified.
+      luna:
+        value: 0.012
+        verified: true
+        why: ''
+        printed: '.012'
+        quote: FairBatch .855±.000 .012±.001 300
+        page: 7
+        spread: 0.001
+        spread_kind: unknown
+        spread_over: runs
+        n_runs: 10
+        note: 跨 10 次实验的平均 EO disparity；论文未说明表中 ± 表示哪种统计量。

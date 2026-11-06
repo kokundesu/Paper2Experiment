@@ -1,0 +1,16 @@
+# Upstream clone (re-create with: git clone --depth 1 https://github.com/cure-lab/LTSF-Linear repos/LTSF-Linear; commit 0c11366)
+repos/
+# Patched working copy (re-create: copy repos/LTSF-Linear, git apply manual/ltsf_linear_cpu_modern.patch, symlink dataset -> ../../data)
+manual/LTSF-Linear/
+# ETT CSVs (re-download from https://github.com/zhouhaoyi/ETDataset/tree/main/ETT-small; sha256 in MANUAL_REPRO.md)
+data/
+# Paper PDFs (re-download: curl -L -o paper/2205.13504.pdf https://arxiv.org/pdf/2205.13504)
+paper/*.pdf
+__pycache__/
+# manual/run_seeds.sh, manual/*.patch and results/ are kept
+# Discrepancy working copies (re-create: see DISCREPANCY.md "Reproducing the experiments")
+discrepancy/LTSF-Linear-721ab58/
+discrepancy/LTSF-Linear-0c11366-init1L/
+# Unused-decoder diagnostic copy (re-create: copy manual/LTSF-Linear, then `patch -p1 < ../decoder.diff` inside it;
+#   see DISCREPANCY.md "Addendum 2026-10-05")
+discrepancy/LTSF-Linear-0c11366-decoder/

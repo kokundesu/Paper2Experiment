@@ -1,0 +1,11 @@
+== faithful runs (official _best.sh configs, released code: train_epochs default 50)
+etth1_96_mse                             n= 8 mean=0.37208 std=0.00006 median=0.37209 min=0.37197 max=0.37216 droplast_median=0.36897 wall=36-43s epochs=[50] | paper=0.372 dev=+0.02% | med3 pass@1/2/3/5%=1.00/1.00/1.00/1.00
+etth1_720_mse                            n= 8 mean=0.42444 std=0.00011 median=0.42438 min=0.42429 max=0.42461 droplast_median=0.41598 wall=46-58s epochs=[50] | paper=0.424 dev=+0.09% | med3 pass@1/2/3/5%=1.00/1.00/1.00/1.00
+etth2_96_mse                             n= 8 mean=0.27102 std=0.00010 median=0.27098 min=0.27092 max=0.27125 droplast_median=0.27008 wall=70-91s epochs=[94, 100] | paper=0.271 dev=-0.01% | med3 pass@1/2/3/5%=1.00/1.00/1.00/1.00
+ettm1_96_mse                             n= 5 mean=0.30294 std=0.00013 median=0.30294 min=0.30276 max=0.30315 droplast_median=0.30359 wall=84-110s epochs=[44, 46, 50] | paper=0.303 dev=-0.02% | med3 pass@1/2/3/5%=1.00/1.00/1.00/1.00
+== diagnostics
+diag_ep100_etth2_96_mse                  n= 3 mean=0.27115 std=0.00019 median=0.27108 min=0.27096 max=0.27140 droplast_median=0.27013 wall=122-150s epochs=[137, 149, 166] | paper=0.271 dev=+0.03% | med3 pass@1/2/3/5%=1.00/1.00/1.00/1.00
+diag_ep100_etth1_96_mse                  n= 1 mean=0.37206 std=0.00000 median=0.37206 min=0.37206 max=0.37206 droplast_median=0.36893 wall=56-56s epochs=[84] | paper=0.372 dev=+0.02%
+diag_valsel_L180_etth2_96_mse            n= 3 mean=0.28551 std=0.00013 median=0.28549 min=0.28536 max=0.28567 droplast_median=0.28488 wall=45-49s epochs=[89, 100] | paper=0.271 dev=+5.35% | med3 pass@1/2/3/5%=0.00/0.00/0.00/0.00
+diag_bs128x2_etth1_720_mse               n= 1 mean=0.45242 std=0.00000 median=0.45242 min=0.45242 max=0.45242 droplast_median=0.44322 wall=50-50s epochs=[50] | paper=0.424 dev=+6.70%
+diag_bs128x2_etth1_96_mse                n= 1 mean=0.37275 std=0.00000 median=0.37275 min=0.37275 max=0.37275 droplast_median=0.36518 wall=36-36s epochs=[50] | paper=0.372 dev=+0.20%

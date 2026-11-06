@@ -1,0 +1,48 @@
+# Hidden ground truth from the paper (GT stage). Tolerances follow after the reference re-runs.
+id: correct_smooth
+extractors:
+- haiku55
+- luna
+values:
+  arxiv_plain_linear_cs_autoscale_test_accuracy:
+    paper_value: 71.11
+    printed: '71.11'
+    precision: 2
+    quote: Autoscale Plain Linear 71.11 80.24 88.62 76.31 89.99
+    page: 7
+    reported_spread: null
+    spread_kind: none
+    spread_over: none
+    n_runs: null
+    status: agreed
+    votes:
+      haiku55:
+        value: 71.11
+        verified: true
+        why: ''
+        printed: '71.11'
+        quote: Autoscale Plain Linear 71.11 80.24 88.62 76.31 89.99
+        page: 7
+        spread: null
+        spread_kind: none
+        spread_over: none
+        n_runs: null
+        note: Table 2 (top half), Autoscale block, Plain Linear row, Arxiv column
+          = 71.11. No ± spread is printed in Table 2. The paper's Table 2 uses only
+          training labels in the LP step, matching the setting. The repo README reports
+          a different number (71.26 ± 0.01 test for Plain Linear, with spectral+diffusion
+          embeddings noted for other variants), so the paper value is taken as the
+          answer.
+      luna:
+        value: 71.11
+        verified: true
+        why: ''
+        printed: '71.11'
+        quote: Autoscale Plain Linear 71.11 80.24 88.62 76.31 89.99
+        page: 7
+        spread: null
+        spread_kind: none
+        spread_over: none
+        n_runs: null
+        note: Table 2 reports accuracy without a printed ± spread; the Arxiv entry
+          is 71.11 (percent).

@@ -1,0 +1,36 @@
+# ReproSpec (agent-visible, no values). FROZEN: see ../FROZEN.yaml.
+id: appnp
+title: ''
+objective: 复现 APPNP（Predict then Propagate，ICLR 2019）在 MS Academic 数据集上的准确率，表 2，用作者的
+  PyTorch 版本。
+task_prompt: ''
+language: Python
+paper:
+  url: https://arxiv.org/abs/1810.05997
+  pdf: null
+code:
+  repo_url: https://github.com/gasteigerjo/ppnp
+  capsule: null
+questions:
+- id: appnp_ms_academic_accuracy
+  text: 论文表 2 中 APPNP 在 MS Academic 数据集上的平均测试准确率（micro-F1）是多少？
+  answer_type: number
+  metric: 平均节点分类准确率（micro-F1）
+  direction: higher
+  unit: '%'
+  locator: 表 2，APPNP 行、MS ACADEMIC 列；取平均准确率，不取随附的置信区间半宽
+  setting: MS Academic 最大连通分量；APPNP（非精确 PPNP）；训练集每类 20 个标注节点，早停集 500 个节点，固定留出测试集；使用作者
+    PyTorch 实现复现，对照论文表 2 一次运行 = 10 个随机划分上的平均（论文为 100 次）。
+  runs: 3
+  evidence: log
+origin:
+  source: user
+  reference: ''
+  prompt: 复现 APPNP（Predict then Propagate，ICLR 2019）在 MS Academic 数据集上的准确率，表 2，用作者的
+    PyTorch 版本。
+  drafted_by:
+  - sol
+  checked_by:
+  - sonnet55
+  - haiku55
+  user_confirmed: true

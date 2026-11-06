@@ -1,0 +1,93 @@
+{
+ "draft": {
+  "understanding": "用户希望使用 BSPM 官方仓库复现 SIGIR 2023 论文中 Gowalla 数据集的 BSPM-EM 排序结果，仅对照表 4 的 Recall@20 和 NDCG@20；按 README 的 Gowalla 命令选择 early merge 变体，而非 BSPM-LM 或其他数据集。",
+  "questions": [
+   {
+    "id": "gowalla_bspm_em_recall20",
+    "text": "论文表 4 中 BSPM-EM 在 Gowalla 上的 Recall@20 是多少？",
+    "metric": "Recall@20",
+    "unit": "",
+    "direction": "higher",
+    "locator": "表 4（Overall performance comparison），BSPM-EM 行、Gowalla 栏下的 Recall 子列",
+    "setting": "Gowalla 数据集；BSPM-EM（early merge），top-20 推荐评估；对应仓库 README 的 Gowalla 命令，final_sharpening=True，sharpening 使用 RK4、K_s=1、T_s=2.5、idl_beta=0.2、factor_dim=448；按论文使用相同训练/测试划分，候选为用户未交互物品，不使用残差连接。",
+    "runs": 1,
+    "protocol_notes": "论文称沿用既有研究的数据及训练/测试划分，但未说明对多个随机种子或划分取平均；该方法不需要训练。README 同时提供 CPU 和 GPU 命令，均指向该变体。"
+   },
+   {
+    "id": "gowalla_bspm_em_ndcg20",
+    "text": "论文表 4 中 BSPM-EM 在 Gowalla 上的 NDCG@20 是多少？",
+    "metric": "NDCG@20",
+    "unit": "",
+    "direction": "higher",
+    "locator": "表 4（Overall performance comparison），BSPM-EM 行、Gowalla 栏下的 NDCG 子列",
+    "setting": "Gowalla 数据集；BSPM-EM（early merge），top-20 推荐评估；对应仓库 README 的 Gowalla 命令，final_sharpening=True，sharpening 使用 RK4、K_s=1、T_s=2.5、idl_beta=0.2、factor_dim=448；按论文使用相同训练/测试划分，候选为用户未交互物品，不使用残差连接。",
+    "runs": 1,
+    "protocol_notes": "论文称沿用既有研究的数据及训练/测试划分，但未说明对多个随机种子或划分取平均；该方法不需要训练。README 同时提供 CPU 和 GPU 命令，均指向该变体。"
+   }
+  ],
+  "open_issues": []
+ },
+ "checks": {
+  "sonnet55": {
+   "items": [
+    {
+     "question_id": "gowalla_bspm_em_recall20",
+     "in_scope": "yes",
+     "locator_ok": "yes",
+     "underspecified": [
+      "none"
+     ],
+     "answer_type_ok": "yes",
+     "measurable": "yes",
+     "comment": "Table 4, BSPM-EM, Gowalla Recall column."
+    },
+    {
+     "question_id": "gowalla_bspm_em_ndcg20",
+     "in_scope": "yes",
+     "locator_ok": "yes",
+     "underspecified": [
+      "none"
+     ],
+     "answer_type_ok": "yes",
+     "measurable": "yes",
+     "comment": "Table 4, BSPM-EM, Gowalla NDCG column."
+    }
+   ],
+   "missing_questions": []
+  },
+  "haiku55": {
+   "items": [
+    {
+     "question_id": "gowalla_bspm_em_recall20",
+     "in_scope": "yes",
+     "locator_ok": "yes",
+     "underspecified": [
+      "none"
+     ],
+     "answer_type_ok": "yes",
+     "measurable": "yes",
+     "comment": "Table 4 gives BSPM-EM Gowalla Recall = 0.1920. The setting matches the paper's Gowalla best config (Ts=2.5, k=1.0, beta=0.2, RK4 sharpening) and the README Gowalla command (final_sharpening=True means EM). The CPU command is available, so no GPU requirement."
+    },
+    {
+     "question_id": "gowalla_bspm_em_ndcg20",
+     "in_scope": "yes",
+     "locator_ok": "yes",
+     "underspecified": [
+      "none"
+     ],
+     "answer_type_ok": "yes",
+     "measurable": "yes",
+     "comment": "Table 4 gives BSPM-EM Gowalla NDCG = 0.1597. The setting matches the same config as the Recall item. No training is required, so this is a direct inference run."
+    }
+   ],
+   "missing_questions": []
+  }
+ },
+ "accepted": [
+  "gowalla_bspm_em_recall20",
+  "gowalla_bspm_em_ndcg20"
+ ],
+ "queue": [],
+ "notes": [],
+ "cost_usd": 0.1598
+}

@@ -1,0 +1,42 @@
+# CORE-Bench v1.1 task as a ReproSpec: what agents see. No answers.
+id: cb-9832712
+title: Reproducible research practices and transparency across linguistics
+objective: 'Test the computational reproducibility of a scientific capsule (CORE-Bench,
+  Hard level): run its code and answer the questions from the output.'
+task_prompt: 'Create the following three directories in the results folder: 01_scopus-selection,
+  02_coding, 03_analyses. Run ''master_script.R'' using Rscript.'
+language: R
+paper: null
+code:
+  repo_url: null
+  capsule: capsule-9832712
+questions:
+- id: q1
+  text: fig From Figure 2 in the cleaned results, report the percentage of 'Not Available'
+    analysis scripts for Pre-RC (2008-09)
+  answer_type: any
+  metric: ''
+  direction: ''
+  unit: ''
+  locator: program output
+  setting: ''
+  runs: 1
+  evidence: either
+- id: q2
+  text: fig From Table 1 in the cleaned results, report the number of Included Articles
+    After.OS
+  answer_type: any
+  metric: ''
+  direction: ''
+  unit: ''
+  locator: program output
+  setting: ''
+  runs: 1
+  evidence: either
+origin:
+  source: corebench
+  reference: core-bench-v1.1-mainline core_test.json sha256:d4aa5ebb984df7f293e04f2dd120722f172fddea6fcb54a0c928e09bc6ef837d
+  prompt: ''
+  drafted_by: []
+  checked_by: []
+  user_confirmed: false

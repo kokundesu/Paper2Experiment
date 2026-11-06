@@ -1,0 +1,80 @@
+# Hidden ground truth from the paper (GT stage). Tolerances follow after the reference re-runs.
+id: ials
+extractors:
+- haiku55
+- luna
+values:
+  ml1m_ncf_ials_hr10:
+    paper_value: 0.73
+    printed: '0.730'
+    precision: 3
+    quote: iALS 0.730 0.453 0.892 0.577 our result
+    page: 14
+    reported_spread: null
+    spread_kind: none
+    spread_over: none
+    n_runs: 10
+    status: agreed
+    votes:
+      haiku55:
+        value: 0.73
+        verified: true
+        why: ''
+        printed: '0.730'
+        quote: iALS 0.730 0.453 0.892 0.577 our result
+        page: 14
+        spread: null
+        spread_kind: none
+        spread_over: none
+        n_runs: 10
+        note: Table 5 row 'iALS' with 'our result'; ML1M HR@10 column. Paper says
+          results are the mean over 10 repetitions, but no ± spread is printed.
+      luna:
+        value: 0.73
+        verified: true
+        why: ''
+        printed: '0.730'
+        quote: iALS 0.730 0.453 0.892 0.577 our result
+        page: 14
+        spread: null
+        spread_kind: none
+        spread_over: none
+        n_runs: 10
+        note: Table 5 reports the mean over 10 repetitions; no ± spread is printed.
+  ml1m_ncf_ials_ndcg10:
+    paper_value: 0.453
+    printed: '0.453'
+    precision: 3
+    quote: iALS 0.730 0.453 0.892 0.577 our result
+    page: 14
+    reported_spread: null
+    spread_kind: none
+    spread_over: none
+    n_runs: 10
+    status: agreed
+    votes:
+      haiku55:
+        value: 0.453
+        verified: true
+        why: ''
+        printed: '0.453'
+        quote: iALS 0.730 0.453 0.892 0.577 our result
+        page: 14
+        spread: null
+        spread_kind: none
+        spread_over: none
+        n_runs: 10
+        note: Table 5 row 'iALS' with 'our result'; ML1M NDCG@10 column (second number
+          of the ML1M pair). Mean over 10 runs per the text; no spread printed.
+      luna:
+        value: 0.453
+        verified: true
+        why: ''
+        printed: '0.453'
+        quote: iALS 0.730 0.453 0.892 0.577 our result
+        page: 14
+        spread: null
+        spread_kind: none
+        spread_over: none
+        n_runs: 10
+        note: Table 5 reports the mean over 10 repetitions; no ± spread is printed.

@@ -1,0 +1,86 @@
+# Hidden ground truth from the paper (GT stage). Tolerances follow after the reference re-runs.
+id: svgd
+extractors:
+- haiku55
+- luna
+values:
+  boston_bnn_svgd_test_rmse:
+    paper_value: 2.957
+    printed: '2.957'
+    precision: 3
+    quote: Boston 2.977 ± 0.093 2 .957 ± 0.099
+    page: 8
+    reported_spread: 0.099
+    spread_kind: unknown
+    spread_over: runs
+    n_runs: 20
+    status: agreed
+    votes:
+      haiku55:
+        value: 2.957
+        verified: true
+        why: ''
+        printed: '2.957'
+        quote: Boston 2.977 ± 0.093 2 .957 ± 0.099
+        page: 8
+        spread: 0.099
+        spread_kind: unknown
+        spread_over: runs
+        n_runs: 20
+        note: Boston row of the BNN table (PBP vs Our Method). The table text is garbled/duplicated
+          in extraction; the Our Method RMSE is 2.957 ± 0.099. Spread type is not
+          stated; the text says results are averaged over 20 random trials.
+      luna:
+        value: 2.957
+        verified: true
+        why: ''
+        printed: '2.957'
+        quote: Boston 2.977 ± 0.093 2 .957 ± 0.0992.957 ± 0.0992.957 ± 0.099
+        page: 8
+        spread: 0.099
+        spread_kind: unknown
+        spread_over: runs
+        n_runs: 20
+        note: The Boston Our Method value is 2.957 ± 0.099; the paper says results
+          are averaged over 20 random trials but does not specify the meaning of the
+          ± spread.
+  boston_bnn_svgd_test_log_likelihood:
+    paper_value: -2.504
+    printed: '-2.504'
+    precision: 3
+    quote: −2.579 ± 0.052 −2.504 ± 0.029−2.504 ± 0.029−2.504 ± 0.029
+    page: 8
+    reported_spread: 0.029
+    spread_kind: unknown
+    spread_over: runs
+    n_runs: 20
+    status: agreed_partial
+    votes:
+      haiku55:
+        value: -2.504
+        verified: false
+        why: quote not found in the paper text
+        printed: null
+        quote: Boston 2.977 ± 0.093 2 .957 ± 0.099 −2.579 ± 0.052 −2.504 ± 0.029
+        page: 8
+        spread: 0.029
+        spread_kind: unknown
+        spread_over: runs
+        n_runs: 20
+        note: Boston row, Avg. Test LL column, Our Method = −2.504 ± 0.029 (PBP =
+          −2.579 ± 0.052). Spread type not stated; averaged over 20 random trials
+          per the text.
+      luna:
+        value: -2.504
+        verified: true
+        why: ''
+        printed: '-2.504'
+        quote: −2.579 ± 0.052 −2.504 ± 0.029−2.504 ± 0.029−2.504 ± 0.029
+        page: 8
+        spread: 0.029
+        spread_kind: unknown
+        spread_over: runs
+        n_runs: 20
+        note: The Boston Our Method value is −2.504 ± 0.029; the paper says results
+          are averaged over 20 random trials but does not specify the meaning of the
+          ± spread.

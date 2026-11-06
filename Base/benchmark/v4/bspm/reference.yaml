@@ -1,0 +1,56 @@
+# Reference recipe (hidden; written by the benchmark builder).
+id: bspm
+status: validated
+repo: https://github.com/jeongwhanchoi/BSPM
+commit: c5cdcfa1d6651848f09f022d96a690082f9d61d9
+files:
+  patches/sparsesvd_setup.py: "# sparsesvd 0.2.2 predates Python 3: drop ez_setup\
+    \ and numpy.distutils from its setup.py (code unchanged).\nimport pathlib, sys\n\
+    p = pathlib.Path(sys.argv[1])\ns = p.read_text()\ns = s.replace(\"        import\
+    \ ez_setup\\n\", \"\").replace(\"        ez_setup.use_setuptools()\\n\", \"\"\
+    )\ns = s.replace(\"        from numpy.distutils.misc_util import get_numpy_include_dirs\\\
+    n\", \"        import numpy\\n\")\ns = s.replace(\"include_dirs=get_numpy_include_dirs()\"\
+    , \"include_dirs=[numpy.get_include()]\")\ns = s.replace(\"\"\"    if '--help'\
+    \ in sys.argv[1:] or \\\\\n      sys.argv[1] in ('--help-commands', 'egg_info',\
+    \ '--version'):\n        pass\n    else:\"\"\", \"    if True:\")\np.write_text(s)\n"
+  patches/cuda_timing.py: "# Timing-only CUDA calls in Procedure.Test break on a CPU;\
+    \ replace them with wall-clock timing (results unchanged).\nimport pathlib, sys\n\
+    p = pathlib.Path(sys.argv[1])\ns = p.read_text()\nfor old, new in [\n    (\"starter,\
+    \ ender = torch.cuda.Event(enable_timing=True),   torch.cuda.Event(enable_timing=True)\"\
+    , \"_t0 = time.time()\"),\n    (\"starter.record()\", \"pass\"), (\"ender.record()\"\
+    , \"pass\"), (\"torch.cuda.synchronize()\", \"pass\"),\n    (\"curr_time = starter.elapsed_time(ender)/1000\"\
+    , \"curr_time = time.time() - _t0\")]:\n    assert old in s, old\n    s = s.replace(old,\
+    \ new)\np.write_text(s)\nprint(\"patched\", p)\n"
+setup:
+- git clone -q https://github.com/jeongwhanchoi/BSPM repo && git -C repo checkout
+  -q c5cdcfa1d6651848f09f022d96a690082f9d61d9
+- uv venv -q --python 3.10 .venv
+- uv pip install -q -p .venv numpy==1.26.4 scipy==1.14.1 pandas==2.3.3 scikit-learn==1.7.2
+  torch==2.14.1 torchdiffeq==0.2.5 cppimport==26.4.17 cython==3.3.0 tensorboard==2.21.0
+  setuptools==84.0.0
+- curl -sSL -o sparsesvd-0.2.2.tar.gz https://files.pythonhosted.org/packages/source/s/sparsesvd/sparsesvd-0.2.2.tar.gz
+  && tar xzf sparsesvd-0.2.2.tar.gz && .venv/bin/python patches/sparsesvd_setup.py
+  sparsesvd-0.2.2/setup.py && uv pip install -q -p .venv --no-build-isolation ./sparsesvd-0.2.2
+- .venv/bin/python patches/cuda_timing.py repo/bspm/Procedure.py
+command: cd repo/bspm && ../../.venv/bin/python main.py --dataset="gowalla" --topks="[20]"
+  --simple_model="bspm" --solver_shr="rk4" --K_s=1 --T_s=2.5 --final_sharpening=True
+  --idl_beta=0.2 --factor_dim=448
+timeout_s: 1800
+seeded: false
+metrics:
+  gowalla_bspm_em_recall20:
+    regex: '''recall'': array\(\[([0-9.]+)\]\)'
+    scale: 1.0
+  gowalla_bspm_em_ndcg20:
+    regex: '''ndcg'': array\(\[([0-9.]+)\]\)'
+    scale: 1.0
+entry: README 里的 CPU 命令（`bspm/main.py --dataset gowalla ...`）
+notes:
+- 'difficulty: 易; estimated time per run: 1–3 分钟'
+- 'risk: 方法完全确定性；`sparsesvd` C 扩展要在 arm64 上编译'
+- 'questions: gowalla_bspm_em_recall20, gowalla_bspm_em_ndcg20'
+- README CPU command (bspm, not bspm-torch); deterministic, so the 5 runs vary only
+  threads
+- 'patches: sparsesvd setup.py for Python 3; Procedure.Test CUDA timing -> wall clock'
+- 'one validation run by the builder: 3.8 min'
+evidence_pattern: '(?i)training time for bspm|>>SEED:'

@@ -1,0 +1,85 @@
+# Reference re-runs of the official code (hidden).
+id: bspm
+recipe_status: draft
+commit: c5cdcfa1d6651848f09f022d96a690082f9d61d9
+run_dir: /Users/allenhuw/Documents/Projects/Paper2Exp/Base/runs/reference/20261017-095037_bspm
+n: 5
+setup_logs:
+- cmd_001_setup.log
+- cmd_002_setup.log
+- cmd_003_setup.log
+- cmd_004_setup.log
+- cmd_005_setup.log
+runs:
+- i: 0
+  seed: null
+  threads: default
+  exit: 0
+  wall_s: 388.7
+  log: cmd_006_ref_0.log
+  values:
+    gowalla_bspm_em_recall20: 0.19207311
+    gowalla_bspm_em_ndcg20: 0.15972039
+- i: 1
+  seed: null
+  threads: '1'
+  exit: 0
+  wall_s: 348.8
+  log: cmd_007_ref_1.log
+  values:
+    gowalla_bspm_em_recall20: 0.19207311
+    gowalla_bspm_em_ndcg20: 0.15972039
+- i: 2
+  seed: null
+  threads: default
+  exit: 0
+  wall_s: 393.1
+  log: cmd_008_ref_2.log
+  values:
+    gowalla_bspm_em_recall20: 0.19207311
+    gowalla_bspm_em_ndcg20: 0.15972039
+- i: 3
+  seed: null
+  threads: '1'
+  exit: 0
+  wall_s: 931.9
+  log: cmd_009_ref_3.log
+  values:
+    gowalla_bspm_em_recall20: 0.19207311
+    gowalla_bspm_em_ndcg20: 0.15972039
+- i: 4
+  seed: null
+  threads: default
+  exit: 0
+  wall_s: 349.6
+  log: cmd_010_ref_4.log
+  values:
+    gowalla_bspm_em_recall20: 0.19207311
+    gowalla_bspm_em_ndcg20: 0.15972039
+values:
+  gowalla_bspm_em_recall20:
+  - 0.19207311
+  - 0.19207311
+  - 0.19207311
+  - 0.19207311
+  - 0.19207311
+  gowalla_bspm_em_ndcg20:
+  - 0.15972039
+  - 0.15972039
+  - 0.15972039
+  - 0.15972039
+  - 0.15972039
+printed_places:
+  gowalla_bspm_em_recall20: 8
+  gowalla_bspm_em_ndcg20: 8
+manifest:
+  cmd_001_setup.log: 3a2832fd74020b6402ef1ab75d05611504c551e5e75d5c4bad9748e0bddb6200
+  cmd_002_setup.log: 67735b26852ba3dd7216625c165805a17f243bf93412e46d0a8a9d591136da59
+  cmd_003_setup.log: 3ce68ee19bea8e44eb60d0bd131516421fbb90097e336626975ac957cd0a4894
+  cmd_004_setup.log: e535a34ab5698ebfc7bb34abbbfc9a443ce730fa216ab18b14290c62a1db6edd
+  cmd_005_setup.log: 7c512b993e1b758524080541ff3c03fff662352404df0c9b520b033bee74c187
+  cmd_006_ref_0.log: 6146da09d9e2ffae466c5c9c2818c51cf2176bcbd8feaba0781f91a39b13e98a
+  cmd_007_ref_1.log: 479edb21b17120be673c29156455944dddd23d0cce86fa0700abad7d662a6e4c
+  cmd_008_ref_2.log: 47e5d6765fac5a58b18a0e9a6f968e3250e4804b965bb555f1b132bd58213c41
+  cmd_009_ref_3.log: 3a1f603d48e3fae3bd12b660e640ffc88bf905a66f0b67c50f445134b2c261d8
+  cmd_010_ref_4.log: a5f8114bca1a955bb0e2c736a8b92eb23348f285498a87de49dc013c370a0846

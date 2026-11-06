@@ -1,0 +1,12 @@
+# Task given to every workflow. Contains no target values.
+id: dgi
+paper_url: https://arxiv.org/pdf/1809.10341
+paper_pdf: paper/1809.10341.pdf
+repo_url: https://github.com/PetarV-/DGI
+objective: >
+  Reproduce the DGI result on Cora from Table 2 (transductive node classification:
+  test accuracy of a logistic regression trained on the frozen, unsupervised DGI
+  embeddings) using the official code and the paper's experimental setup.
+claims:
+  - {id: cora_acc, metric: test_accuracy, setting: "Table 2, transductive, DGI (ours), Cora", unit: "%", description: "Test accuracy on Cora of logistic regression on DGI embeddings"}
+seeds: 3

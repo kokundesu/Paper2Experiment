@@ -1,0 +1,14 @@
+# Hidden: pre-registered tolerances, computed from the 3 manual re-runs.
+capsule_id: capsule-9477017
+source: core-bench-v1.1-mainline core_test.json
+split: test
+data_sha256: d4aa5ebb984df7f293e04f2dd120722f172fddea6fcb54a0c928e09bc6ef837d
+rule: docs/benchmark-redesign.md section 3.3
+questions:
+- id: q1
+  question: fig Pearson correlation coefficients between the estimated proportions
+    of different cell types were calculated, what is the highest pearson correlation
+    related to? Give response in a list of strings
+  vision: true
+  kind: list
+  scored: true

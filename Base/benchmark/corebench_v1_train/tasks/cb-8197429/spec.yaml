@@ -1,0 +1,42 @@
+# CORE-Bench v1.1 task as a ReproSpec: what agents see. No answers.
+id: cb-8197429
+title: Low-Latency Live Video Streaming over a Low-Earth-Orbit Satellite Network with
+  DASH
+objective: 'Test the computational reproducibility of a scientific capsule (CORE-Bench,
+  Hard level): run its code and answer the questions from the output.'
+task_prompt: Run 'plot.sh'.
+language: Python
+paper: null
+code:
+  repo_url: null
+  capsule: capsule-8197429
+questions:
+- id: q1
+  text: fig From the figure measuring average bitrate (Kbps) over the Starlink network,
+    report the name of the model with the highest average bitrate for 5 seconds of
+    latency.
+  answer_type: any
+  metric: ''
+  direction: ''
+  unit: ''
+  locator: program output
+  setting: ''
+  runs: 1
+  evidence: either
+- id: q2
+  text: fig From the figure measuring average RTT without ISL, report the x-axis label.
+  answer_type: any
+  metric: ''
+  direction: ''
+  unit: ''
+  locator: program output
+  setting: ''
+  runs: 1
+  evidence: either
+origin:
+  source: corebench
+  reference: core-bench (original) core_train.json sha256:3df47f1b3fa1cb60045018eb1a0f1ad4ecf6a53f72318c845a879ce0313b0730
+  prompt: ''
+  drafted_by: []
+  checked_by: []
+  user_confirmed: false

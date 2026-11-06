@@ -1,0 +1,40 @@
+# Hidden: targets are the reference re-runs' means, tolerances their h.
+id: v4-itransformer
+rubric:
+  min_seeds: 3
+  aggregate: mean
+claims:
+- id: exchange_96_96_mse
+  metric: MSE
+  setting: 附录 F.4 表 10（Full results of the long-term forecasting task），Exchange 数据集分组、预测长度
+    96 行、iTransformer (Ours) 的 MSE 列
+  unit: ''
+  value: 0.08720105439424515
+  tolerance:
+    abs: 0.001491917113456226
+  target: reference
+  paper_value: 0.086
+  evidence_pattern: (?i:epoch:\s*\d+,\s*steps:\s*\d+\s*\|\s*train loss)|(?i:\b(?:seeds?|splits?|trials?|folds?|iter(?:ation)?s?|epochs?|steps?|runs?)\b\W{0,3}\d+)
+  ref_spread: 0.0007359119749351309
+  run_definition: one complete run of the experiment with one seed; the three runs
+    use different seeds, and the seed must change what the code does
+  diagnostic_only: false
+- id: exchange_96_96_mae
+  metric: MAE
+  setting: 附录 F.4 表 10（Full results of the long-term forecasting task），Exchange 数据集分组、预测长度
+    96 行、iTransformer (Ours) 的 MAE 列
+  unit: ''
+  value: 0.2074086457490921
+  tolerance:
+    abs: 0.0018895758193860318
+  target: reference
+  paper_value: 0.206
+  evidence_pattern: (?i:epoch:\s*\d+,\s*steps:\s*\d+\s*\|\s*train loss)|(?i:\b(?:seeds?|splits?|trials?|folds?|iter(?:ation)?s?|epochs?|steps?|runs?)\b\W{0,3}\d+)
+  ref_spread: 0.0009320634909888665
+  run_definition: one complete run of the experiment with one seed; the three runs
+    use different seeds, and the seed must change what the code does
+  diagnostic_only: false
+discrepancies: []
+source:
+  spec: benchmark/v4/itransformer
+  split: dev

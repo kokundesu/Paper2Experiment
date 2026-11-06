@@ -1,0 +1,171 @@
+diff --git a/appendix/continuous_time_inference (Burgers)/Burgers.py b/appendix/continuous_time_inference (Burgers)/Burgers.py
+old mode 100755
+new mode 100644
+index 005be1f..088e211
+--- a/appendix/continuous_time_inference (Burgers)/Burgers.py	
++++ b/appendix/continuous_time_inference (Burgers)/Burgers.py	
+@@ -5,20 +5,62 @@
+ import sys
+ sys.path.insert(0, '../../Utilities/')
+ 
+-import tensorflow as tf
++import os
++import tensorflow.compat.v1 as tf  # PATCH: TF1 API on TF 2.x
++tf.disable_v2_behavior()
+ import numpy as np
++import scipy.optimize  # PATCH: replaces tf.contrib.opt.ScipyOptimizerInterface
+ import matplotlib.pyplot as plt
+ import scipy.io
+ from scipy.interpolate import griddata
+ from pyDOE import lhs
+-from plotting import newfig, savefig
++# from plotting import newfig, savefig  # PATCH: plotting disabled (plotting.py rcParams fail on matplotlib >= 3.x)
+ from mpl_toolkits.mplot3d import Axes3D
+ import time
+ import matplotlib.gridspec as gridspec
+ from mpl_toolkits.axes_grid1 import make_axes_locatable
+ 
+-np.random.seed(1234)
+-tf.set_random_seed(1234)
++SEED = int(os.environ.get('SEED', 1234))  # PATCH: seed configurable (original: 1234)
++np.random.seed(SEED)
++tf.set_random_seed(SEED)
++
++
++class ScipyOptimizerInterface:
++    """PATCH: drop-in replacement for tf.contrib.opt.ScipyOptimizerInterface (removed in TF2).
++    Same mechanics: pack all trainable variables into one float64 vector, let
++    scipy.optimize.minimize(method='L-BFGS-B', jac=True) drive the graph's loss
++    and gradients, write the final vector back into the variables."""
++    def __init__(self, loss, method='L-BFGS-B', options=None):
++        self.loss = loss
++        self.method = method
++        self.options = options or {}
++        self.vars = tf.trainable_variables()
++        self.shapes = [v.shape.as_list() for v in self.vars]
++        self.sizes = [int(np.prod(s)) for s in self.shapes]
++        grads = tf.gradients(loss, self.vars)
++        self.packed_grad = tf.concat([tf.reshape(g, [-1]) for g in grads], 0)
++        self.packed_var = tf.concat([tf.reshape(v, [-1]) for v in self.vars], 0)
++        self.phs = [tf.placeholder(v.dtype.base_dtype, shape=s) for v, s in zip(self.vars, self.shapes)]
++        self.assign_op = tf.group(*[v.assign(p) for v, p in zip(self.vars, self.phs)])
++        self.result = None
++
++    def _assign(self, sess, x):
++        offs = np.cumsum([0] + self.sizes)
++        sess.run(self.assign_op, {p: x[offs[i]:offs[i+1]].reshape(self.shapes[i])
++                                  for i, p in enumerate(self.phs)})
++
++    def minimize(self, sess, feed_dict=None, fetches=None, loss_callback=None):
++        fetches = fetches or []
++        def fun(x):
++            self._assign(sess, x)
++            out = sess.run([self.loss, self.packed_grad] + fetches, feed_dict)
++            if loss_callback is not None:
++                loss_callback(*out[2:])
++            return np.float64(out[0]), out[1].astype('float64')
++        x0 = sess.run(self.packed_var).astype('float64')
++        self.result = scipy.optimize.minimize(fun, x0, jac=True, method=self.method, options=self.options)
++        self._assign(sess, self.result.x)
++        return self.result
+ 
+ class PhysicsInformedNN:
+     # Initialize the class
+@@ -43,7 +85,7 @@ class PhysicsInformedNN:
+         
+         # tf placeholders and graph
+         self.sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True,
+-                                                     log_device_placement=True))
++                                                     log_device_placement=False))
+         
+         self.x_u_tf = tf.placeholder(tf.float32, shape=[None, self.x_u.shape[1]])
+         self.t_u_tf = tf.placeholder(tf.float32, shape=[None, self.t_u.shape[1]])        
+@@ -59,13 +101,13 @@ class PhysicsInformedNN:
+                     tf.reduce_mean(tf.square(self.f_pred))
+                
+                 
+-        self.optimizer = tf.contrib.opt.ScipyOptimizerInterface(self.loss, 
++        self.optimizer = ScipyOptimizerInterface(self.loss, 
+                                                                 method = 'L-BFGS-B', 
+-                                                                options = {'maxiter': 50000,
+-                                                                           'maxfun': 50000,
++                                                                options = {'maxiter': MAXITER,  # PATCH: env-configurable, default 50000 as original
++                                                                           'maxfun': MAXITER,
+                                                                            'maxcor': 50,
+                                                                            'maxls': 50,
+-                                                                           'ftol' : 1.0 * np.finfo(float).eps})
++                                                                           'ftol' : float(os.environ.get('FTOL', 1.0 * np.finfo(float).eps))})  # PATCH: env override for diagnostics only
+         
+         init = tf.global_variables_initializer()
+         self.sess.run(init)
+@@ -115,14 +157,17 @@ class PhysicsInformedNN:
+         return f
+     
+     def callback(self, loss):
+-        print('Loss:', loss)
++        # PATCH: print every 1000th evaluation only (original printed every evaluation)
++        self.n_eval = getattr(self, 'n_eval', 0) + 1
++        if self.n_eval % 1000 == 0:
++            print('Eval %d Loss: %.3e' % (self.n_eval, loss), flush=True)
+         
+     def train(self):
+         
+         tf_dict = {self.x_u_tf: self.x_u, self.t_u_tf: self.t_u, self.u_tf: self.u,
+                    self.x_f_tf: self.x_f, self.t_f_tf: self.t_f}
+                                                                                                                           
+-        self.optimizer.minimize(self.sess, 
++        return self.optimizer.minimize(self.sess, 
+                                 feed_dict = tf_dict,         
+                                 fetches = [self.loss], 
+                                 loss_callback = self.callback)        
+@@ -135,14 +180,19 @@ class PhysicsInformedNN:
+                
+         return u_star, f_star
+     
++MAXITER = int(os.environ.get('MAXITER', 50000))  # PATCH
++
+ if __name__ == "__main__": 
+      
+     nu = 0.01/np.pi
+     noise = 0.0        
+ 
+-    N_u = 100
+-    N_f = 10000
+-    layers = [2, 20, 20, 20, 20, 20, 20, 20, 20, 1]
++    # PATCH: env-configurable for table cells; defaults are the original values
++    N_u = int(os.environ.get('N_U', 100))
++    N_f = int(os.environ.get('N_F', 10000))
++    n_hidden = int(os.environ.get('LAYERS', 8))
++    n_neurons = int(os.environ.get('NEURONS', 20))
++    layers = [2] + [n_neurons]*n_hidden + [1]   # default: [2, 20, 20, 20, 20, 20, 20, 20, 20, 1]
+     
+     data = scipy.io.loadmat('../Data/burgers_shock.mat')
+     
+@@ -178,7 +228,7 @@ if __name__ == "__main__":
+     model = PhysicsInformedNN(X_u_train, u_train, X_f_train, layers, lb, ub, nu)
+     
+     start_time = time.time()                
+-    model.train()
++    res = model.train()
+     elapsed = time.time() - start_time                
+     print('Training time: %.4f' % (elapsed))
+     
+@@ -186,6 +236,18 @@ if __name__ == "__main__":
+             
+     error_u = np.linalg.norm(u_star-u_pred,2)/np.linalg.norm(u_star,2)
+     print('Error u: %e' % (error_u))                     
++    # PATCH: machine-readable summary + optional CSV append
++    print('Optimizer: nit=%d nfev=%d status=%d msg=%s final_loss=%.3e' % (res.nit, res.nfev, res.status, res.message, res.fun))
++    csv = os.environ.get('RESULTS_CSV')
++    if csv:
++        new = not os.path.exists(csv)
++        with open(csv, 'a') as fh:
++            if new:
++                fh.write('N_u,N_f,layers,neurons,seed,maxiter,error_u,final_loss,nit,nfev,status,train_time_s\n')
++            fh.write('%d,%d,%d,%d,%d,%d,%.6e,%.6e,%d,%d,%d,%.1f\n' % (N_u, N_f, n_hidden, n_neurons, SEED, MAXITER,
++                     error_u, res.fun, res.nit, res.nfev, res.status, elapsed))
++    if os.environ.get('PLOT', '0') != '1':  # PATCH: plotting disabled by default
++        sys.exit(0)
+ 
+     
+     U_pred = griddata(X_star, u_pred.flatten(), (X, T), method='cubic')

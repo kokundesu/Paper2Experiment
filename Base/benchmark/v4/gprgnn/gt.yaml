@@ -1,0 +1,50 @@
+# Hidden ground truth from the paper (GT stage). Tolerances follow after the reference re-runs.
+id: gprgnn
+extractors:
+- haiku55
+- luna
+values:
+  chameleon_gprgnn_dense_mean_accuracy:
+    paper_value: 67.48
+    printed: '67.48'
+    precision: 2
+    quote: GPRGNN 79.51±0.36 67.63±0.38 85.07±0.09 82.90±0.37 91.93±0.26 67.48±0.40
+      39.30±0.27 49.93±0.53 92.92±0.61 91.36±0.70
+    page: 8
+    reported_spread: 0.4
+    spread_kind: ci
+    spread_over: runs
+    n_runs: 100
+    status: agreed
+    votes:
+      haiku55:
+        value: 67.48
+        verified: true
+        why: ''
+        printed: '67.48'
+        quote: GPRGNN 79.51±0.36 67.63±0.38 85.07±0.09 82.90±0.37 91.93±0.26 67.48±0.40
+          39.30±0.27 49.93±0.53 92.92±0.61 91.36±0.70
+        page: 8
+        spread: 0.4
+        spread_kind: ci
+        spread_over: runs
+        n_runs: 100
+        note: 'Table 2, GPRGNN row, Chameleon column: 67.48±0.40 (mean accuracy %,
+          ±95% confidence interval). Heterophilic datasets use dense 60/20/20 split.
+          Paper states each experiment is run 100 times. The ±0.40 is a 95% CI, not
+          std.'
+      luna:
+        value: 67.48
+        verified: true
+        why: ''
+        printed: '67.48'
+        quote: GPRGNN 79.51±0.36 67.63±0.38 85.07±0.09 82.90±0.37 91.93±0.26 67.48±0.40
+          39.30±0.27 49.93±0.53 92.92±0.61 91.36±0.70
+        page: 8
+        spread: 0.4
+        spread_kind: ci
+        spread_over: runs
+        n_runs: 100
+        note: Table 2 reports the mean accuracy in percent; the ±0.40 is a 95% confidence
+          interval. The paper states that each experiment is run 100 times with multiple
+          random splits and different initializations.

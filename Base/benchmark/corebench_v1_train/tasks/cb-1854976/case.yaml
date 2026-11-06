@@ -1,0 +1,52 @@
+# Hidden: pre-registered tolerances, computed from the 3 manual re-runs.
+capsule_id: capsule-1854976
+source: core-bench (original) core_train.json
+split: dev
+data_sha256: 3df47f1b3fa1cb60045018eb1a0f1ad4ecf6a53f72318c845a879ce0313b0730
+rule: docs/benchmark-redesign.md section 3.3
+questions:
+- id: q1
+  question: Report the final sensitivity (Sen1) after the ten different verifications.
+  vision: false
+  kind: numeric
+  scored: true
+  tolerance:
+    mean: 75.23
+    s: 0.0
+    n: 3
+    m: 1
+    noise: 0.0
+    precision: 0.005
+    floor: 0.0007523000000000001
+    h: 0.005
+    term: precision
+- id: q2
+  question: Report the final specificity (Spe1) after the ten different verifications.
+  vision: false
+  kind: numeric
+  scored: true
+  tolerance:
+    mean: 70.82
+    s: 0.0
+    n: 3
+    m: 1
+    noise: 0.0
+    precision: 0.005
+    floor: 0.0007082
+    h: 0.005
+    term: precision
+- id: q3
+  question: Report the final quality index (QI) after the ten different verifications.
+  vision: false
+  kind: numeric
+  scored: true
+  tolerance:
+    mean: 72.29
+    s: 0.0
+    n: 3
+    m: 1
+    noise: 0.0
+    precision: 0.005
+    floor: 0.0007229000000000002
+    h: 0.005
+    term: precision

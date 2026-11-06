@@ -1,0 +1,50 @@
+# ReproSpec (agent-visible, no values). FROZEN: see ../FROZEN.yaml.
+id: fairbatch
+title: ''
+objective: 复现 FairBatch（ICLR 2021）在合成数据上用逻辑回归、equal opportunity 公平性下的 accuracy 和 EO
+  disparity（表 1）。
+task_prompt: ''
+language: Python
+paper:
+  url: https://arxiv.org/abs/2012.01696
+  pdf: null
+code:
+  repo_url: https://github.com/yuji-roh/fairbatch
+  capsule: null
+questions:
+- id: synthetic_fairbatch_eo_accuracy
+  text: 论文表 1 中，合成数据集上采用 FairBatch、逻辑回归模型并以 equal opportunity 为公平性目标时，测试集 accuracy
+    的跨次实验平均值是多少？
+  answer_type: number
+  metric: Test accuracy
+  direction: higher
+  unit: ''
+  locator: Table 1, FairBatch row, Synthetic group, Acc. column
+  setting: Synthetic dataset; logistic regression trained with FairBatch for equal
+    opportunity; separate test set
+  runs: 3
+  evidence: log
+- id: synthetic_fairbatch_eo_disparity
+  text: 论文表 1 中，合成数据集上采用 FairBatch、逻辑回归模型并以 equal opportunity 为公平性目标时，测试集 EO disparity
+    的跨次实验平均值是多少？
+  answer_type: number
+  metric: EO disparity = max over sensitive groups z of |Pr(predicted positive | z,
+    true positive) − Pr(predicted positive | true positive)|
+  direction: lower
+  unit: ''
+  locator: Table 1, FairBatch row, Synthetic group, EO Disp. column
+  setting: Synthetic dataset; logistic regression trained with FairBatch for equal
+    opportunity; separate test set
+  runs: 3
+  evidence: log
+origin:
+  source: user
+  reference: ''
+  prompt: 复现 FairBatch（ICLR 2021）在合成数据上用逻辑回归、equal opportunity 公平性下的 accuracy 和 EO
+    disparity（表 1）。
+  drafted_by:
+  - sol
+  checked_by:
+  - sonnet55
+  - haiku55
+  user_confirmed: true

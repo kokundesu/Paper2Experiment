@@ -1,0 +1,27 @@
+Args in experiment:
+Namespace(is_training=1, model_id='ETTh1_360_96', model='FITS', data='ETTh1', root_path='./dataset/', data_path='ETTh1.csv', features='M', target='OT', freq='h', checkpoints='./checkpoints/', seq_len=360, label_len=48, pred_len=96, individual=False, embed_type=0, enc_in=7, dec_in=7, c_out=7, d_model=512, n_heads=8, e_layers=2, d_layers=1, d_ff=2048, moving_avg=25, factor=1, distil=True, dropout=0.05, embed='timeF', activation='gelu', output_attention=False, do_predict=False, ab=2, hidden_size=1, kernel=5, groups=1, levels=3, stacks=1, num_workers=10, itr=1, train_epochs=50, batch_size=128, patience=20, learning_rate=0.0005, des='Exp', loss='mse', lradj='type3', use_amp=False, use_gpu=False, gpu=0, use_multi_gpu=False, devices='0,1,2,3', test_flop=False, aug_method='NA', aug_rate=0.5, in_batch_augmentation=False, in_dataset_augmentation=False, data_size=1, aug_data_size=1, seed=514, testset_div=2, test_time_train=False, train_mode=1, cut_freq=106, base_T=24, H_order=6)
+Use CPU
+>>>>>>>start training : ETTh1_360_96_FITS_ETTh1_ftM_sl360_ll48_pl96_H6_0>>>>>>>>>>>>>>>>>>>>>>>>>>
+train 8185
+val 2785
+test 2785
+Model(
+  (freq_upsampler): Linear(in_features=106, out_features=134, bias=True)
+)
+[INFO] Register count_linear() for <class 'torch.nn.modules.linear.Linear'>.
+FLOPs:  12726784.0
+params:  14338.0
+Trainable parameters:  14338
+Traceback (most recent call last):
+  File "/Users/allenhuw/Documents/Projects/Paper2Experiment/benchmark/fits/manual/FITS/run_longExp_F.py", line 157, in <module>
+    exp.train(setting, ft=True) # train on y
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/allenhuw/Documents/Projects/Paper2Experiment/benchmark/fits/manual/FITS/exp/exp_main_F.py", line 122, in train
+    early_stopping = EarlyStopping(patience=self.args.patience, verbose=True)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/allenhuw/Documents/Projects/Paper2Experiment/benchmark/fits/manual/FITS/utils/tools.py", line 42, in __init__
+    self.val_loss_min = np.Inf
+                        ^^^^^^
+  File "/Users/allenhuw/Documents/Projects/Paper2Experiment/envs/fits/lib/python3.11/site-packages/numpy/__init__.py", line 778, in __getattr__
+    raise AttributeError(
+AttributeError: `np.Inf` was removed in the NumPy 2.0 release. Use `np.inf` instead.

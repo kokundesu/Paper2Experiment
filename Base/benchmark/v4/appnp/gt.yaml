@@ -1,0 +1,48 @@
+# Hidden ground truth from the paper (GT stage). Tolerances follow after the reference re-runs.
+id: appnp
+extractors:
+- haiku55
+- luna
+values:
+  appnp_ms_academic_accuracy:
+    paper_value: 93.27
+    printed: '93.27'
+    precision: 2
+    quote: APPNP 75.73 ± 0.30 85 .09 ± 0.25 79.73 ± 0.31 93 .27 ± 0.08
+    page: 6
+    reported_spread: 0.08
+    spread_kind: ci
+    spread_over: unknown
+    n_runs: 100
+    status: agreed
+    votes:
+      haiku55:
+        value: 93.27
+        verified: true
+        why: ''
+        printed: '93.27'
+        quote: APPNP 75.73 ± 0.30 85 .09 ± 0.25 79.73 ± 0.31 93 .27 ± 0.08
+        page: 6
+        spread: 0.08
+        spread_kind: ci
+        spread_over: unknown
+        n_runs: 100
+        note: 'Table 2 (page 6), APPNP row, MS ACADEMIC column: 93.27 ± 0.08 (95%
+          bootstrap confidence interval half-width, not a std). Paper states 100 runs
+          per experiment (20 splits x 5 initializations). This is the paper''s reported
+          value only; I did not run the authors'' PyTorch code, so no reproduction
+          was performed.'
+      luna:
+        value: 93.27
+        verified: true
+        why: ''
+        printed: '93.27'
+        quote: APPNP 75.73 ± 0.30 85.09 ± 0.25 79.73 ± 0.31 93 .27 ± 0.08
+        page: 6
+        spread: 0.08
+        spread_kind: ci
+        spread_over: runs
+        n_runs: 100
+        note: Table 2 reports the mean accuracy as 93.27%; the ±0.08 is the 95% bootstrap
+          confidence interval half-width. The paper states that each experiment is
+          run with 5 initializations on each of 20 random splits (100 runs total).

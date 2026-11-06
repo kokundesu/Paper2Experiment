@@ -1,0 +1,54 @@
+# Model profiles. Pick one with `p2e run --model <profile>` or P2E_MODEL=<profile>; the default is haiku55.
+#
+#   provider     anthropic | openai (any OpenAI-compatible endpoint: set base_url)
+#   model        the provider's model id
+#   api_key_env  name of the environment variable (or .env entry) that holds the key; the key itself never goes here
+#   base_url     optional; an inherited OPENAI_BASE_URL / ANTHROPIC_BASE_URL is ignored on purpose
+#   prices       USD per million tokens: in, out, cache_read, cache_write; `tiers` raise the rates for a request
+#                whose prompt (input incl. cached tokens) is above `above` tokens
+#   compaction   anthropic only: server-side compaction once a request's input reaches `trigger` tokens
+#                (min 50000); keep it below the first price tier
+#   prompt_cache anthropic: top-level automatic prompt caching; openai caches automatically (prompt_cache_key)
+#
+# Without `prices` a run records tokens but counts $0 and warns: the run budget then cannot stop it.
+
+haiku55:
+  provider: anthropic
+  model: claude-haiku-5-5
+  api_key_env: ANTHROPIC_API_KEY
+  prices: {in: 0.10, out: 0.50, cache_read: 0.01, cache_write: 0.125,
+           tiers: [{above: 100000, x_in: 5.0, x_out: 5.0}]}
+  compaction: {trigger: 70000}
+  prompt_cache: true
+
+sonnet55:
+  provider: anthropic
+  model: claude-sonnet-5-5
+  api_key_env: ANTHROPIC_API_KEY
+  prices: {in: 2.00, out: 10.00, cache_read: 0.20, cache_write: 2.50}
+  compaction: {trigger: 150000}
+  prompt_cache: true
+
+luna:
+  provider: openai
+  model: gpt-6-luna
+  api_key_env: OPENAI_API_KEY
+  base_url: https://api.openai.com/v1
+  prices: {in: 0.10, out: 0.50, cache_read: 0.01, cache_write: 0.125,
+           tiers: [{above: 272000, x_in: 2.0, x_out: 1.5}]}
+
+sol:
+  provider: openai
+  model: gpt-6-sol
+  api_key_env: OPENAI_API_KEY
+  base_url: https://api.openai.com/v1
+  prices: {in: 2.00, out: 10.00, cache_read: 0.20, cache_write: 2.50,
+           tiers: [{above: 272000, x_in: 2.0, x_out: 1.5}]}
+
+# Your own endpoint, e.g. a local vLLM server or another OpenAI-compatible API:
+# my-endpoint:
+#   provider: openai
+#   model: <model id>
+#   base_url: https://.../v1
+#   api_key_env: MY_ENDPOINT_API_KEY
+#   prices: {in: 0.0, out: 0.0, cache_read: 0.0, cache_write: 0.0}

@@ -1,0 +1,11 @@
+--- a/filing_paths.py
++++ b/filing_paths.py
+@@ -3,7 +3,7 @@
+ path_model_Toy = 'Simulations/Toy_problems/'
+ path_model_Pendulum = 'Simulations/Pendulum/'
+ 
+-path_model = path_model_Toy
++path_model = path_model_Lor  # [p2e] was path_model_Toy at branch tip; Lorenz experiments need Lor
+ path_session = path_model + 'Experiment_GPS_RNN/'
+ 
+ '''

@@ -1,0 +1,97 @@
+# Reference re-runs of the official code (hidden).
+id: ecod
+recipe_status: draft
+commit: f0d0967d162ed46150cfa39ca61ffd1e7f78404b
+run_dir: /Users/allenhuw/Documents/Projects/Paper2Exp/Base/runs/reference/20261017-095315_ecod
+n: 5
+setup_logs:
+- cmd_001_setup.log
+- cmd_002_setup.log
+- cmd_003_setup.log
+- cmd_004_setup.log
+- cmd_005_setup.log
+runs:
+- i: 0
+  seed: 0
+  threads: default
+  exit: 0
+  wall_s: 20.5
+  log: cmd_006_ref_0.log
+  values:
+    cardio_ecod_roc_auc: 0.936388
+    breastw_ecod_roc_auc: 0.990923
+    mammography_ecod_roc_auc: 0.908511
+- i: 1
+  seed: 1
+  threads: '1'
+  exit: 0
+  wall_s: 3.5
+  log: cmd_007_ref_1.log
+  values:
+    cardio_ecod_roc_auc: 0.93845
+    breastw_ecod_roc_auc: 0.991088
+    mammography_ecod_roc_auc: 0.90809
+- i: 2
+  seed: 2
+  threads: default
+  exit: 0
+  wall_s: 3.0
+  log: cmd_008_ref_2.log
+  values:
+    cardio_ecod_roc_auc: 0.934143
+    breastw_ecod_roc_auc: 0.991569
+    mammography_ecod_roc_auc: 0.913507
+- i: 3
+  seed: 3
+  threads: '1'
+  exit: 0
+  wall_s: 3.0
+  log: cmd_009_ref_3.log
+  values:
+    cardio_ecod_roc_auc: 0.934761
+    breastw_ecod_roc_auc: 0.992298
+    mammography_ecod_roc_auc: 0.904473
+- i: 4
+  seed: 4
+  threads: default
+  exit: 0
+  wall_s: 2.6
+  log: cmd_010_ref_4.log
+  values:
+    cardio_ecod_roc_auc: 0.934006
+    breastw_ecod_roc_auc: 0.991822
+    mammography_ecod_roc_auc: 0.90833
+values:
+  cardio_ecod_roc_auc:
+  - 0.936388
+  - 0.93845
+  - 0.934143
+  - 0.934761
+  - 0.934006
+  breastw_ecod_roc_auc:
+  - 0.990923
+  - 0.991088
+  - 0.991569
+  - 0.992298
+  - 0.991822
+  mammography_ecod_roc_auc:
+  - 0.908511
+  - 0.90809
+  - 0.913507
+  - 0.904473
+  - 0.90833
+printed_places:
+  cardio_ecod_roc_auc: 6
+  breastw_ecod_roc_auc: 6
+  mammography_ecod_roc_auc: 6
+manifest:
+  cmd_001_setup.log: 5e063fd3ea442ff93a2537c75bca420252a11cf259f6c1967974ae1c7f5e8425
+  cmd_002_setup.log: 65394a6ccbde1910aba9cf7ea8f9eb8911d975523e213308ae9a68ccac9fbe2a
+  cmd_003_setup.log: 6a33a5730183954b0006f6119d3e20d55c7a2099c2c1ea3e2496472d37ebd02e
+  cmd_004_setup.log: 55ea767d896d636eb94d2a84187d472082c19489a731b1c196cd8cc24ab0bd6f
+  cmd_005_setup.log: eea59c28888fb3e3b728f241fa4666e44655ce756b459b03fefdb0403d92d6d9
+  cmd_006_ref_0.log: 3e5a3e513f49e532db967412bbd4758e3bf59cd6b88a025b56ef404d55e89579
+  cmd_007_ref_1.log: 1f4f3cedbfd95e8d3ce02df141c1f3ff622035ee0fc78340ed55f40c141bceed
+  cmd_008_ref_2.log: 39cb57b8ee07a811f32be8c6cda652569f19f263604e139639a2f95bb9a682bf
+  cmd_009_ref_3.log: 9a0cd6f1c3ecaa8cc56b8e90209188c6129ae1b6546dbbd0fcf3e5533a865462
+  cmd_010_ref_4.log: 84a882d69f3c946c358229361df0ed5737a521ec6f854716ed4f08bacecda5f8

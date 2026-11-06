@@ -1,0 +1,127 @@
+{
+ "draft": {
+  "understanding": "复现论文中二维 Helmholtz 方程实验在表 2 报告的 M1（原始 PINN）与 M2（加入学习率退火的 PINN）的预测解相对 L2 误差。表 2 列有多种网络结构；在 README 未给出默认运行命令或默认结构的情况下，暂以表格居中的“每层 50 个单元、5 个隐藏层”作为两项结果的共同设置。",
+  "questions": [
+   {
+    "id": "helmholtz2d_m1_relative_l2_50x5",
+    "text": "二维 Helmholtz 方程实验中，采用每层 50 个单元、5 个隐藏层的 M1 原始 PINN，表 2 所报告的预测解相对 L2 误差是多少？",
+    "metric": "预测解与解析解之间的相对 L2 误差",
+    "unit": "",
+    "direction": "lower",
+    "locator": "表 2（Helmholtz equation），行“50 units / 5 hidden layers”，列“M1”",
+    "setting": "二维 Helmholtz 方程；解析解 u(x,y)=sin(πx)sin(4πy)；M1 为原始全连接 PINN，不使用自适应损失权重；50 units / 5 hidden layers；40,000 次 Adam 更新。",
+    "runs": 10,
+    "protocol_notes": "表 2 报告 10 次独立试验的平均结果，各试验使用随机 Glorot 权重初始化。论文第 3 节说明使用 tanh、128 点 mini-batch、单精度和默认设置的 Adam。"
+   },
+   {
+    "id": "helmholtz2d_m2_relative_l2_50x5",
+    "text": "二维 Helmholtz 方程实验中，采用每层 50 个单元、5 个隐藏层的 M2 PINN（学习率退火算法），表 2 所报告的预测解相对 L2 误差是多少？",
+    "metric": "预测解与解析解之间的相对 L2 误差",
+    "unit": "",
+    "direction": "lower",
+    "locator": "表 2（Helmholtz equation），行“50 units / 5 hidden layers”，列“M2”",
+    "setting": "二维 Helmholtz 方程；解析解 u(x,y)=sin(πx)sin(4πy)；M2 为常规全连接 PINN 加自适应学习率退火/损失权重调整；50 units / 5 hidden layers；40,000 次 Adam 更新。",
+    "runs": 10,
+    "protocol_notes": "表 2 报告 10 次独立试验的平均结果，各试验使用随机 Glorot 权重初始化。论文第 3 节说明使用 tanh、128 点 mini-batch、单精度和默认设置的 Adam；M2 每 10 次更新调整一次损失权重。"
+   }
+  ],
+  "open_issues": [
+   "表 2 同时列出每层 30、50、100 个单元及 3、5、7 个隐藏层的多种结构，用户想要哪一行的 M1/M2 结果？这里暂选 50 units / 5 hidden layers；README 未指定默认复现命令或网络结构，仓库文件清单也不能确认脚本默认配置。"
+  ]
+ },
+ "checks": {
+  "sonnet55": {
+   "items": [
+    {
+     "question_id": "helmholtz2d_m1_relative_l2_50x5",
+     "in_scope": "yes",
+     "locator_ok": "yes",
+     "underspecified": [
+      "setting"
+     ],
+     "answer_type_ok": "yes",
+     "measurable": "yes",
+     "comment": "The user did not name an architecture. Table 2 has 9 rows, and the draft picks 50x5 on its own."
+    },
+    {
+     "question_id": "helmholtz2d_m2_relative_l2_50x5",
+     "in_scope": "yes",
+     "locator_ok": "yes",
+     "underspecified": [
+      "setting"
+     ],
+     "answer_type_ok": "yes",
+     "measurable": "yes",
+     "comment": "Same architecture ambiguity as M1."
+    }
+   ],
+   "missing_questions": []
+  },
+  "haiku55": {
+   "items": [
+    {
+     "question_id": "helmholtz2d_m1_relative_l2_50x5",
+     "in_scope": "yes",
+     "locator_ok": "yes",
+     "underspecified": [
+      "variant"
+     ],
+     "answer_type_ok": "yes",
+     "measurable": "yes",
+     "comment": "表 2 中确有 50 units / 5 hidden layers 行、M1 列。但用户要求的是表 2 的 M1 结果，表中有 9 种结构，草稿只选了一行，且“表格居中”这一选择是草稿自行假定的，用户并未指定。"
+    },
+    {
+     "question_id": "helmholtz2d_m2_relative_l2_50x5",
+     "in_scope": "yes",
+     "locator_ok": "yes",
+     "underspecified": [
+      "variant"
+     ],
+     "answer_type_ok": "yes",
+     "measurable": "yes",
+     "comment": "表 2 中确有 50 units / 5 hidden layers 行、M2 列。同上，结构选择是草稿假定的，用户未指定；M2 的定义与论文表 1 一致。"
+    }
+   ],
+   "missing_questions": [
+    "表 2 中其余 8 种结构（30/50/100 units × 3/5/7 hidden layers，去掉已选的 50 units / 5 hidden layers）下的 M1 和 M2 相对 L2 误差未被覆盖；若用户要的是整张表的 M1、M2 结果，需要补充这些行。"
+   ]
+  }
+ },
+ "accepted": [
+  "helmholtz2d_m1_relative_l2_50x5",
+  "helmholtz2d_m2_relative_l2_50x5"
+ ],
+ "queue": [
+  {
+   "kind": "draft_issue",
+   "by": "drafter",
+   "text": "表 2 同时列出每层 30、50、100 个单元及 3、5、7 个隐藏层的多种结构，用户想要哪一行的 M1/M2 结果？这里暂选 50 units / 5 hidden layers；README 未指定默认复现命令或网络结构，仓库文件清单也不能确认脚本默认配置。"
+  },
+  {
+   "kind": "missing",
+   "by": "haiku55",
+   "text": "表 2 中其余 8 种结构（30/50/100 units × 3/5/7 hidden layers，去掉已选的 50 units / 5 hidden layers）下的 M1 和 M2 相对 L2 误差未被覆盖；若用户要的是整张表的 M1、M2 结果，需要补充这些行。"
+  }
+ ],
+ "notes": [
+  {
+   "question_id": "helmholtz2d_m1_relative_l2_50x5",
+   "text": "二维 Helmholtz 方程实验中，采用每层 50 个单元、5 个隐藏层的 M1 原始 PINN，表 2 所报告的预测解相对 L2 误差是多少？",
+   "locator": "表 2（Helmholtz equation），行“50 units / 5 hidden layers”，列“M1”",
+   "notes": [
+    "sonnet55: underspecified (setting) -- The user did not name an architecture. Table 2 has 9 rows, and the draft picks 50x5 on its own.",
+    "haiku55: underspecified (variant) -- 表 2 中确有 50 units / 5 hidden layers 行、M1 列。但用户要求的是表 2 的 M1 结果，表中有 9 种结构，草稿只选了一行，且“表格居中”这一选择是草稿自行假定的，用户并未指定。"
+   ]
+  },
+  {
+   "question_id": "helmholtz2d_m2_relative_l2_50x5",
+   "text": "二维 Helmholtz 方程实验中，采用每层 50 个单元、5 个隐藏层的 M2 PINN（学习率退火算法），表 2 所报告的预测解相对 L2 误差是多少？",
+   "locator": "表 2（Helmholtz equation），行“50 units / 5 hidden layers”，列“M2”",
+   "notes": [
+    "sonnet55: underspecified (setting) -- Same architecture ambiguity as M1.",
+    "haiku55: underspecified (variant) -- 表 2 中确有 50 units / 5 hidden layers 行、M2 列。同上，结构选择是草稿假定的，用户未指定；M2 的定义与论文表 1 一致。"
+   ]
+  }
+ ],
+ "cost_usd": 0.2104
+}

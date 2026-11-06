@@ -1,0 +1,15 @@
+# Task given to every workflow. Contains no target values.
+id: hnn
+paper_url: https://arxiv.org/pdf/1906.01563
+paper_pdf: paper/1906.01563.pdf
+repo_url: https://github.com/greydanus/hamiltonian-nn
+objective: >
+  Reproduce the Hamiltonian Neural Network (HNN) results of Table 1 for Task 1
+  (ideal mass-spring) and Task 2 (ideal pendulum) using the official code and the
+  paper's experimental setup. Report every value unscaled, as computed (Table 1
+  prints them multiplied by 10^3).
+claims:
+  - {id: spring_hnn_test_loss,  metric: test_loss,  setting: "Table 1, Task 1 ideal mass-spring, HNN, test loss",  unit: "", description: "HNN L2 test loss on the ideal mass-spring task, unscaled"}
+  - {id: spring_hnn_energy_mse, metric: energy_mse, setting: "Table 1, Task 1 ideal mass-spring, HNN, energy",     unit: "", description: "HNN energy MSE along integrated test trajectories on the ideal mass-spring task, unscaled"}
+  - {id: pend_hnn_energy_mse,   metric: energy_mse, setting: "Table 1, Task 2 ideal pendulum, HNN, energy",        unit: "", description: "HNN energy MSE along integrated test trajectories on the ideal pendulum task, unscaled"}
+seeds: 3

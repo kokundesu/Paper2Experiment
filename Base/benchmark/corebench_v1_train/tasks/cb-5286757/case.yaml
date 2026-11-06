@@ -1,0 +1,22 @@
+# Hidden: pre-registered tolerances, computed from the 3 manual re-runs.
+capsule_id: capsule-5286757
+source: core-bench (original) core_train.json
+split: dev
+data_sha256: 3df47f1b3fa1cb60045018eb1a0f1ad4ecf6a53f72318c845a879ce0313b0730
+rule: docs/benchmark-redesign.md section 3.3
+questions:
+- id: q1
+  question: Report the train loss after training the final epoch (epoch 9).
+  vision: false
+  kind: numeric
+  scored: false
+  tolerance:
+    mean: 0.05002870217970599
+    s: 0.003922635840567411
+    n: 3
+    m: 1
+    noise: 0.019490308192117334
+    precision: 5.0e-18
+    floor: 5.002870217970599e-07
+    h: 0.019490308192117334
+    term: noise

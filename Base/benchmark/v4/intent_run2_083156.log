@@ -1,0 +1,23 @@
+drafter=sol checkers=sonnet55,haiku55 extractors=haiku55,luna papers=20
+[bspm] questions=2 values agreed=2/2 to clarify=0 cost=$0.1598
+[ials] questions=2 values agreed=2/2 to clarify=0 cost=$0.1164
+[gprgnn] questions=1 values agreed=1/1 to clarify=0 cost=$0.1899
+[correct_smooth] questions=1 values agreed=0/1 to clarify=1 cost=$0.1117
+[appnp] questions=1 values agreed=1/1 to clarify=1 cost=$0.1177
+[itransformer] questions=2 values agreed=2/2 to clarify=0 cost=$0.2537
+[tstcc] questions=2 values agreed=2/2 to clarify=0 cost=$0.0993
+[ts2vec] questions=5 values agreed=5/5 to clarify=0 cost=$0.2176
+[cyclenet] questions=2 values agreed=2/2 to clarify=0 cost=$0.2739
+[patchtst] questions=2 values agreed=2/2 to clarify=1 cost=$0.2178
+[ngboost] questions=2 values agreed=2/2 to clarify=0 cost=$0.1070
+[ecod] questions=3 values agreed=3/3 to clarify=0 cost=$0.1932
+[svgd] questions=2 values agreed=1/2 to clarify=0 cost=$0.1030
+[mc_dropout] questions=2 values agreed=2/2 to clarify=0 cost=$0.1031
+[fairbatch] questions=2 values agreed=2/2 to clarify=0 cost=$0.1589
+[doc2vecc] questions=1 values agreed=1/1 to clarify=3 cost=$0.0940
+[pinn_gradpath] questions=2 values agreed=2/2 to clarify=5 cost=$0.2056
+[set_transformer] questions=1 values agreed=1/1 to clarify=1 cost=$0.1288
+[nngp] questions=1 values agreed=1/1 to clarify=4 cost=$0.1273
+[am_tsp] questions=3 values agreed=3/3 to clarify=0 cost=$0.1761
+total cost $3.1546; clarifications in /Users/allenhuw/Documents/Projects/Paper2Exp/Base/benchmark/v4/clarifications.md
+exit=0

@@ -1,0 +1,78 @@
+RUN name=old_authors_knet_ckpt_attractor_known_x0 code=old inv_r2_db=30 seed=0 opts=[JAC=correct DATA=attractor INIT=true KNET=../scratch_old/model_KNetNew_DT_HNL_r30q30_T20.pt]
+/Users/allenhuw/Documents/Projects/Paper2Experiment/benchmark/kalmannet/manual/KalmanNet_TSP_old/Simulations/Lorenz_Atractor/model.py:125: UserWarning: The use of `x.T` on tensors of dimension other than 2 to reverse their shape is deprecated and it will throw an error in a future release. Consider `x.mT` to transpose batches of matrices or `x.permute(*torch.arange(x.ndim - 1, -1, -1))` to reverse the dimensions of a tensor. (Triggered internally at /Users/runner/work/pytorch/pytorch/aten/src/ATen/native/TensorShape.cpp:4323.)
+  y = torch.reshape((x.T),[x.size()[0]])
+Running on the CPU
+Running on the CPU
+Running on the CPU
+SEED: 0  1/r2 [dB]: 30.0  nu [dB]: 0.0  T: 20  N_T: 200  DATA: attractor  INIT: true  JAC: correct  QF_SCALE: 1.0  KNET: ../scratch_old/model_KNetNew_DT_HNL_r30q30_T20.pt
+m1x_0: [1.0, 1.0, 1.0]  m2x_0 diag: [0.0, 0.0, 0.0]
+EKF obs. Jacobian at x=(1,1,1): [[0.577, 0.577, 0.577], [0.236, 0.236, -0.471], [-0.5, 0.5, 0.0]]
+RESULT EKF: dB_of_mean=-13.443 mean_of_dB=-25.930 median_dB=-26.520 n_nonfinite=0
+Extended Kalman Filter - MSE LOSS: tensor(-13.4427) [dB]
+RESULT KalmanNet(pretrained): dB_of_mean=13.004 mean_of_dB=-11.416 median_dB=-18.512 n_nonfinite=0
+KalmanNet-MSE Test: tensor(13.0044) [dB]
+RUN name=old_authors_knet_ckpt_attractor_known_x0 code=old inv_r2_db=30 seed=1 opts=[JAC=correct DATA=attractor INIT=true KNET=../scratch_old/model_KNetNew_DT_HNL_r30q30_T20.pt]
+/Users/allenhuw/Documents/Projects/Paper2Experiment/benchmark/kalmannet/manual/KalmanNet_TSP_old/Simulations/Lorenz_Atractor/model.py:125: UserWarning: The use of `x.T` on tensors of dimension other than 2 to reverse their shape is deprecated and it will throw an error in a future release. Consider `x.mT` to transpose batches of matrices or `x.permute(*torch.arange(x.ndim - 1, -1, -1))` to reverse the dimensions of a tensor. (Triggered internally at /Users/runner/work/pytorch/pytorch/aten/src/ATen/native/TensorShape.cpp:4323.)
+  y = torch.reshape((x.T),[x.size()[0]])
+Running on the CPU
+Running on the CPU
+Running on the CPU
+SEED: 1  1/r2 [dB]: 30.0  nu [dB]: 0.0  T: 20  N_T: 200  DATA: attractor  INIT: true  JAC: correct  QF_SCALE: 1.0  KNET: ../scratch_old/model_KNetNew_DT_HNL_r30q30_T20.pt
+m1x_0: [1.0, 1.0, 1.0]  m2x_0 diag: [0.0, 0.0, 0.0]
+EKF obs. Jacobian at x=(1,1,1): [[0.577, 0.577, 0.577], [0.236, 0.236, -0.471], [-0.5, 0.5, 0.0]]
+RESULT EKF: dB_of_mean=-25.905 mean_of_dB=-26.295 median_dB=-26.295 n_nonfinite=0
+Extended Kalman Filter - MSE LOSS: tensor(-25.9050) [dB]
+RESULT KalmanNet(pretrained): dB_of_mean=10.379 mean_of_dB=-12.711 median_dB=-18.845 n_nonfinite=0
+KalmanNet-MSE Test: tensor(10.3794) [dB]
+RUN name=old_authors_knet_ckpt_attractor_known_x0 code=old inv_r2_db=30 seed=2 opts=[JAC=correct DATA=attractor INIT=true KNET=../scratch_old/model_KNetNew_DT_HNL_r30q30_T20.pt]
+/Users/allenhuw/Documents/Projects/Paper2Experiment/benchmark/kalmannet/manual/KalmanNet_TSP_old/Simulations/Lorenz_Atractor/model.py:125: UserWarning: The use of `x.T` on tensors of dimension other than 2 to reverse their shape is deprecated and it will throw an error in a future release. Consider `x.mT` to transpose batches of matrices or `x.permute(*torch.arange(x.ndim - 1, -1, -1))` to reverse the dimensions of a tensor. (Triggered internally at /Users/runner/work/pytorch/pytorch/aten/src/ATen/native/TensorShape.cpp:4323.)
+  y = torch.reshape((x.T),[x.size()[0]])
+Running on the CPU
+Running on the CPU
+Running on the CPU
+SEED: 2  1/r2 [dB]: 30.0  nu [dB]: 0.0  T: 20  N_T: 200  DATA: attractor  INIT: true  JAC: correct  QF_SCALE: 1.0  KNET: ../scratch_old/model_KNetNew_DT_HNL_r30q30_T20.pt
+m1x_0: [1.0, 1.0, 1.0]  m2x_0 diag: [0.0, 0.0, 0.0]
+EKF obs. Jacobian at x=(1,1,1): [[0.577, 0.577, 0.577], [0.236, 0.236, -0.471], [-0.5, 0.5, 0.0]]
+RESULT EKF: dB_of_mean=-15.065 mean_of_dB=-25.894 median_dB=-26.202 n_nonfinite=0
+Extended Kalman Filter - MSE LOSS: tensor(-15.0655) [dB]
+RESULT KalmanNet(pretrained): dB_of_mean=11.818 mean_of_dB=-11.058 median_dB=-16.974 n_nonfinite=0
+KalmanNet-MSE Test: tensor(11.8182) [dB]
+RUN name=old_authors_knet_ckpt_attractor_known_x0 code=old inv_r2_db=20 seed=0 opts=[JAC=correct DATA=attractor INIT=true KNET=../scratch_old/model_KNetNew_DT_HNL_r20q20_T20.pt]
+/Users/allenhuw/Documents/Projects/Paper2Experiment/benchmark/kalmannet/manual/KalmanNet_TSP_old/Simulations/Lorenz_Atractor/model.py:125: UserWarning: The use of `x.T` on tensors of dimension other than 2 to reverse their shape is deprecated and it will throw an error in a future release. Consider `x.mT` to transpose batches of matrices or `x.permute(*torch.arange(x.ndim - 1, -1, -1))` to reverse the dimensions of a tensor. (Triggered internally at /Users/runner/work/pytorch/pytorch/aten/src/ATen/native/TensorShape.cpp:4323.)
+  y = torch.reshape((x.T),[x.size()[0]])
+Running on the CPU
+Running on the CPU
+Running on the CPU
+SEED: 0  1/r2 [dB]: 20.0  nu [dB]: 0.0  T: 20  N_T: 200  DATA: attractor  INIT: true  JAC: correct  QF_SCALE: 1.0  KNET: ../scratch_old/model_KNetNew_DT_HNL_r20q20_T20.pt
+m1x_0: [1.0, 1.0, 1.0]  m2x_0 diag: [0.0, 0.0, 0.0]
+EKF obs. Jacobian at x=(1,1,1): [[0.577, 0.577, 0.577], [0.236, 0.236, -0.471], [-0.5, 0.5, 0.0]]
+RESULT EKF: dB_of_mean=-9.373 mean_of_dB=-16.003 median_dB=-16.274 n_nonfinite=0
+Extended Kalman Filter - MSE LOSS: tensor(-9.3726) [dB]
+RESULT KalmanNet(pretrained): dB_of_mean=13.835 mean_of_dB=-3.896 median_dB=-9.920 n_nonfinite=0
+KalmanNet-MSE Test: tensor(13.8350) [dB]
+RUN name=old_authors_knet_ckpt_attractor_known_x0 code=old inv_r2_db=20 seed=1 opts=[JAC=correct DATA=attractor INIT=true KNET=../scratch_old/model_KNetNew_DT_HNL_r20q20_T20.pt]
+/Users/allenhuw/Documents/Projects/Paper2Experiment/benchmark/kalmannet/manual/KalmanNet_TSP_old/Simulations/Lorenz_Atractor/model.py:125: UserWarning: The use of `x.T` on tensors of dimension other than 2 to reverse their shape is deprecated and it will throw an error in a future release. Consider `x.mT` to transpose batches of matrices or `x.permute(*torch.arange(x.ndim - 1, -1, -1))` to reverse the dimensions of a tensor. (Triggered internally at /Users/runner/work/pytorch/pytorch/aten/src/ATen/native/TensorShape.cpp:4323.)
+  y = torch.reshape((x.T),[x.size()[0]])
+Running on the CPU
+Running on the CPU
+Running on the CPU
+SEED: 1  1/r2 [dB]: 20.0  nu [dB]: 0.0  T: 20  N_T: 200  DATA: attractor  INIT: true  JAC: correct  QF_SCALE: 1.0  KNET: ../scratch_old/model_KNetNew_DT_HNL_r20q20_T20.pt
+m1x_0: [1.0, 1.0, 1.0]  m2x_0 diag: [0.0, 0.0, 0.0]
+EKF obs. Jacobian at x=(1,1,1): [[0.577, 0.577, 0.577], [0.236, 0.236, -0.471], [-0.5, 0.5, 0.0]]
+RESULT EKF: dB_of_mean=-9.083 mean_of_dB=-15.474 median_dB=-16.316 n_nonfinite=0
+Extended Kalman Filter - MSE LOSS: tensor(-9.0834) [dB]
+RESULT KalmanNet(pretrained): dB_of_mean=14.844 mean_of_dB=-4.655 median_dB=-10.879 n_nonfinite=0
+KalmanNet-MSE Test: tensor(14.8437) [dB]
+RUN name=old_authors_knet_ckpt_attractor_known_x0 code=old inv_r2_db=20 seed=2 opts=[JAC=correct DATA=attractor INIT=true KNET=../scratch_old/model_KNetNew_DT_HNL_r20q20_T20.pt]
+/Users/allenhuw/Documents/Projects/Paper2Experiment/benchmark/kalmannet/manual/KalmanNet_TSP_old/Simulations/Lorenz_Atractor/model.py:125: UserWarning: The use of `x.T` on tensors of dimension other than 2 to reverse their shape is deprecated and it will throw an error in a future release. Consider `x.mT` to transpose batches of matrices or `x.permute(*torch.arange(x.ndim - 1, -1, -1))` to reverse the dimensions of a tensor. (Triggered internally at /Users/runner/work/pytorch/pytorch/aten/src/ATen/native/TensorShape.cpp:4323.)
+  y = torch.reshape((x.T),[x.size()[0]])
+Running on the CPU
+Running on the CPU
+Running on the CPU
+SEED: 2  1/r2 [dB]: 20.0  nu [dB]: 0.0  T: 20  N_T: 200  DATA: attractor  INIT: true  JAC: correct  QF_SCALE: 1.0  KNET: ../scratch_old/model_KNetNew_DT_HNL_r20q20_T20.pt
+m1x_0: [1.0, 1.0, 1.0]  m2x_0 diag: [0.0, 0.0, 0.0]
+EKF obs. Jacobian at x=(1,1,1): [[0.577, 0.577, 0.577], [0.236, 0.236, -0.471], [-0.5, 0.5, 0.0]]
+RESULT EKF: dB_of_mean=-7.997 mean_of_dB=-15.800 median_dB=-16.587 n_nonfinite=0
+Extended Kalman Filter - MSE LOSS: tensor(-7.9966) [dB]
+RESULT KalmanNet(pretrained): dB_of_mean=13.759 mean_of_dB=-3.295 median_dB=-8.950 n_nonfinite=0
+KalmanNet-MSE Test: tensor(13.7593) [dB]

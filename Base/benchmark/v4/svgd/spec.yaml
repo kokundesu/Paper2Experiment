@@ -1,0 +1,49 @@
+# ReproSpec (agent-visible, no values). FROZEN: see ../FROZEN.yaml.
+id: svgd
+title: ''
+objective: 复现 Stein Variational Gradient Descent（NeurIPS 2016）在 Boston 数据集上 Bayesian
+  神经网络的 RMSE 和测试对数似然（第 5 节 BNN 实验的表）。
+task_prompt: ''
+language: Python
+paper:
+  url: https://arxiv.org/abs/1608.04471
+  pdf: null
+code:
+  repo_url: https://github.com/dilinwang820/Stein-Variational-Gradient-Descent
+  capsule: null
+questions:
+- id: boston_bnn_svgd_test_rmse
+  text: SVGD（Our Method）在 Boston 数据集的 Bayesian neural network 实验中，平均测试 RMSE 是多少？
+  answer_type: number
+  metric: Avg. Test RMSE
+  direction: lower
+  unit: ''
+  locator: 第 5 节 Bayesian Neural Network 实验表（第 8 页），Boston 行，Avg. Test RMSE 下的 Our
+    Method 列
+  setting: Boston 数据集；SVGD Bayesian neural network，单隐层、50 个 ReLU 隐藏单元、20 个粒子；随机划分
+    90% 训练集和 10% 测试集。 一次运行 = 论文的完整协议：20 个随机训练/测试划分上的平均。
+  runs: 3
+  evidence: log
+- id: boston_bnn_svgd_test_log_likelihood
+  text: SVGD（Our Method）在 Boston 数据集的 Bayesian neural network 实验中，平均测试对数似然是多少？
+  answer_type: number
+  metric: Avg. Test LL
+  direction: higher
+  unit: ''
+  locator: 第 5 节 Bayesian Neural Network 实验表（第 8 页），Boston 行，Avg. Test LL 下的 Our Method
+    列
+  setting: Boston 数据集；SVGD Bayesian neural network，单隐层、50 个 ReLU 隐藏单元、20 个粒子；随机划分
+    90% 训练集和 10% 测试集。 一次运行 = 论文的完整协议：20 个随机训练/测试划分上的平均。
+  runs: 3
+  evidence: log
+origin:
+  source: user
+  reference: ''
+  prompt: 复现 Stein Variational Gradient Descent（NeurIPS 2016）在 Boston 数据集上 Bayesian
+    神经网络的 RMSE 和测试对数似然（第 5 节 BNN 实验的表）。
+  drafted_by:
+  - sol
+  checked_by:
+  - sonnet55
+  - haiku55
+  user_confirmed: true

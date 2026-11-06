@@ -1,0 +1,187 @@
+diff -ruN -x .git -x __pycache__ ../repos/TSP-DNN/function_dnn_powercontrol.py TSP-DNN/function_dnn_powercontrol.py
+--- ../repos/TSP-DNN/function_dnn_powercontrol.py	2026-10-01 16:40:39
++++ TSP-DNN/function_dnn_powercontrol.py	2026-10-01 18:41:31
+@@ -67,8 +67,8 @@
+     num_train = num_total - num_val               # number of training samples
+     n_input = X.shape[0]                          # input size
+     n_output = Y.shape[0]                         # output size
+-    X_train = np.transpose(X[:, 0:num_train])     # training data
+-    Y_train = np.transpose(Y[:, 0:num_train])     # training label
++    X_train = np.ascontiguousarray(np.transpose(X[:, 0:num_train]), dtype=np.float32)  # training data  [repro patch: row-major copy, fast minibatch gather]
++    Y_train = np.ascontiguousarray(np.transpose(Y[:, 0:num_train]), dtype=np.float32)  # training label
+     X_val = np.transpose(X[:, num_train:num_total]) # validation data
+     Y_val = np.transpose(Y[:, num_train:num_total]) # validation label
+ 
+diff -ruN -x .git -x __pycache__ ../repos/TSP-DNN/function_wmmse_powercontrol.py TSP-DNN/function_wmmse_powercontrol.py
+--- ../repos/TSP-DNN/function_wmmse_powercontrol.py	2026-10-01 16:40:39
++++ TSP-DNN/function_wmmse_powercontrol.py	2026-10-01 18:41:38
+@@ -68,7 +68,7 @@
+     return p_opt
+ 
+ # Functions for performance evaluation
+-def perf_eval(H, Py_p, NN_p, K, var_noise=1):
++def perf_eval(H, Py_p, NN_p, K, var_noise=1, plot=True):
+     num_sample = H.shape[2]
+     pyrate = np.zeros(num_sample)
+     nnrate = np.zeros(num_sample)
+@@ -78,12 +78,16 @@
+         pyrate[i] = obj_IA_sum_rate(H[:, :, i], Py_p[:, i], var_noise, K)
+         nnrate[i] = obj_IA_sum_rate(H[:, :, i], NN_p[i, :], var_noise, K)
+         mprate[i] = obj_IA_sum_rate(H[:, :, i], np.ones(K), var_noise, K)
+-        rdrate[i] = obj_IA_sum_rate(H[:, :, i], np.random.rand(K,1), var_noise, K)
++        rdrate[i] = obj_IA_sum_rate(H[:, :, i], np.random.rand(K), var_noise, K)
+     print('Sum-rate: WMMSE: %0.3f, DNN: %0.3f, Max Power: %0.3f, Random Power: %0.3f'%(sum(pyrate)/num_sample, sum(nnrate)/num_sample, sum(mprate)/num_sample, sum(rdrate)/num_sample))
+     print('Ratio: DNN: %0.3f%%, Max Power: %0.3f%%, Random Power: %0.3f%%\n' % (sum(nnrate) / sum(pyrate)* 100, sum(mprate) / sum(pyrate) * 100, sum(rdrate) / sum(pyrate) * 100))
+ 
++    res = dict(wmmse=sum(pyrate)/num_sample, dnn=sum(nnrate)/num_sample, maxp=sum(mprate)/num_sample, rand=sum(rdrate)/num_sample,
++               ratio=sum(nnrate)/sum(pyrate)*100, maxp_ratio=sum(mprate)/sum(pyrate)*100, rand_ratio=sum(rdrate)/sum(pyrate)*100)  # [repro patch]
++    if not plot:
++        return res
+     plt.figure('%d'%K)
+-    plt.style.use('seaborn-deep')
++    plt.style.use('seaborn-v0_8-deep')
+     data = np.vstack([pyrate, nnrate]).T
+     bins = np.linspace(0, max(pyrate), 50)
+     plt.hist(data, bins, alpha=0.7, label=['WMMSE', 'DNN'])
+@@ -93,7 +97,7 @@
+     plt.ylabel('number of samples')
+     plt.savefig('Histogram_%d.eps'%K, format='eps', dpi=1000)
+     plt.show()
+-    return 0
++    return res
+ 
+ # Functions for data generation, Gaussian IC case
+ def generate_Gaussian(K, num_H, Pmax=1, Pmin=0, seed=2017):
+@@ -156,3 +160,52 @@
+     # print("wmmse time: %0.2f s" % wmmsetime)
+     return CH, Y, wmmsetime, H
+ 
++
++# [repro patch] Batched (vectorised over samples) version of generate_Gaussian + WMMSE_sum_rate.
++# Same RNG stream, same per-sample update rule (the b-update only depends on w, f of the previous
++# iteration, so it is a Jacobi step) and the same per-sample stopping rule (100 iterations or
++# objective increase <= 1e-3). Only used to make 1e6-sample data generation affordable on CPU.
++def WMMSE_sum_rate_batch(H, Pmax=1, var_noise=1, max_iter=100, tol=1e-3):
++    # H: (N, K, K) channel magnitudes, H[n, i, j] = |h_ij| as in WMMSE_sum_rate
++    N, K, _ = H.shape
++    H2 = np.square(H)
++    Hd = np.diagonal(H, axis1=1, axis2=2)                       # (N, K)
++    b = np.sqrt(Pmax) * np.ones((N, K))
++    def fw(b):
++        f = Hd * b / (np.einsum('nij,nj->ni', H2, np.square(b)) + var_noise)
++        w = 1 / (1 - f * b * Hd)
++        return f, w
++    f, w = fw(b)
++    vnew = np.log2(w).sum(1)
++    active = np.ones(N, dtype=bool)
++    for it in range(max_iter):
++        if not active.any():
++            break
++        vold = vnew.copy()
++        btmp = w * f * Hd / np.einsum('nk,nki->ni', w * np.square(f), H2)
++        bnew = np.minimum(btmp, np.sqrt(Pmax)) + np.maximum(btmp, 0) - btmp
++        b = np.where(active[:, None], bnew, b)
++        fn, wn = fw(b)
++        f = np.where(active[:, None], fn, f)
++        w = np.where(active[:, None], wn, w)
++        vnew = np.where(active, np.log2(w).sum(1), vnew)
++        active = active & ~(vnew - vold <= tol)
++    return np.square(b)
++
++def generate_Gaussian_fast(K, num_H, Pmax=1, seed=2017, chunk=10000):
++    print('Generate Data (batched) ... (seed = %d)' % seed)
++    np.random.seed(seed)
++    # X is stored sample-major in float32 (the network is fed float32 anyway) and returned as the
++    # (K^2, num_H) view the official code expects; 1e6 x 900 float64 (7.2 GB) plus the copy made in df.train would exhaust 16 GB RAM.
++    Xt = np.zeros((num_H, K ** 2), dtype=np.float32)
++    Y = np.zeros((K, num_H))
++    total_time = 0.0
++    for s in range(0, num_H, chunk):
++        n = min(chunk, num_H - s)
++        R = np.random.randn(n, 2, K, K)                         # same draw order as the loop version
++        H = np.abs(1 / np.sqrt(2) * (R[:, 0] + 1j * R[:, 1]))
++        Xt[s:s + n] = H.transpose(0, 2, 1).reshape(n, K ** 2)   # column-major flatten, as reshape(order="F")
++        t = time.time()
++        Y[:, s:s + n] = WMMSE_sum_rate_batch(H, Pmax).T
++        total_time += time.time() - t
++    return Xt.T, Y, total_time
+diff -ruN -x .git -x __pycache__ ../repos/TSP-DNN/repro.py TSP-DNN/repro.py
+--- ../repos/TSP-DNN/repro.py	1970-01-01 07:30:00
++++ TSP-DNN/repro.py	2026-10-01 16:50:57
+@@ -0,0 +1,76 @@
++# [repro patch] Driver for the benchmark reproduction of Table I (Gaussian IC).
++# Uses the official functions (df.train / df.test / wf.generate_Gaussian / wf.perf_eval);
++# only adds seeding, data caching, CLI arguments and a CSV row per run.
++#
++#   python repro.py --mode pretrained --K 10 --test_seed 7
++#   python repro.py --mode train --K 10 --seed 0 --num_train 1000000 --epochs 100
++import argparse, csv, os, time
++import numpy as np
++import scipy.io as sio
++import function_wmmse_powercontrol as wf
++import function_dnn_powercontrol as df
++
++p = argparse.ArgumentParser()
++p.add_argument('--mode', choices=['pretrained', 'train'], required=True)
++p.add_argument('--K', type=int, default=10)
++p.add_argument('--seed', type=int, default=0, help='TF/numpy seed for weight init and minibatch sampling')
++p.add_argument('--train_seed', type=int, default=0, help='seed of the training-set channels (demo.py uses 0)')
++p.add_argument('--test_seed', type=int, default=7, help='seed of the test-set channels (test.py uses 7)')
++p.add_argument('--num_train', type=int, default=1000000, help='paper: 1e6 training samples')
++p.add_argument('--num_test', type=int, default=10000, help='paper: 1e4 test samples')
++p.add_argument('--epochs', type=int, default=100)
++p.add_argument('--batch', type=int, default=1000, help='paper: 1000')
++p.add_argument('--lr', type=float, default=0.001, help='paper: 0.001')
++p.add_argument('--val_split', type=float, default=0.01)
++p.add_argument('--hidden', type=int, nargs=3, default=[200, 80, 80], help='official code/checkpoints: 200 80 80; paper text: 200 200 200')
++p.add_argument('--out', default='runs')
++p.add_argument('--csv', default='results.csv')
++a = p.parse_args()
++
++here = os.path.dirname(os.path.abspath(__file__))
++os.makedirs(a.out, exist_ok=True)
++t0 = time.time()
++
++if a.mode == 'pretrained':
++    model = os.path.join(here, 'DNNmodel', 'model_%d.ckpt' % a.K)
++    train_time = 0.0
++else:
++    tg = time.time()
++    Xtr, Ytr, _ = wf.generate_Gaussian_fast(a.K, a.num_train, seed=a.train_seed)   # deterministic given train_seed
++    print('training data generated in %.1f s' % (time.time() - tg))
++    df.tf.reset_default_graph()
++    df.tf.set_random_seed(a.seed)
++    np.random.seed(a.seed)
++    model = os.path.abspath(os.path.join(a.out, 'model_K%d_seed%d_n%d_e%d.ckpt' % (a.K, a.seed, a.num_train, a.epochs)))
++    cwd = os.getcwd(); os.chdir(a.out)          # df.train writes MSETime_*.mat into cwd
++    ts = time.time()
++    df.train(Xtr, Ytr, model, training_epochs=a.epochs, batch_size=a.batch, LR=a.lr, traintestsplit=a.val_split,
++             n_hidden_1=a.hidden[0], n_hidden_2=a.hidden[1], n_hidden_3=a.hidden[2])
++    train_time = time.time() - ts
++    os.chdir(cwd)
++    del Xtr, Ytr
++
++# Test set: official loop implementation, so the WMMSE CPU time is the paper's "WMMSE (Python)" column
++X, Y, wmmsetime = wf.generate_Gaussian(a.K, a.num_test, seed=a.test_seed)
++pred_file = os.path.join(a.out, 'Prediction_K%d_%s_seed%d' % (a.K, a.mode, a.seed))
++dnntime = df.test(X, model, pred_file, a.K * a.K, a.K, n_hidden_1=a.hidden[0], n_hidden_2=a.hidden[1],
++                  n_hidden_3=a.hidden[2], binary=1)
++H = np.reshape(X, (a.K, a.K, X.shape[1]), order="F")
++NNVbb = sio.loadmat(pred_file)['pred']
++r = wf.perf_eval(H, Y, NNVbb, a.K, plot=False)
++print('wmmse time: %0.3f s, dnn time: %0.3f s, time speed up: %0.1f X' % (wmmsetime, dnntime, wmmsetime / dnntime))
++
++row = dict(mode=a.mode, K=a.K, seed=a.seed if a.mode == 'train' else '', train_seed=a.train_seed if a.mode == 'train' else '',
++           test_seed=a.test_seed, num_train=a.num_train if a.mode == 'train' else 'unknown', num_test=a.num_test,
++           epochs=a.epochs if a.mode == 'train' else '', hidden='-'.join(map(str, a.hidden)),
++           wmmse_sumrate=round(r['wmmse'], 4), dnn_sumrate=round(r['dnn'], 4), dnn_pct_of_wmmse=round(r['ratio'], 3),
++           maxpower_pct=round(r['maxp_ratio'], 3), random_pct=round(r['rand_ratio'], 3),
++           dnn_cpu_s=round(dnntime, 4), wmmse_py_cpu_s=round(wmmsetime, 3), train_s=round(train_time, 1),
++           wall_s=round(time.time() - t0, 1))
++new = not os.path.exists(a.csv)
++with open(a.csv, 'a', newline='') as f:
++    w = csv.DictWriter(f, fieldnames=list(row))
++    if new:
++        w.writeheader()
++    w.writerow(row)
++print(row)

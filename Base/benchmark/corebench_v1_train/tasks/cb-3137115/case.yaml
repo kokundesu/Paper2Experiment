@@ -1,0 +1,75 @@
+# Hidden: pre-registered tolerances, computed from the 3 manual re-runs.
+capsule_id: capsule-3137115
+source: core-bench (original) core_train.json
+split: dev
+data_sha256: 3df47f1b3fa1cb60045018eb1a0f1ad4ecf6a53f72318c845a879ce0313b0730
+rule: docs/benchmark-redesign.md section 3.3
+questions:
+- id: q1
+  question: Report the final outcomes of reproducibility checks at the article level
+    after original authors were contacted (Table 1 of the manuscript). You should
+    report n for row 1 in the table (ignore the confidence interval).
+  vision: false
+  kind: numeric
+  scored: true
+  tolerance:
+    mean: 6.0
+    s: 0.0
+    n: 3
+    m: 1
+    noise: 0.0
+    precision: 0.05
+    floor: 6.000000000000001e-05
+    h: 0.05
+    term: precision
+- id: q2
+  question: Report the final outcomes of reproducibility checks at the article level
+    after original authors were contacted (Table 1 of the manuscript). You should
+    report n for row 2 in the table (ignore the confidence interval).
+  vision: false
+  kind: numeric
+  scored: true
+  tolerance:
+    mean: 9.0
+    s: 0.0
+    n: 3
+    m: 1
+    noise: 0.0
+    precision: 0.05
+    floor: 9.0e-05
+    h: 0.05
+    term: precision
+- id: q3
+  question: Report the final outcomes of reproducibility checks at the article level
+    after original authors were contacted (Table 1 of the manuscript). You should
+    report n for row 3 in the table (ignore the confidence interval).
+  vision: false
+  kind: numeric
+  scored: true
+  tolerance:
+    mean: 7.0
+    s: 0.0
+    n: 3
+    m: 1
+    noise: 0.0
+    precision: 0.05
+    floor: 7.000000000000001e-05
+    h: 0.05
+    term: precision
+- id: q4
+  question: fig From Figure 1, report the proportion of articles with fully reproducible
+    target values from the random effects model after author contact. Ignore the confidence
+    intervals
+  vision: true
+  kind: numeric
+  scored: true
+  tolerance:
+    mean: 0.62
+    s: 0.0
+    n: 3
+    m: 1
+    noise: 0.0
+    precision: 0.005
+    floor: 6.200000000000001e-06
+    h: 0.005
+    term: precision

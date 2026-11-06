@@ -1,0 +1,17 @@
+# Reference recipe (hidden; written by the benchmark builder). status: draft until the setup,
+# the command and one regex per question have been checked by an actual run.
+id: svgd
+status: draft
+repo: https://github.com/dilinwang820/Stein-Variational-Gradient-Descent
+commit: ''
+setup:
+- git clone https://github.com/dilinwang820/Stein-Variational-Gradient-Descent repo
+command: ''
+timeout_s: 1800
+seeded: true
+metrics: {}
+entry: '`python/bayesian_nn.py`'
+notes:
+- 'difficulty: 难; estimated time per run: 5–10 分钟'
+- 'risk: Python 2 + Theano，需要移植；要自己加 20 次划分的循环'
+- 'questions: boston_bnn_svgd_test_rmse, boston_bnn_svgd_test_log_likelihood'

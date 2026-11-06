@@ -1,0 +1,88 @@
+{
+ "draft": {
+  "understanding": "复现论文表 1 中 Doc2VecC 在 IMDB 影评情感分类测试集上的分类错误率；按仓库 README 所述默认 go.sh 流程，优先选用表中“include test”这一列作为待复现结果。",
+  "questions": [
+   {
+    "id": "imdb_doc2vecc_include_test_error",
+    "text": "Doc2VecC 在 IMDB 情感分类测试集上，表 1 的“include test”协议下，线性 SVM 的分类错误率是多少？",
+    "metric": "分类错误率",
+    "unit": "%",
+    "direction": "lower",
+    "locator": "表 1，Doc2VecC 行，Error rate % (include test) 列",
+    "setting": "IMDB 预定义训练／测试划分；Doc2VecC 文档表示在训练集、无标签集和测试集全部文本上学习，再以有标签训练集的表示训练线性 SVM，在测试集上评估；按 README 中 go.sh 的默认复现流程理解。",
+    "runs": 1,
+    "protocol_notes": "论文描述超参数在从训练集抽出的验证集上调整，最终报告测试集分类错误率；未说明独立随机运行的平均。README 未提供 go.sh 的具体内容，因此无法仅凭现有材料确认默认脚本使用哪种表示学习数据范围。"
+   }
+  ],
+  "open_issues": [
+   "表 1 还有“exclude test”列，即仅用训练集及无标签集学习表示。您要复现的是默认选取的“include test”列，还是“exclude test”列？README 未明确 go.sh 对应哪一列。"
+  ]
+ },
+ "checks": {
+  "sonnet55": {
+   "items": [
+    {
+     "question_id": "imdb_doc2vecc_include_test_error",
+     "in_scope": "yes",
+     "locator_ok": "yes",
+     "underspecified": [
+      "variant"
+     ],
+     "answer_type_ok": "yes",
+     "measurable": "yes",
+     "comment": "The user asked for the Doc2VecC IMDB error rate in Table 1. Table 1 has two columns, include test (10.48) and exclude test (11.70), and the request doesn't pick one. The draft chose 'include test' on its own and admits the README doesn't settle it. Either column could be the intended number. The draft covers only one of the two Table 1 values. The code needs only a CPU plus liblinear."
+    }
+   ],
+   "missing_questions": [
+    "Doc2VecC IMDB error rate in Table 1, 'exclude test' column (representation learned on training and unlabeled data only)"
+   ]
+  },
+  "haiku55": {
+   "items": [
+    {
+     "question_id": "imdb_doc2vecc_include_test_error",
+     "in_scope": "yes",
+     "locator_ok": "yes",
+     "underspecified": [
+      "variant"
+     ],
+     "answer_type_ok": "yes",
+     "measurable": "yes",
+     "comment": "Table 1 Doc2VecC row, include-test column = 10.48. The user did not name a column, and the two columns (include test / exclude test) give different numbers. The draft picked include test on the assumption that go.sh uses it, but the README does not say which protocol go.sh runs. The question should either name the column explicitly or be paired with the exclude-test question. The draft's own open_issues already acknowledge this. Runs on CPU (C code plus liblinear), so no GPU or API is needed."
+    }
+   ],
+   "missing_questions": [
+    "imdb_doc2vecc_exclude_test_error: Doc2VecC on IMDB, Table 1 'exclude test' column (representation learned only on train + unlabeled data). The user asked for the Doc2VecC error rate in Table 1 without choosing a column, and this column is not covered by the draft."
+   ]
+  }
+ },
+ "accepted": [],
+ "queue": [
+  {
+   "kind": "question",
+   "question_id": "imdb_doc2vecc_include_test_error",
+   "text": "Doc2VecC 在 IMDB 情感分类测试集上，表 1 的“include test”协议下，线性 SVM 的分类错误率是多少？",
+   "locator": "表 1，Doc2VecC 行，Error rate % (include test) 列",
+   "reasons": [
+    "all checkers: underspecified (variant) -- sonnet55: The user asked for the Doc2VecC IMDB error rate in Table 1. Table 1 has two columns, include test (10.48) and exclude test (11.70), and the request doesn't pick one. The draft chose 'include test' on its own and admits the README doesn't settle it. Either column could be the intended number. The draft covers only one of the two Table 1 values. The code needs only a CPU plus liblinear. | haiku55: Table 1 Doc2VecC row, include-test column = 10.48. The user did not name a column, and the two columns (include test / exclude test) give different numbers. The draft picked include test on the assumption that go.sh uses it, but the README does not say which protocol go.sh runs. The question should either name the column explicitly or be paired with the exclude-test question. The draft's own open_issues already acknowledge this. Runs on CPU (C code plus liblinear), so no GPU or API is needed."
+   ]
+  },
+  {
+   "kind": "draft_issue",
+   "by": "drafter",
+   "text": "表 1 还有“exclude test”列，即仅用训练集及无标签集学习表示。您要复现的是默认选取的“include test”列，还是“exclude test”列？README 未明确 go.sh 对应哪一列。"
+  },
+  {
+   "kind": "missing",
+   "by": "sonnet55",
+   "text": "Doc2VecC IMDB error rate in Table 1, 'exclude test' column (representation learned on training and unlabeled data only)"
+  },
+  {
+   "kind": "missing",
+   "by": "haiku55",
+   "text": "imdb_doc2vecc_exclude_test_error: Doc2VecC on IMDB, Table 1 'exclude test' column (representation learned only on train + unlabeled data). The user asked for the Doc2VecC error rate in Table 1 without choosing a column, and this column is not covered by the draft."
+  }
+ ],
+ "notes": [],
+ "cost_usd": 0.0969
+}

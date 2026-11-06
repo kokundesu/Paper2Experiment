@@ -1,0 +1,9 @@
+# cmd (cwd manual/SGC): citation.py --dataset cora --tuned --epochs 100 --seed 5 
+# date: 2026-10-04 23:14:28
+/Users/allenhuw/Documents/Projects/Paper2Experiment/benchmark/sgc/manual/SGC/utils.py:30: UserWarning: torch.sparse.SparseTensor(indices, values, shape, *, device=) is deprecated.  Please use torch.sparse_coo_tensor(indices, values, shape, dtype=, device=). (Triggered internally at /Users/runner/work/pytorch/pytorch/torch/csrc/utils/tensor_new.cpp:655.)
+  return torch.sparse.FloatTensor(indices, values, shape)
+using tuned weight decay: 1.3026973714043257e-05
+0.0100s
+Validation Accuracy: 0.7940 Test Accuracy: 0.8100
+Pre-compute time: 0.0100s, train time: 0.0274s, total: 0.0374s
+# wall_s: 4.4

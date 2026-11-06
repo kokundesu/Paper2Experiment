@@ -1,0 +1,23 @@
+# Task given to every workflow. Contains no target values.
+id: l2o_wmmse
+paper_url: https://arxiv.org/pdf/1705.09412
+paper_pdf: paper/1705.09412.pdf
+repo_url: https://github.com/Haoran-S/TSP-DNN
+objective: >
+  Reproduce the Gaussian interference channel (IC) results of Table I
+  ("Sum-Rate and Computational Performance for Gaussian IC"): train the DNN
+  that approximates WMMSE power allocation from scratch with the official code
+  and the paper's setup, then report the DNN's average sum-rate as a percentage
+  of WMMSE's on a held-out test set, plus the CPU-time speed-up of the DNN over
+  the Python WMMSE. Each training run must finish in about 20 minutes on a CPU;
+  if you have to scale the setup down, say exactly what you changed.
+claims:
+  - {id: k10_dnn_pct, metric: sum_rate_ratio, setting: "gaussian_ic_K10", unit: "%",
+     description: "Average DNN sum-rate divided by average WMMSE sum-rate (x100), Gaussian IC with K=10 users, DNN outputs binarised at 0.5, on a test set of fresh channel realisations (paper: 10,000), DNN trained from scratch"}
+  - {id: k20_dnn_pct, metric: sum_rate_ratio, setting: "gaussian_ic_K20", unit: "%",
+     description: "Same as k10_dnn_pct but K=20 users"}
+  - {id: k30_dnn_pct, metric: sum_rate_ratio, setting: "gaussian_ic_K30", unit: "%",
+     description: "Same as k10_dnn_pct but K=30 users"}
+  - {id: k10_speedup_py, metric: cpu_time_speedup, setting: "gaussian_ic_K10", unit: "x",
+     description: "Total CPU time of the Python WMMSE on the whole K=10 test set divided by the DNN's total CPU inference time on the same test set (both on CPU)"}
+seeds: 3

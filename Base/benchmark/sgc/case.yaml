@@ -1,0 +1,68 @@
+# Benchmark case: hidden ground truth for the evaluator. Agents never see this file
+# (they get task.yaml instead).
+id: sgc
+paper:
+  title: "Simplifying Graph Convolutional Networks"
+  authors: "Wu, Zhang, Holanda de Souza Jr., Fifty, Yu, Weinberger"
+  venue: "ICML 2019"
+  arxiv: "1902.07153"
+  version_note: >
+    Targets copied from Table 2 (SGC row) of the ICML 2019 camera-ready PDF in paper/ (PDF metadata
+    2019-06-21). The same three numbers (81.0 / 71.9 / 78.9) are already in the README of the initial code
+    release (commit 5f0e9e9, 2019-01-30), together with the `--epochs 150` Citeseer command.
+repo:
+  url: https://github.com/Tiiiger/SGC
+  commit: 2c7a2727e82e462d8ef9d6e57f0b08888e16488f
+  note: >
+    Official PyTorch code. The citation path (citation.py, args.py, models.py, normalization.py, the
+    load_citation part of utils.py, data/, SGC-tuning/) is unchanged since the 2019-01-30 release apart from a
+    default-argument typo fix (d2a66ec) that citation.py overrides anyway. Data (Planetoid public split) and the
+    hyperopt-tuned weight decays (SGC-tuning/<dataset>.txt pickles) ship with the repo. The `ablation` branch
+    is a separate work-in-progress branch for the paper's ablations and is not needed.
+difficulty: easy
+expected_runtime_cpu_min: 1   # every run is 4-6 s wall on an M4 CPU (training itself 0.03 s; the rest is imports and data loading)
+
+# Paper Table 2, SGC row: test accuracy (%) on the Planetoid public split, averaged over 10 runs
+# (paper: 81.0 ± 0.0 / 71.9 ± 0.1 / 78.9 ± 0.0). K = 2, Adam lr 0.2, tuned weight decay,
+# 100 epochs for Cora/Pubmed and 150 for Citeseer (README commands).
+# A claim is reproduced when the mean over seeds is within tolerance:
+#   abs: |mean - value| <= abs
+# evidence_pattern matches the training trace only (2026-10-05): the value itself must also appear in the same
+# log, which the evaluator checks separately. Patterns that also pinned the final print line failed a correct
+# FITS run whose agent had (legitimately) patched the output format.
+claims:
+  - {id: cora_acc,     metric: test_accuracy, setting: cora,     unit: "%", value: 81.0, tolerance: {abs: 0.5}, evidence_pattern: "train time: [0-9.]+s"}
+  - {id: citeseer_acc, metric: test_accuracy, setting: citeseer, unit: "%", value: 71.9, tolerance: {abs: 0.5}, evidence_pattern: "train time: [0-9.]+s"}
+  - {id: pubmed_acc,   metric: test_accuracy, setting: pubmed,   unit: "%", value: 78.9, tolerance: {abs: 0.5}, evidence_pattern: "train time: [0-9.]+s"}
+
+rubric:
+  min_seeds: 3
+  aggregate: mean
+  levels:
+    full: "all verdict claims within tolerance (diagnostic_only claims excluded)"
+    partial: "at least one verdict claim within tolerance"
+    fail: "no verdict claim reproduced or run did not finish"
+  tolerance_justification: >
+    10 seeds per claim (42 = upstream default, 0-8), official README commands, CPU. SGC is logistic
+    regression on precomputed S^2 X, so the seed only changes the initial weights: test accuracy is
+    81.02 ± 0.04 (81.0-81.1) / 71.84 ± 0.07 (71.7-71.9) / 78.95 ± 0.05 (78.9-79.0), and seed 42 gives
+    exactly 81.0 / 71.9 / 78.9. All C(10,3)=120 three-seed means lie within 0.17 pp of the paper. 0.5 pp
+    (5 of 1000 test nodes, ~7 std of the noisiest claim) leaves room for platform numerics (1 vs 4 threads
+    gave identical results) while rejecting wrong setups: Citeseer at 100 epochs with the shipped weight
+    decay gives 71.2 (-0.7, all 10 seeds), untuned weight decay 5e-6 gives 69.5 (-2.4) on Citeseer and
+    77.8 (-1.1) on Pubmed, K=1 is 1.4-4.4 pp low everywhere, K=3 gives 81.9 (+0.9) on Cora. Accepted
+    on purpose: re-running hyperopt as the paper describes (Citeseer at 100 epochs: 72.0-72.3 over 6
+    hyperopt seeds; 150 epochs: 71.9-72.0). Limitations: untuned Cora (80.6, -0.4) and Cora at 150
+    epochs (81.4, +0.4) still pass that claim; the other claims catch the untuned case.
+
+# Known obstacles on a modern environment (Python 3.11, torch 2.14.1 CPU, NumPy 2.4, SciPy 1.17, networkx 3.6)
+known_issues:
+  - "No code changes are needed: the unmodified repo runs with modern torch/scipy/networkx; only a torch.sparse.FloatTensor deprecation warning is printed. But requirements.txt pins networkx==1.11 (and hyperopt==0.1.1, which imports it): on Python >= 3.9 `import networkx` fails with `cannot import name 'gcd' from 'fractions'`. Install unpinned networkx (3.6.1 works)."
+  - "Paper text says 100 epochs, but the README runs Citeseer with `--epochs 150`; the paper also says epochs were tuned per dataset on convergence and validation accuracy. 150 reproduces 71.9; 100 epochs with the shipped tuned weight decay gives 71.2 on every seed."
+  - "Must pass `--tuned` (reads the hyperopt weight decay from SGC-tuning/<dataset>.txt: cora 1.30e-5, citeseer 2.35e-5, pubmed 7.40e-5); the args.py default 5e-6 gives 80.6 / 69.5 / 77.8."
+  - "citation.py must run from the repo root: data/ and SGC-tuning/ are opened with relative paths."
+  - "args.py uses parse_known_args: unknown or misspelled flags (e.g. --weight-decay, --K) are silently ignored, and a whole command passed as one quoted string falls back to cora defaults (80.7). Prefixes are accepted (--epoch 150 works)."
+  - "Seed: `--seed` flag, default 42 (no patch needed). Seed only affects the weight init; runs are deterministic on CPU (identical with 1 and 4 threads)."
+  - "Metric: last `Test Accuracy: 0.xxxx` line (fraction, scale 100); printed once per run after the 100/150 full-batch Adam steps. The validation accuracy on the same line is not the claim."
+  - "Re-running tuning.py (hyperopt, 60 evals) instead of using --tuned gives slightly different weight decays (cora 1.2-1.7e-5, citeseer 2.8-3.7e-5 at 150 epochs or 5.4-7.8e-5 at 100 epochs, pubmed 6.7-7.7e-5) but test accuracies within 0.4 pp of the paper. tuning.py overwrites SGC-tuning/<dataset>.txt and executes citation.py on import."
+  - "Trap: library re-implementations (PyG SGConv example, DGL) use other hyperparameters; the README warns their results differ from the paper."

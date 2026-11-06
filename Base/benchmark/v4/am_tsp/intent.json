@@ -1,0 +1,127 @@
+{
+ "draft": {
+  "understanding": "用户要仅使用仓库随附的、分别针对 TSP20、TSP50、TSP100 训练好的 AM 预训练模型进行推理，以贪心解码复现论文表 1 中这三个规模的平均 TSP 回路长度（Obj.），不重新训练，也不进行采样或局部搜索。",
+  "questions": [
+   {
+    "id": "tsp20_am_greedy_mean_tour_length",
+    "text": "论文表 1 中，TSP20 的 AM (greedy) 平均回路长度（Obj.）是多少？",
+    "metric": "平均 TSP 回路长度（Obj.）",
+    "unit": "",
+    "direction": "lower",
+    "locator": "表 1，TSP 部分，AM (greedy) 行，n = 20 的 Obj. 列",
+    "setting": "20 个节点的二维欧氏 TSP；节点坐标独立均匀采样于单位正方形；使用仓库 pretrained/tsp_20 的预训练 AM 模型，仅推理、逐步贪心选择节点；测试集为 10000 个实例（仓库对应 tsp20_test_seed1234.pkl）。",
+    "runs": 1,
+    "protocol_notes": "论文第 5 节称表 1 的结果在每个问题的 10000 个测试实例上评估；每个实例贪心构建一条完整回路，再对回路长度取实例平均。表 1 未声明对多个独立模型或随机种子取平均；README 的 eval.py 示例使用对应规模预训练模型和 greedy 解码。"
+   },
+   {
+    "id": "tsp50_am_greedy_mean_tour_length",
+    "text": "论文表 1 中，TSP50 的 AM (greedy) 平均回路长度（Obj.）是多少？",
+    "metric": "平均 TSP 回路长度（Obj.）",
+    "unit": "",
+    "direction": "lower",
+    "locator": "表 1，TSP 部分，AM (greedy) 行，n = 50 的 Obj. 列",
+    "setting": "50 个节点的二维欧氏 TSP；节点坐标独立均匀采样于单位正方形；使用仓库 pretrained/tsp_50 的预训练 AM 模型，仅推理、逐步贪心选择节点；测试集为 10000 个实例（仓库对应 tsp50_test_seed1234.pkl）。",
+    "runs": 1,
+    "protocol_notes": "论文第 5 节称表 1 的结果在每个问题的 10000 个测试实例上评估；每个实例贪心构建一条完整回路，再对回路长度取实例平均。表 1 未声明对多个独立模型或随机种子取平均；使用对应规模的预训练模型，不采样或训练。"
+   },
+   {
+    "id": "tsp100_am_greedy_mean_tour_length",
+    "text": "论文表 1 中，TSP100 的 AM (greedy) 平均回路长度（Obj.）是多少？",
+    "metric": "平均 TSP 回路长度（Obj.）",
+    "unit": "",
+    "direction": "lower",
+    "locator": "表 1，TSP 部分，AM (greedy) 行，n = 100 的 Obj. 列",
+    "setting": "100 个节点的二维欧氏 TSP；节点坐标独立均匀采样于单位正方形；使用仓库 pretrained/tsp_100 的预训练 AM 模型，仅推理、逐步贪心选择节点；测试集为 10000 个实例（仓库对应 tsp100_test_seed1234.pkl）。",
+    "runs": 1,
+    "protocol_notes": "论文第 5 节称表 1 的结果在每个问题的 10000 个测试实例上评估；每个实例贪心构建一条完整回路，再对回路长度取实例平均。表 1 未声明对多个独立模型或随机种子取平均；使用对应规模的预训练模型，不采样或训练。"
+   }
+  ],
+  "open_issues": []
+ },
+ "checks": {
+  "sonnet55": {
+   "items": [
+    {
+     "question_id": "tsp20_am_greedy_mean_tour_length",
+     "in_scope": "yes",
+     "locator_ok": "yes",
+     "underspecified": [
+      "none"
+     ],
+     "answer_type_ok": "yes",
+     "measurable": "yes",
+     "comment": ""
+    },
+    {
+     "question_id": "tsp50_am_greedy_mean_tour_length",
+     "in_scope": "yes",
+     "locator_ok": "yes",
+     "underspecified": [
+      "none"
+     ],
+     "answer_type_ok": "yes",
+     "measurable": "yes",
+     "comment": ""
+    },
+    {
+     "question_id": "tsp100_am_greedy_mean_tour_length",
+     "in_scope": "yes",
+     "locator_ok": "yes",
+     "underspecified": [
+      "none"
+     ],
+     "answer_type_ok": "yes",
+     "measurable": "yes",
+     "comment": ""
+    }
+   ],
+   "missing_questions": []
+  },
+  "haiku55": {
+   "items": [
+    {
+     "question_id": "tsp20_am_greedy_mean_tour_length",
+     "in_scope": "yes",
+     "locator_ok": "yes",
+     "underspecified": [
+      "none"
+     ],
+     "answer_type_ok": "yes",
+     "measurable": "yes",
+     "comment": "Table 1 TSP section, AM (greedy) row, n=20 Obj. column. The test set (10000 instances, seed 1234) and the greedy decoding protocol are stated in Section 5 and the README."
+    },
+    {
+     "question_id": "tsp50_am_greedy_mean_tour_length",
+     "in_scope": "yes",
+     "locator_ok": "yes",
+     "underspecified": [
+      "none"
+     ],
+     "answer_type_ok": "yes",
+     "measurable": "yes",
+     "comment": "Table 1 TSP section, AM (greedy) row, n=50 Obj. column. Same protocol as n=20."
+    },
+    {
+     "question_id": "tsp100_am_greedy_mean_tour_length",
+     "in_scope": "yes",
+     "locator_ok": "yes",
+     "underspecified": [
+      "none"
+     ],
+     "answer_type_ok": "yes",
+     "measurable": "yes",
+     "comment": "Table 1 TSP section, AM (greedy) row, n=100 Obj. column. Same protocol as n=20; inference on CPU for 10000 instances is feasible."
+    }
+   ],
+   "missing_questions": []
+  }
+ },
+ "accepted": [
+  "tsp20_am_greedy_mean_tour_length",
+  "tsp50_am_greedy_mean_tour_length",
+  "tsp100_am_greedy_mean_tour_length"
+ ],
+ "queue": [],
+ "notes": [],
+ "cost_usd": 0.1989
+}

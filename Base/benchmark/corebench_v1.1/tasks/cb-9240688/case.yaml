@@ -1,0 +1,22 @@
+# Hidden: pre-registered tolerances, computed from the 3 manual re-runs.
+capsule_id: capsule-9240688
+source: core-bench-v1.1-mainline core_test.json
+split: test
+data_sha256: d4aa5ebb984df7f293e04f2dd120722f172fddea6fcb54a0c928e09bc6ef837d
+rule: docs/benchmark-redesign.md section 3.3
+questions:
+- id: q1
+  question: From table 1, report the portion relevant in both corpora.
+  vision: false
+  kind: numeric
+  scored: true
+  tolerance:
+    mean: 0.44
+    s: 0.0
+    n: 3
+    m: 1
+    noise: 0.0
+    precision: 0.005
+    floor: 4.4e-06
+    h: 0.005
+    term: precision

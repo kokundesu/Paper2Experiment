@@ -1,0 +1,831 @@
+[
+    {
+        "field": "Computer Science",
+        "language": "Python",
+        "capsule_title": "Detection and State Analysis of Drowsiness using Multitask Learning with Neural Networks",
+        "capsule_id": "capsule-5507257",
+        "task_prompt": "Run multiclass_state_analysis_testing.py",
+        "gpu": true,
+        "results": [
+            {
+                "Report the test accuracy of 'mouth talking'.": 96.12499135323452
+            },
+            {
+                "Report the test accuracy of 'mouth talking'.": 96.12499135323452
+            },
+            {
+                "Report the test accuracy of 'mouth talking'.": 96.12499135323452
+            }
+        ],
+        "capsule_doi": "https://doi.org/10.24433/CO.0217715.v1"
+    },
+    {
+        "field": "Computer Science",
+        "language": "Python",
+        "capsule_title": "Short-Term Temperature Forecasts Using a Convolutional Neural Network",
+        "capsule_id": "capsule-3449234",
+        "task_prompt": "Run the jupyter notebook visualize_results.ipynb using a python3 kernel and convert it to html. For all the runs, disable the cell execution timeout and allow errors.",
+        "gpu": true,
+        "results": [
+            {
+                "fig From the figure containing the standard deviation for the Essen data, report the name of the model with the highest standard deviation between time 0 and 10.": "SN"
+            },
+            {
+                "fig From the figure containing the standard deviation for the Essen data, report the name of the model with the highest standard deviation between time 0 and 10.": "SN"
+            },
+            {
+                "fig From the figure containing the standard deviation for the Essen data, report the name of the model with the highest standard deviation between time 0 and 10.": "SN"
+            }
+        ],
+        "capsule_doi": "https://doi.org/10.24433/CO.8788349.v1"
+    },
+    {
+        "field": "Computer Science",
+        "language": "Python",
+        "capsule_title": "Network Diffusion Examples",
+        "capsule_id": "capsule-8807709",
+        "task_prompt": "Run 'epidemic.py'.",
+        "results": [
+            {
+                "fig For the third subplot in the visualization of the experiments, report the color of the line with the greatest number of nodes at epoch 15.": "blue",
+                "fig Report the name of the first subplot in the visualization of the experiments.": "ill"
+            },
+            {
+                "fig For the third subplot in the visualization of the experiments, report the color of the line with the greatest number of nodes at epoch 15.": "blue",
+                "fig Report the name of the first subplot in the visualization of the experiments.": "ill"
+            },
+            {
+                "fig For the third subplot in the visualization of the experiments, report the color of the line with the greatest number of nodes at epoch 15.": "blue",
+                "fig Report the name of the first subplot in the visualization of the experiments.": "ill"
+            }
+        ],
+        "capsule_doi": "https://doi.org/10.24433/CO.1013089.v4"
+    },
+    {
+        "field": "Computer Science",
+        "language": "Python",
+        "capsule_title": "Multi-Instance Ensemble Learning with Discriminative Bags (ELDB)",
+        "capsule_id": "capsule-6049678",
+        "task_prompt": "Run 'Main.py'.",
+        "results": [
+            {
+                "Report the f1 score for the Musk1+ dataset with the svm classifier.": 87.516,
+                "Report the f1 score for the Musk1+ dataset with the j48 classifier.": 79.813
+            },
+            {
+                "Report the f1 score for the Musk1+ dataset with the svm classifier.": 86.578,
+                "Report the f1 score for the Musk1+ dataset with the j48 classifier.": 79.426
+            },
+            {
+                "Report the f1 score for the Musk1+ dataset with the svm classifier.": 86.186,
+                "Report the f1 score for the Musk1+ dataset with the j48 classifier.": 78.673
+            }
+        ],
+        "capsule_doi": "https://doi.org/10.24433/CO.1490343.v1"
+    },
+    {
+        "field": "Computer Science",
+        "language": "R",
+        "capsule_title": "mFLICA Reproducible Capsule",
+        "capsule_id": "capsule-2804717",
+        "task_prompt": "Export the following R default packages: datasets,utils,grDevices,graphics,stats,methods. Run 'ResultReproducibilityNotebook.Rmd' and render it as an html file. Store the output in ../results and set clean to 'TRUE'.",
+        "results": [
+            {
+                "fig From the Network Density plot (Figure 4), report the label for the red line (ignore spaces).": "TS#1"
+            },
+            {
+                "fig From the Network Density plot (Figure 4), report the label for the red line (ignore spaces).": "TS#1"
+            },
+            {
+                "fig From the Network Density plot (Figure 4), report the label for the red line (ignore spaces).": "TS#1"
+            }
+        ],
+        "capsule_doi": "https://doi.org/10.24433/CO.4248204.v1"
+    },
+    {
+        "field": "Computer Science",
+        "language": "Python",
+        "capsule_title": "Explainable Machine Learning Pipeline for Twitter Bot Detection",
+        "capsule_id": "capsule-3418007",
+        "task_prompt": "Run 'main.py'.",
+        "results": [
+            {
+                "Report the F1 score for statistical general only.": 0.7536528881857651,
+                "fig Report the proposed model's AUC from the ROC curves figure. Ignore the confidence interval.": 0.98
+            },
+            {
+                "Report the F1 score for statistical general only.": 0.7569591300356435,
+                "fig Report the proposed model's AUC from the ROC curves figure. Ignore the confidence interval.": 0.98
+            },
+            {
+                "Report the F1 score for statistical general only.": 0.7599081605158183,
+                "fig Report the proposed model's AUC from the ROC curves figure. Ignore the confidence interval.": 0.98
+            }
+        ],
+        "capsule_doi": "https://doi.org/10.24433/CO.9672787.v1"
+    },
+    {
+        "field": "Computer Science",
+        "language": "Python",
+        "capsule_title": "Feature Selection",
+        "capsule_id": "capsule-1624349",
+        "task_prompt": "Execute 'FS-Filters.ipynb'. Save the results in html format in ../results. For all the runs, disable the cell execution timeout and allow errors.",
+        "results": [
+            {
+                "Report the best accuracy of the hybrid filter wrapper strategy.": 0.9506166187739464,
+                "fig Report the name of the feature with the highest I-Gain.": "RAWRED-MEAN"
+            },
+            {
+                "Report the best accuracy of the hybrid filter wrapper strategy.": 0.9506166187739464,
+                "fig Report the name of the feature with the highest I-Gain.": "RAWRED-MEAN"
+            },
+            {
+                "Report the best accuracy of the hybrid filter wrapper strategy.": 0.9506166187739464,
+                "fig Report the name of the feature with the highest I-Gain.": "RAWRED-MEAN"
+            }
+        ],
+        "capsule_doi": "https://doi.org/10.24433/CO.1509005.v1"
+    },
+    {
+        "field": "Social Sciences",
+        "language": "R",
+        "capsule_title": "Reproducible research practices and transparency across linguistics",
+        "capsule_id": "capsule-9832712",
+        "task_prompt": "Create the following three directories in the results folder: 01_scopus-selection, 02_coding, 03_analyses. Run 'master_script.R' using Rscript.",
+        "results": [
+            {
+                "fig From Figure 2 in the cleaned results, report the percentage of 'Not Available' analysis scripts for Pre-RC (2008-09)": 100,
+                "fig From Table 1 in the cleaned results, report the number of Included Articles After.OS": 255
+            },
+            {
+                "fig From Figure 2 in the cleaned results, report the percentage of 'Not Available' analysis scripts for Pre-RC (2008-09)": 100,
+                "fig From Table 1 in the cleaned results, report the number of Included Articles After.OS": 255
+            },
+            {
+                "fig From Figure 2 in the cleaned results, report the percentage of 'Not Available' analysis scripts for Pre-RC (2008-09)": 100,
+                "fig From Table 1 in the cleaned results, report the number of Included Articles After.OS": 255
+            }
+        ],
+        "capsule_doi": "https://doi.org/10.24433/CO.2289033.v2"
+    },
+    {
+        "field": "Medical Sciences",
+        "language": "R",
+        "capsule_title": "ESR1 mutant breast cancers show elevated basal cytokeratins and immune activation",
+        "capsule_id": "capsule-2816027",
+        "task_prompt": "Export the following R default packages: datasets,utils,grDevices,graphics,stats,methods. Then, run 'main.R' using Rscript.",
+        "results": [
+            {
+                "fig For CTCF Signature Enrichment, report the name of the group with the highest median GSVA score.": "MCF7_D538G"
+            },
+            {
+                "fig For CTCF Signature Enrichment, report the name of the group with the highest median GSVA score.": "MCF7_D538G"
+            },
+            {
+                "fig For CTCF Signature Enrichment, report the name of the group with the highest median GSVA score.": "MCF7_D538G"
+            }
+        ],
+        "capsule_doi": "https://doi.org/10.24433/CO.0627595.v1"
+    },
+    {
+        "field": "Social Sciences",
+        "language": "R",
+        "capsule_title": "Adaptations to sea level change and transitions to agriculture at Khao Toh Chong rockshelter, Peninsular Thailand",
+        "capsule_id": "capsule-3821950",
+        "task_prompt": "Create a 'figures' directory in the results folder. Run 'ktc_11_paper.Rmd' using Rscript and render it as html. Save the output to the ../results output directory. Set clean to 'TRUE'.",
+        "results": [
+            {
+                "fig Report the name of the material with the highest Depth Below Surface at 10,000 calibrated years BP.": "charcoal",
+                "fig Report the name of the material with the highest mass (g) and 5000 years cal. BP.": "ceramics"
+            },
+            {
+                "fig Report the name of the material with the highest Depth Below Surface at 10,000 calibrated years BP.": "charcoal",
+                "fig Report the name of the material with the highest mass (g) and 5000 years cal. BP.": "ceramics"
+            },
+            {
+                "fig Report the name of the material with the highest Depth Below Surface at 10,000 calibrated years BP.": "charcoal",
+                "fig Report the name of the material with the highest mass (g) and 5000 years cal. BP.": "ceramics"
+            }
+        ],
+        "capsule_doi": "https://doi.org/10.24433/CO.0c427240-6e28-417d-ba1a-777c8c4e485a"
+    },
+    {
+        "field": "Medical Sciences",
+        "language": "R",
+        "capsule_title": "Framework to study harms and benefits of multi-cancer early detection tests",
+        "capsule_id": "capsule-9054015",
+        "task_prompt": "Run 'pancancer_calculation.R' using Rscript.",
+        "results": [
+            {
+                "fig Report the percentage sensitivity for cancers A and B that has the highest number of cancers detected per 1,000 women for a 1.0% prevalance of cancer B.": 90
+            },
+            {
+                "fig Report the percentage sensitivity for cancers A and B that has the highest number of cancers detected per 1,000 women for a 1.0% prevalance of cancer B.": 90
+            },
+            {
+                "fig Report the percentage sensitivity for cancers A and B that has the highest number of cancers detected per 1,000 women for a 1.0% prevalance of cancer B.": 90
+            }
+        ],
+        "capsule_doi": "https://doi.org/10.24433/CO.4448554.v3"
+    },
+    {
+        "field": "Computer Science",
+        "language": "Python",
+        "capsule_title": "Deep Learning for Cellular Traffic Prediction",
+        "capsule_id": "capsule-3301293",
+        "task_prompt": "Run 'run_prediction.py'.",
+        "gpu": true,
+        "results": [
+            {
+                "Report the test RMSE of the model.": 26.21204
+            },
+            {
+                "Report the test RMSE of the model.": 26.21204
+            },
+            {
+                "Report the test RMSE of the model.": 26.21204
+            }
+        ],
+        "capsule_doi": "https://doi.org/10.24433/CO.761a91d4-6f2f-4912-8129-2bb8abeaa044"
+    },
+    {
+        "field": "Social Sciences",
+        "language": "R",
+        "capsule_title": "Adapting the coordination of eyes and head to differences in task and environment during fully-mobile visual exploration",
+        "capsule_id": "capsule-1724988",
+        "task_prompt": "Run 'calibration_error.R', 'lss1_summary_analyses.R', 'lss2_summary_analyses.R', and 'lss2_peak_analyses.R' all using Rscript.",
+        "results": [
+            {
+                "fig Report the task name with the higher median walking speed (m/s).": "Walk",
+                "fig Report the task name with the higher median straightness ratio.": "Search"
+            },
+            {
+                "fig Report the task name with the higher median walking speed (m/s).": "Walk",
+                "fig Report the task name with the higher median straightness ratio.": "Search"
+            },
+            {
+                "fig Report the task name with the higher median walking speed (m/s).": "Walk",
+                "fig Report the task name with the higher median straightness ratio.": "Search"
+            }
+        ],
+        "capsule_doi": "https://doi.org/10.24433/CO.8767371.v2"
+    },
+    {
+        "field": "Social Sciences",
+        "language": "R",
+        "capsule_title": "Preaching to the Choir: A Problem of Participatory Interventions",
+        "capsule_id": "capsule-4299879",
+        "task_prompt": "Run '01_motivation.R', '02_design.R', '03_survey.R', '04_metaketa_comp.R', '05_lapop.R', '06_misc.R' using Rscript.",
+        "results": [
+            {
+                "fig From the figure measuring homicide rate per 100k in the last 12 months, report the name of the sample with the lower homicide rate per 100k in 2000.": "Colombia"
+            },
+            {
+                "fig From the figure measuring homicide rate per 100k in the last 12 months, report the name of the sample with the lower homicide rate per 100k in 2000.": "Colombia"
+            },
+            {
+                "fig From the figure measuring homicide rate per 100k in the last 12 months, report the name of the sample with the lower homicide rate per 100k in 2000.": "Colombia"
+            }
+        ],
+        "capsule_doi": "https://doi.org/10.24433/CO.0479587.v1"
+    },
+    {
+        "field": "Medical Sciences",
+        "language": "Python",
+        "capsule_title": "MLP-based classification of COVID-19 and skin diseases",
+        "capsule_id": "capsule-0851068",
+        "task_prompt": "Run the bash script 'demo.sh'.",
+        "gpu": true,
+        "results": [
+            {
+                "Report the final AUC after training.": 0.9157952669235003
+            },
+            {
+                "Report the final AUC after training.": 0.9157952669235003
+            },
+            {
+                "Report the final AUC after training.": 0.9157952669235003
+            }
+        ],
+        "capsule_doi": "https://doi.org/10.24433/CO.9705378.v1"
+    },
+    {
+        "field": "Medical Sciences",
+        "language": "R",
+        "capsule_title": "Compute capsule for stochastic process based COVID-19 simulation environment",
+        "capsule_id": "capsule-1394704",
+        "task_prompt": "Run 'modular.Rmd' using Rscript and render it as a html. Store the output in ../results. Set clean to 'TRUE'.",
+        "results": [
+            {
+                "fig Report the name of the method with the higher R0.": "ML",
+                "Report the R0 of EG.": 1.035213
+            },
+            {
+                "fig Report the name of the method with the higher R0.": "ML",
+                "Report the R0 of EG.": 1.035213
+            },
+            {
+                "fig Report the name of the method with the higher R0.": "ML",
+                "Report the R0 of EG.": 1.035213
+            }
+        ],
+        "capsule_doi": "https://doi.org/10.24433/CO.7958703.v1"
+    },
+    {
+        "field": "Social Sciences",
+        "language": "R",
+        "capsule_title": "No Evaluative Conditioning Effects with Briefly Presented Stimuli",
+        "capsule_id": "capsule-0504157",
+        "task_prompt": "Run 'manuscript.Rmd' using Rscript and render it as a pdf. Store the output in the ../results directory. Set clean to 'TRUE'.",
+        "results": [
+            {
+                "fig From figure 1, report the CS presentation time with the greatest mean EC effect (ignore units).": 1000
+            },
+            {
+                "fig From figure 1, report the CS presentation time with the greatest mean EC effect (ignore units).": 1000
+            },
+            {
+                "fig From figure 1, report the CS presentation time with the greatest mean EC effect (ignore units).": 1000
+            }
+        ],
+        "capsule_doi": "https://doi.org/10.24433/CO.26389ff0-ea56-467d-a550-b96cb9a31e04"
+    },
+    {
+        "field": "Computer Science",
+        "language": "Python",
+        "capsule_title": "On the Energy Footprint of Mobile Testing Frameworks",
+        "capsule_id": "capsule-3593259",
+        "task_prompt": "Run 'physalia_automators.reports' as a python module with /results as the output directory.",
+        "results": [
+            {
+                "fig From the violin plot of the energy comsumption of tap, report the name of the framework that consumes the most energy.": "Appium"
+            },
+            {
+                "fig From the violin plot of the energy comsumption of tap, report the name of the framework that consumes the most energy.": "Appium"
+            },
+            {
+                "fig From the violin plot of the energy comsumption of tap, report the name of the framework that consumes the most energy.": "Appium"
+            }
+        ],
+        "capsule_doi": "https://doi.org/10.24433/CO.4277516.v1"
+    },
+    {
+        "field": "Social Sciences",
+        "language": "Python",
+        "capsule_title": "When to retrieve and encode episodic memories: a neural network model of hippocampal-cortical interaction",
+        "capsule_id": "capsule-3639589",
+        "task_prompt": "Run demo.py in the code/src folder.",
+        "results": [
+            {
+                "fig Report the color of the line with the highest maximum activation for target memory activation, DM.": "blue"
+            },
+            {
+                "fig Report the color of the line with the highest maximum activation for target memory activation, DM.": "blue"
+            },
+            {
+                "fig Report the color of the line with the highest maximum activation for target memory activation, DM.": "blue"
+            }
+        ],
+        "capsule_doi": "https://doi.org/10.24433/CO.5779179.v3"
+    },
+    {
+        "field": "Social Sciences",
+        "language": "R",
+        "capsule_title": "Attentional fluctuations and the temporal organization of memory - Jayakumar, Balusu, & Aly (2023). Cognition.",
+        "capsule_id": "capsule-2345790",
+        "task_prompt": "Set up the following subfolders in the ../results directory: intermediates, figures, stats_figures_markdowns. Run all the .Rmd files using Rscript and render them as html. Store the output files in ../results/stats_figures_markdowns.",
+        "results": [
+            {
+                "From Study 1, report the mean of the response rate across all participants.": 97.82,
+                "From Study 2, report the mean of the response rate across all participants.": 99.41
+            },
+            {
+                "From Study 1, report the mean of the response rate across all participants.": 97.82,
+                "From Study 2, report the mean of the response rate across all participants.": 99.41
+            },
+            {
+                "From Study 1, report the mean of the response rate across all participants.": 97.82,
+                "From Study 2, report the mean of the response rate across all participants.": 99.41
+            }
+        ],
+        "capsule_doi": "https://doi.org/10.24433/CO.3162457.v1"
+    },
+    {
+        "field": "Medical Sciences",
+        "language": "R",
+        "capsule_title": "Excess significance and power miscalculations in neurofeedback research",
+        "capsule_id": "capsule-7716865",
+        "task_prompt": "Run 'manuscript.Rmd' using Rscript and render it as a pdf. Store the output in ../results. Set clean to 'TRUE'.",
+        "results": [
+            {
+                "fig From Table 1, report the sensitivity for 80% power and recalculated mean (regulation).": 1.31
+            },
+            {
+                "fig From Table 1, report the sensitivity for 80% power and recalculated mean (regulation).": 1.31
+            },
+            {
+                "fig From Table 1, report the sensitivity for 80% power and recalculated mean (regulation).": 1.31
+            }
+        ],
+        "capsule_doi": "https://doi.org/10.24433/CO.7282505.v1"
+    },
+    {
+        "field": "Medical Sciences",
+        "language": "R",
+        "capsule_title": "A global and integrated analysis of CINSARC-associated genetic defects",
+        "capsule_id": "capsule-4933686",
+        "task_prompt": "Run \"Main.R\" using Rscript and xvfb-run.",
+        "results": [
+            {
+                "fig From Figure 2 plot A, report Fisher's P. If the value is in scientific notion, convert it to a floating point number.": 0.0182,
+                "fig From Figure 1 plot A, measuring time vs. metastasis-free survival, report the numerical value of HR (ignore the confidence interval).": 2.15
+            },
+            {
+                "fig From Figure 2 plot A, report Fisher's P. If the value is in scientific notion, convert it to a floating point number.": 0.0182,
+                "fig From Figure 1 plot A, measuring time vs. metastasis-free survival, report the numerical value of HR (ignore the confidence interval).": 2.15
+            },
+            {
+                "fig From Figure 2 plot A, report Fisher's P. If the value is in scientific notion, convert it to a floating point number.": 0.0182,
+                "fig From Figure 1 plot A, measuring time vs. metastasis-free survival, report the numerical value of HR (ignore the confidence interval).": 2.15
+            }
+        ],
+        "capsule_doi": "https://doi.org/10.24433/CO.9777456.v4"
+    },
+    {
+        "field": "Social Sciences",
+        "language": "R",
+        "capsule_title": "Automated Text Classification of News Articles: A Practical Guide",
+        "capsule_id": "capsule-9240688",
+        "task_prompt": "Run the bash script 'run.sh'.",
+        "results": [
+            {
+                "From table 1, report the portion relevant in both corpora.": 0.44
+            },
+            {
+                "From table 1, report the portion relevant in both corpora.": 0.44
+            },
+            {
+                "From table 1, report the portion relevant in both corpora.": 0.44
+            }
+        ],
+        "capsule_doi": "https://doi.org/10.24433/CO.4630956.v1"
+    },
+    {
+        "field": "Medical Sciences",
+        "language": "R",
+        "capsule_title": "Cardiac structure and function in schizophrenia",
+        "capsule_id": "capsule-1175539",
+        "task_prompt": "Run \"/code/CardioSCZ.R\" using Rscript.",
+        "results": [
+            {
+                "fig Report the name of the patient group with the greater median concentricity.": "SCZ"
+            },
+            {
+                "fig Report the name of the patient group with the greater median concentricity.": "SCZ"
+            },
+            {
+                "fig Report the name of the patient group with the greater median concentricity.": "SCZ"
+            }
+        ],
+        "capsule_doi": "https://doi.org/10.24433/CO.9265392.v1"
+    },
+    {
+        "field": "Medical Sciences",
+        "language": "R",
+        "capsule_title": "Estimating the prevalence of discrepancies between study registrations and publications: A systematic review and meta-analyses",
+        "capsule_id": "capsule-2708693",
+        "task_prompt": "Run 'preregSR_manuscript.Rmd' and render it as a pdf. Store the output in ../results. Set clean as 'TRUE'.",
+        "results": [
+            {
+                "fig From table 1, report the k value for the medicine discipline.": 81,
+                "fig From table 3, report n for 'percentage of studies with at least one outcome discrepancy that disclose an outcome discrepancy'.": 620
+            },
+            {
+                "fig From table 1, report the k value for the medicine discipline.": 81,
+                "fig From table 3, report n for 'percentage of studies with at least one outcome discrepancy that disclose an outcome discrepancy'.": 620
+            },
+            {
+                "fig From table 1, report the k value for the medicine discipline.": 81,
+                "fig From table 3, report n for 'percentage of studies with at least one outcome discrepancy that disclose an outcome discrepancy'.": 620
+            }
+        ],
+        "capsule_doi": "https://doi.org/10.24433/CO.4753181.v1"
+    },
+    {
+        "field": "Medical Sciences",
+        "language": "R",
+        "capsule_title": "Integrative Cancer Pharmacogenomics to Infer Large-Scale Drug Taxonomy [PMID: 28314784]",
+        "capsule_id": "capsule-4252248",
+        "task_prompt": "Create the symbolic links for ../results output. Create the symbolic links for ../data Data. Run 'main-ctrpv.R', 'main-nci.R', and 'main-network-generation.R' using Rscript.",
+        "results": [
+            {
+                "fig Report the overall AUC from the PR curve generated with the CTRPv2 sensitivity dataset, tested against ATC annotations and drug-target information from CHEMBL.": 0.4929241
+            },
+            {
+                "fig Report the overall AUC from the PR curve generated with the CTRPv2 sensitivity dataset, tested against ATC annotations and drug-target information from CHEMBL.": 0.4929241
+            },
+            {
+                "fig Report the overall AUC from the PR curve generated with the CTRPv2 sensitivity dataset, tested against ATC annotations and drug-target information from CHEMBL.": 0.4929241
+            }
+        ],
+        "capsule_doi": "https://doi.org/10.24433/CO.0012b3fb-3cf2-41fa-9b8d-6cc055b53ca2"
+    },
+    {
+        "field": "Computer Science",
+        "language": "Python",
+        "capsule_title": "SPT: Security Policy Translator for Network Security Functions in Cloud-Based Security Services",
+        "capsule_id": "capsule-4671827",
+        "task_prompt": "Execute 'PerformanveEval.ipynb'. Save the results in html format in ../results. For all the runs, disable the cell execution timeout and allow errors.",
+        "results": [
+            {
+                "fig Report the name of the mapping with the higher execution time at 44 elements.": "Semantic-based"
+            },
+            {
+                "fig Report the name of the mapping with the higher execution time at 44 elements.": "Semantic-based"
+            },
+            {
+                "fig Report the name of the mapping with the higher execution time at 44 elements.": "Semantic-based"
+            }
+        ],
+        "capsule_doi": "https://doi.org/10.24433/CO.7409799.v1"
+    },
+    {
+        "field": "Medical Sciences",
+        "language": "R",
+        "capsule_title": "lab: An R package for generating analysis-ready data from laboratory records",
+        "capsule_id": "capsule-7186268",
+        "task_prompt": "Run 'SampleCode.Rmd' using Rscript and render it as html. Store the output in ../results. Set clean as 'TRUE'.",
+        "results": [
+            {
+                "fig From laboratory test 18262-6, report the name of the method with the higher missing rate at gap 30.": "By Window",
+                "fig From laboratory test 2160-0 Creatinine, report the ID number with the highest laboratory result at window 2.": 109
+            },
+            {
+                "fig From laboratory test 18262-6, report the name of the method with the higher missing rate at gap 30.": "By Window",
+                "fig From laboratory test 2160-0 Creatinine, report the ID number with the highest laboratory result at window 2.": 109
+            },
+            {
+                "fig From laboratory test 18262-6, report the name of the method with the higher missing rate at gap 30.": "By Window",
+                "fig From laboratory test 2160-0 Creatinine, report the ID number with the highest laboratory result at window 2.": 109
+            }
+        ],
+        "capsule_doi": "https://doi.org/10.24433/CO.9692445.v1"
+    },
+    {
+        "field": "Social Sciences",
+        "language": "R",
+        "capsule_title": "Partisan Enclaves and Information Bazaars: Mapping Selective Exposure to Online News",
+        "capsule_id": "capsule-5136217",
+        "task_prompt": "Make the following subfolders in the ../results directory: tables, figures, for_publication/tables, for_publication/figures. Run all the .R scripts in the ../code folder using Rscript with 'source' and set echo to 'TRUE'.",
+        "results": [
+            {
+                "fig From figure 3 from the figures for publication, report the name of the party ID with the lowest share of political news from portals.": "Lean DEM"
+            },
+            {
+                "fig From figure 3 from the figures for publication, report the name of the party ID with the lowest share of political news from portals.": "Lean DEM"
+            },
+            {
+                "fig From figure 3 from the figures for publication, report the name of the party ID with the lowest share of political news from portals.": "Lean DEM"
+            }
+        ],
+        "capsule_doi": "https://doi.org/10.24433/CO.1889895.v1"
+    },
+    {
+        "field": "Medical Sciences",
+        "language": "Python",
+        "capsule_title": "A Predictive Analytics Framework for Early-Stage Thyroid Cancer Using ML",
+        "capsule_id": "capsule-7800694",
+        "task_prompt": "Execute 'Thyroid Cancer Final Code.ipynb'. Save the results in html format in ../results. For all the runs, disable the cell execution timeout and allow errors.",
+        "results": [
+            {
+                "Which model has the highest Macro F1?": "CatBoost",
+                "What is the ROC AUC (macro OvR) of the best performing model?": 0.957
+            },
+            {
+                "Which model has the highest Macro F1?": "CatBoost",
+                "What is the ROC AUC (macro OvR) of the best performing model?": 0.957
+            },
+            {
+                "Which model has the highest Macro F1?": "CatBoost",
+                "What is the ROC AUC (macro OvR) of the best performing model?": 0.957
+            }
+        ],
+        "capsule_doi": "https://doi.org/10.24433/CO.2418823.v1"
+    },
+    {
+        "field": "Social Sciences",
+        "language": "Python",
+        "capsule_title": "The Sovereign Constitution Fabric (SNF) v2.0 — Reproducible Synthetic-Floor Capsule",
+        "capsule_id": "capsule-8412128",
+        "task_prompt": "Run 'run_all.sh'.",
+        "results": [
+            {
+                "What is the mean of the snf_effectiveness_index?": 0.5791337825021187,
+                "What is the median of the dignity_score?": 0.5888590852515395
+            },
+            {
+                "What is the mean of the snf_effectiveness_index?": 0.5791337825021187,
+                "What is the median of the dignity_score?": 0.5888590852515395
+            },
+            {
+                "What is the mean of the snf_effectiveness_index?": 0.5791337825021187,
+                "What is the median of the dignity_score?": 0.5888590852515395
+            }
+        ],
+        "capsule_doi": "https://doi.org/10.24433/CO.9005626.v1"
+    },
+    {
+        "field": "Computer Science",
+        "language": "Python",
+        "capsule_title": "DignityProof — Global Verifiability Capsule (v1.0)",
+        "capsule_id": "capsule-7655932",
+        "task_prompt": "Run 'run_all.sh'.",
+        "results": [
+            {
+                "What is the point estimate (deaths averted synthetic) from the child wasting impact model? Give results as integer.": 280000,
+                "What is the child wasting impact model reported 95% interval (synthetic)? Give a list of 2 integer value for the confidence interval.": [
+                    196000,
+                    364000
+                ]
+            },
+            {
+                "What is the point estimate (deaths averted synthetic) from the child wasting impact model? Give results as integer.": 280000,
+                "What is the child wasting impact model reported 95% interval (synthetic)? Give a list of 2 integer value for the confidence interval.": [
+                    196000,
+                    364000
+                ]
+            },
+            {
+                "What is the point estimate (deaths averted synthetic) from the child wasting impact model? Give results as integer.": 280000,
+                "What is the child wasting impact model reported 95% interval (synthetic)? Give a list of 2 integer value for the confidence interval.": [
+                    196000,
+                    364000
+                ]
+            }
+        ],
+        "capsule_doi": "https://doi.org/10.24433/CO.0436753.v1"
+    },
+    {
+        "field": "Medical Sciences",
+        "language": "R",
+        "capsule_title": "Unravelling the transcriptome of the human tuberculosis lesion and its clinical implications",
+        "capsule_id": "capsule-9294029",
+        "task_prompt": "Run 'script1.R' using Rscript.",
+        "results": [
+            {
+                "fig what location has the lowest median enrichment score?": "H"
+            },
+            {
+                "fig what location has the lowest median enrichment score?": "H"
+            },
+            {
+                "fig what location has the lowest median enrichment score?": "H"
+            }
+        ],
+        "capsule_doi": "https://doi.org/10.24433/CO.4427270.v1"
+    },
+    {
+        "field": "Medical Sciences",
+        "language": "R",
+        "capsule_title": "custom code for: Predicting IVF live birth probabilities using live machine learning, center-specific models",
+        "capsule_id": "capsule-6295990",
+        "task_prompt": "Run 'R_demo.R' using Rscript.",
+        "results": [
+            {
+                "What is the LBP model ROC-AUC (weighted)": 0.7142857,
+                "What is the percent AUC-Improvement? Give an integer": 25
+            },
+            {
+                "What is the LBP model ROC-AUC (weighted)": 0.7142857,
+                "What is the percent AUC-Improvement? Give an integer": 25
+            },
+            {
+                "What is the LBP model ROC-AUC (weighted)": 0.7142857,
+                "What is the percent AUC-Improvement? Give an integer": 25
+            }
+        ],
+        "capsule_doi": "https://doi.org/10.24433/CO.8413662.v1"
+    },
+    {
+        "field": "Medical Sciences",
+        "language": "R",
+        "capsule_title": "VascularBC-ST: the code to analyze the Vascular microenvironment of Breast Cancer using Spatial Transcriptome",
+        "capsule_id": "capsule-9477017",
+        "task_prompt": "Export the following R default packages: datasets,utils,grDevices,graphics,stats,methods. Run 'main.R' using Rscript.",
+        "results": [
+            {
+                "fig Pearson correlation coefficients between the estimated proportions of different cell types were calculated, what is the highest pearson correlation related to? Give response in a list of strings": [
+                    "Smooth.1",
+                    "Endo.1"
+                ]
+            },
+            {
+                "fig Pearson correlation coefficients between the estimated proportions of different cell types were calculated, what is the highest pearson correlation related to? Give response in a list of strings": [
+                    "Smooth.1",
+                    "Endo.1"
+                ]
+            },
+            {
+                "fig Pearson correlation coefficients between the estimated proportions of different cell types were calculated, what is the highest pearson correlation related to? Give response in a list of strings": [
+                    "Smooth.1",
+                    "Endo.1"
+                ]
+            }
+        ],
+        "capsule_doi": "https://doi.org/10.24433/CO.9243235.v1"
+    },
+    {
+        "field": "Computer Science",
+        "language": "Python",
+        "capsule_title": "Codex Wall v4.0 — Encrypted Holo-Causality & Predictive Governance (Reproducible Capsule)",
+        "capsule_id": "capsule-0201673",
+        "task_prompt": "Run 'run_all.sh'.",
+        "results": [
+            {
+                "What is the mean_gdp_gain_pct?": 0.9999005880537901,
+                "What is the p95?": 1.1643528158326386,
+                "What is the p50?": 0.9999966483532146
+            },
+            {
+                "What is the mean_gdp_gain_pct?": 0.9999005880537901,
+                "What is the p95?": 1.1643528158326386,
+                "What is the p50?": 0.9999966483532146
+            },
+            {
+                "What is the mean_gdp_gain_pct?": 0.9999005880537901,
+                "What is the p95?": 1.1643528158326386,
+                "What is the p50?": 0.9999966483532146
+            }
+        ],
+        "capsule_doi": "https://doi.org/10.24433/CO.4072743.v1"
+    },
+    {
+        "field": "Medical Sciences",
+        "language": "Python",
+        "capsule_title": "Deep learning-enabled accurate assessment of gait impairments in Parkinson's disease using smartphone videos",
+        "capsule_id": "capsule-0152700",
+        "task_prompt": "Check GPU status using nvidia-smi, run the training, validation, and testing shell scripts (train.sh, val.sh, test.sh), and execute the Python scripts: directory_features_process.py, grad_cam.py, joint_feature_severity_spearman_calculation.py, sig_cal.py, joint_significance_cal_medication_response.py, summary_of_joint_medication_response_stats.py, joint_significance_ana_medication_response.py, and chord.py.",
+        "results": [
+            {
+                "fig are there more than 2 features with accuracy exceeding 0.4? Respond with yes or no.": "yes",
+                "fig which joint has the lowest absolute spearman correlation for acceleration?": "ankle",
+                "Given the Kruskal-Wallis for Group 0-2 (Group 1 vs. Group 3), what is the p-value?": "2.341092434893948e-10"
+            },
+            {
+                "fig are there more than 2 features with accuracy exceeding 0.4? Respond with yes or no.": "yes",
+                "fig which joint has the lowest absolute spearman correlation for acceleration?": "ankle",
+                "Given the Kruskal-Wallis for Group 0-2 (Group 1 vs. Group 3), what is the p-value?": "2.341092434893948e-10"
+            },
+            {
+                "fig are there more than 2 features with accuracy exceeding 0.4? Respond with yes or no.": "yes",
+                "fig which joint has the lowest absolute spearman correlation for acceleration?": "ankle",
+                "Given the Kruskal-Wallis for Group 0-2 (Group 1 vs. Group 3), what is the p-value?": "2.341092434893948e-10"
+            }
+        ],
+        "capsule_doi": "https://doi.org/10.24433/CO.7700825.v1"
+    },
+    {
+        "field": "Medical Sciences",
+        "language": "Python",
+        "capsule_title": "A motif preferred adenine base editor with minimal bystander and off-targets editing",
+        "capsule_id": "capsule-2242462",
+        "task_prompt": "Run 'main.py'.",
+        "results": [
+            {
+                "What is the Chromosome chr1 with positioning 1013983, IsNGGMatch status?": "True",
+                "What is the Chromosome chr1 with positioning 1319313, ABE8e_NG status?": "False"
+            },
+            {
+                "What is the Chromosome chr1 with positioning 1013983, IsNGGMatch status?": "True",
+                "What is the Chromosome chr1 with positioning 1319313, ABE8e_NG status?": "False"
+            },
+            {
+                "What is the Chromosome chr1 with positioning 1013983, IsNGGMatch status?": "True",
+                "What is the Chromosome chr1 with positioning 1319313, ABE8e_NG status?": "False"
+            }
+        ],
+        "capsule_doi": "https://doi.org/10.24433/CO.8003706.v2"
+    },
+    {
+        "field": "Computer Science",
+        "language": "Python",
+        "capsule_title": "PM-Score-Net: A Disjoint-Label Multi-Task Learning Framework for Automated Continuous Severity Assessment of Myopic Maculopathy",
+        "capsule_id": "capsule-3762736",
+        "task_prompt": "Run the evaluation scripts: run_baseline_eval.sh, run_convnext_eval.sh, run_scl_eval.sh, run_task1_eval.sh, run_palm_eval.sh, and run_rigor_eval.sh.",
+        "results": [
+            {
+                "What is the Task1_Only macro f1?": 0.7012,
+                "What is the Winner_SCL RMSE?": 0.4708
+            },
+            {
+                "What is the Task1_Only macro f1?": 0.7012,
+                "What is the Winner_SCL RMSE?": 0.4708
+            },
+            {
+                "What is the Task1_Only macro f1?": 0.7012,
+                "What is the Winner_SCL RMSE?": 0.4708
+            }
+        ],
+        "capsule_doi": "https://doi.org/10.24433/CO.6713286.v2"
+    }
+]

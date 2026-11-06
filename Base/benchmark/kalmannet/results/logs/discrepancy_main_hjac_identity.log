@@ -1,0 +1,30 @@
+RUN name=main_hjac_identity code=main inv_r2_db=30 seed=0 opts=[--h_jac identity]
+CONFIG {'inv_r2_db': 30.0, 'nu_db': 0.0, 'seed': 0, 'N_T': 200, 'T': 20, 'data': 'fixed', 'long_T': 2000, 'burn': 0, 'init_var': 100.0, 'ekf_init': 'm1x_0', 'P0': 0.0, 'q_scale': 1.0, 'r_scale': 1.0, 'h_jac': 'identity', 'tag': 'main_hjac_identity'}
+data: x0 mean |x0| = 1.73, mean |x_t| over test set = 26.37, test shape (200, 3, 20)
+Extended Kalman Filter - MSE LOSS: tensor(-21.9851) [dB]
+RESULT tag=main_hjac_identity inv_r2_db=30.0 seed=0 ekf_dB=-21.985 mean_of_dB=-22.854 median_dB=-23.112 n_nonfinite=0 mean_rho=26.37 max_abs_K=0.645
+RUN name=main_hjac_identity code=main inv_r2_db=30 seed=1 opts=[--h_jac identity]
+CONFIG {'inv_r2_db': 30.0, 'nu_db': 0.0, 'seed': 1, 'N_T': 200, 'T': 20, 'data': 'fixed', 'long_T': 2000, 'burn': 0, 'init_var': 100.0, 'ekf_init': 'm1x_0', 'P0': 0.0, 'q_scale': 1.0, 'r_scale': 1.0, 'h_jac': 'identity', 'tag': 'main_hjac_identity'}
+data: x0 mean |x0| = 1.73, mean |x_t| over test set = 26.35, test shape (200, 3, 20)
+Extended Kalman Filter - MSE LOSS: tensor(-22.0302) [dB]
+RESULT tag=main_hjac_identity inv_r2_db=30.0 seed=1 ekf_dB=-22.030 mean_of_dB=-22.810 median_dB=-23.183 n_nonfinite=0 mean_rho=26.35 max_abs_K=0.645
+RUN name=main_hjac_identity code=main inv_r2_db=30 seed=2 opts=[--h_jac identity]
+CONFIG {'inv_r2_db': 30.0, 'nu_db': 0.0, 'seed': 2, 'N_T': 200, 'T': 20, 'data': 'fixed', 'long_T': 2000, 'burn': 0, 'init_var': 100.0, 'ekf_init': 'm1x_0', 'P0': 0.0, 'q_scale': 1.0, 'r_scale': 1.0, 'h_jac': 'identity', 'tag': 'main_hjac_identity'}
+data: x0 mean |x0| = 1.73, mean |x_t| over test set = 26.41, test shape (200, 3, 20)
+Extended Kalman Filter - MSE LOSS: tensor(-21.5997) [dB]
+RESULT tag=main_hjac_identity inv_r2_db=30.0 seed=2 ekf_dB=-21.600 mean_of_dB=-22.533 median_dB=-22.715 n_nonfinite=0 mean_rho=26.41 max_abs_K=0.645
+RUN name=main_hjac_identity code=main inv_r2_db=10 seed=0 opts=[--h_jac identity]
+CONFIG {'inv_r2_db': 10.0, 'nu_db': 0.0, 'seed': 0, 'N_T': 200, 'T': 20, 'data': 'fixed', 'long_T': 2000, 'burn': 0, 'init_var': 100.0, 'ekf_init': 'm1x_0', 'P0': 0.0, 'q_scale': 1.0, 'r_scale': 1.0, 'h_jac': 'identity', 'tag': 'main_hjac_identity'}
+data: x0 mean |x0| = 1.73, mean |x_t| over test set = 25.62, test shape (200, 3, 20)
+Extended Kalman Filter - MSE LOSS: tensor(-1.2039) [dB]
+RESULT tag=main_hjac_identity inv_r2_db=10.0 seed=0 ekf_dB=-1.204 mean_of_dB=-2.513 median_dB=-2.995 n_nonfinite=0 mean_rho=25.62 max_abs_K=0.647
+RUN name=main_hjac_identity code=main inv_r2_db=10 seed=1 opts=[--h_jac identity]
+CONFIG {'inv_r2_db': 10.0, 'nu_db': 0.0, 'seed': 1, 'N_T': 200, 'T': 20, 'data': 'fixed', 'long_T': 2000, 'burn': 0, 'init_var': 100.0, 'ekf_init': 'm1x_0', 'P0': 0.0, 'q_scale': 1.0, 'r_scale': 1.0, 'h_jac': 'identity', 'tag': 'main_hjac_identity'}
+data: x0 mean |x0| = 1.73, mean |x_t| over test set = 25.44, test shape (200, 3, 20)
+Extended Kalman Filter - MSE LOSS: tensor(-1.5861) [dB]
+RESULT tag=main_hjac_identity inv_r2_db=10.0 seed=1 ekf_dB=-1.586 mean_of_dB=-2.577 median_dB=-3.005 n_nonfinite=0 mean_rho=25.44 max_abs_K=0.647
+RUN name=main_hjac_identity code=main inv_r2_db=10 seed=2 opts=[--h_jac identity]
+CONFIG {'inv_r2_db': 10.0, 'nu_db': 0.0, 'seed': 2, 'N_T': 200, 'T': 20, 'data': 'fixed', 'long_T': 2000, 'burn': 0, 'init_var': 100.0, 'ekf_init': 'm1x_0', 'P0': 0.0, 'q_scale': 1.0, 'r_scale': 1.0, 'h_jac': 'identity', 'tag': 'main_hjac_identity'}
+data: x0 mean |x0| = 1.73, mean |x_t| over test set = 26.07, test shape (200, 3, 20)
+Extended Kalman Filter - MSE LOSS: tensor(-1.0276) [dB]
+RESULT tag=main_hjac_identity inv_r2_db=10.0 seed=2 ekf_dB=-1.028 mean_of_dB=-2.222 median_dB=-2.757 n_nonfinite=0 mean_rho=26.07 max_abs_K=0.649

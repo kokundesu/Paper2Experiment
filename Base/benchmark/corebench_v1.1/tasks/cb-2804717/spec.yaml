@@ -1,0 +1,32 @@
+# CORE-Bench v1.1 task as a ReproSpec: what agents see. No answers.
+id: cb-2804717
+title: mFLICA Reproducible Capsule
+objective: 'Test the computational reproducibility of a scientific capsule (CORE-Bench,
+  Hard level): run its code and answer the questions from the output.'
+task_prompt: 'Export the following R default packages: datasets,utils,grDevices,graphics,stats,methods.
+  Run ''ResultReproducibilityNotebook.Rmd'' and render it as an html file. Store the
+  output in ../results and set clean to ''TRUE''.'
+language: R
+paper: null
+code:
+  repo_url: null
+  capsule: capsule-2804717
+questions:
+- id: q1
+  text: fig From the Network Density plot (Figure 4), report the label for the red
+    line (ignore spaces).
+  answer_type: any
+  metric: ''
+  direction: ''
+  unit: ''
+  locator: program output
+  setting: ''
+  runs: 1
+  evidence: either
+origin:
+  source: corebench
+  reference: core-bench-v1.1-mainline core_test.json sha256:d4aa5ebb984df7f293e04f2dd120722f172fddea6fcb54a0c928e09bc6ef837d
+  prompt: ''
+  drafted_by: []
+  checked_by: []
+  user_confirmed: false

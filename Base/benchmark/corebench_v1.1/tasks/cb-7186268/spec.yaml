@@ -1,0 +1,42 @@
+# CORE-Bench v1.1 task as a ReproSpec: what agents see. No answers.
+id: cb-7186268
+title: 'lab: An R package for generating analysis-ready data from laboratory records'
+objective: 'Test the computational reproducibility of a scientific capsule (CORE-Bench,
+  Hard level): run its code and answer the questions from the output.'
+task_prompt: Run 'SampleCode.Rmd' using Rscript and render it as html. Store the output
+  in ../results. Set clean as 'TRUE'.
+language: R
+paper: null
+code:
+  repo_url: null
+  capsule: capsule-7186268
+questions:
+- id: q1
+  text: fig From laboratory test 18262-6, report the name of the method with the higher
+    missing rate at gap 30.
+  answer_type: any
+  metric: ''
+  direction: ''
+  unit: ''
+  locator: program output
+  setting: ''
+  runs: 1
+  evidence: either
+- id: q2
+  text: fig From laboratory test 2160-0 Creatinine, report the ID number with the
+    highest laboratory result at window 2.
+  answer_type: any
+  metric: ''
+  direction: ''
+  unit: ''
+  locator: program output
+  setting: ''
+  runs: 1
+  evidence: either
+origin:
+  source: corebench
+  reference: core-bench-v1.1-mainline core_test.json sha256:d4aa5ebb984df7f293e04f2dd120722f172fddea6fcb54a0c928e09bc6ef837d
+  prompt: ''
+  drafted_by: []
+  checked_by: []
+  user_confirmed: false

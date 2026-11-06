@@ -1,0 +1,37 @@
+# Benchmark case: hidden ground truth for the evaluator. Agents never see this file.
+# Held-out case for v3.0-heldout (added 2026-10-15). Written from the paper and the repository's README and file
+# listing only: no code of this paper was run before the tolerance was fixed (a priori, pre-registered).
+id: fasttext
+paper:
+  title: "Bag of Tricks for Efficient Text Classification"
+  authors: "Joulin, Grave, Bojanowski, Mikolov"
+  venue: "EACL 2017"
+  arxiv: "1607.01759"
+repo:
+  url: https://github.com/facebookresearch/fastText
+  note: >
+    Official C++ code. classification-results.sh says it "produces the results from Table 1": per dataset
+    `fasttext supervised -dim 10 -lr <lr> -wordNgrams 2 -minCount 1 -bucket 10000000 -epoch 5 -thread 4`, then
+    `fasttext test`; lr AG 0.25, DBpedia 0.5, Yelp P. 0.1. The script sends training output to /dev/null and
+    downloads the datasets itself (whether the download links still work was not checked).
+difficulty: medium
+expected_runtime_cpu_min: 10  # estimate, not measured: build + download + seconds of training per dataset
+
+# Table 1, row "fastText, h = 10, bigram": AG 92.5, DBP 98.6, Yelp P. 95.7 (single numbers, no spread reported).
+# evidence_pattern: fastText's training trace (progress line, "Read <n>M words", "Number of labels"); a printed
+# test result alone (N / P@1 / R@1) does not match it, so the value must come from a log of a run that trained.
+claims:
+  - {id: ag_acc,      metric: test_accuracy, setting: "Table 1, fastText h=10 bigram, AG",      unit: "%", value: 92.5, tolerance: {abs: 0.5}, evidence_pattern: "(?i)(progress:|avg\\.?\\s*loss|number of labels|read \\d+m words)"}
+  - {id: dbpedia_acc, metric: test_accuracy, setting: "Table 1, fastText h=10 bigram, DBpedia", unit: "%", value: 98.6, tolerance: {abs: 0.5}, evidence_pattern: "(?i)(progress:|avg\\.?\\s*loss|number of labels|read \\d+m words)"}
+  - {id: yelp_p_acc,  metric: test_accuracy, setting: "Table 1, fastText h=10 bigram, Yelp P.", unit: "%", value: 95.7, tolerance: {abs: 0.5}, evidence_pattern: "(?i)(progress:|avg\\.?\\s*loss|number of labels|read \\d+m words)"}
+
+rubric:
+  min_seeds: 3
+  aggregate: mean
+  levels:
+    full: "all verdict claims within tolerance (diagnostic_only claims excluded)"
+    partial: "at least one verdict claim within tolerance"
+    fail: "no verdict claim reproduced or run did not finish"
+  tolerance_justification: >
+    Pre-registered rule for held-out cases: the paper reports single numbers without a spread, so accuracy claims
+    get +-0.5 percentage points on the mean over the seed runs. Fixed before any run of this paper.

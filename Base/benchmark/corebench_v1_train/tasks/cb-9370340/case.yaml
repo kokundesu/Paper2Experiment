@@ -1,0 +1,22 @@
+# Hidden: pre-registered tolerances, computed from the 3 manual re-runs.
+capsule_id: capsule-9370340
+source: core-bench (original) core_train.json
+split: dev
+data_sha256: 3df47f1b3fa1cb60045018eb1a0f1ad4ecf6a53f72318c845a879ce0313b0730
+rule: docs/benchmark-redesign.md section 3.3
+questions:
+- id: q1
+  question: Report the accuracy for testing after epoch 3.
+  vision: false
+  kind: numeric
+  scored: false
+  tolerance:
+    mean: 0.8772333199999999
+    s: 0.013072639621254734
+    n: 3
+    m: 1
+    noise: 0.06495371618943943
+    precision: 5.0e-09
+    floor: 8.7723332e-06
+    h: 0.06495371618943943
+    term: noise

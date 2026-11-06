@@ -1,0 +1,31 @@
+# CORE-Bench v1.1 task as a ReproSpec: what agents see. No answers.
+id: cb-3593259
+title: On the Energy Footprint of Mobile Testing Frameworks
+objective: 'Test the computational reproducibility of a scientific capsule (CORE-Bench,
+  Hard level): run its code and answer the questions from the output.'
+task_prompt: Run 'physalia_automators.reports' as a python module with /results as
+  the output directory.
+language: Python
+paper: null
+code:
+  repo_url: null
+  capsule: capsule-3593259
+questions:
+- id: q1
+  text: fig From the violin plot of the energy comsumption of tap, report the name
+    of the framework that consumes the most energy.
+  answer_type: any
+  metric: ''
+  direction: ''
+  unit: ''
+  locator: program output
+  setting: ''
+  runs: 1
+  evidence: either
+origin:
+  source: corebench
+  reference: core-bench-v1.1-mainline core_test.json sha256:d4aa5ebb984df7f293e04f2dd120722f172fddea6fcb54a0c928e09bc6ef837d
+  prompt: ''
+  drafted_by: []
+  checked_by: []
+  user_confirmed: false

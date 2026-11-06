@@ -1,0 +1,41 @@
+# Hidden: targets are the reference re-runs' means, tolerances their h.
+id: v4-ngboost
+rubric:
+  min_seeds: 3
+  aggregate: mean
+claims:
+- id: concrete_ngboost_nll
+  metric: 测试集平均负对数似然（NLL）
+  setting: 表 1，Concrete 行，NGBoost 列（取 ± 前的汇总指标）
+  unit: ''
+  value: 3.0846
+  tolerance:
+    abs: 0.06366379410270802
+  target: reference
+  paper_value: 3.04
+  evidence_pattern: (?:\[\d+/\d+\] BestIter=\d+)|(?i:\b(?:seeds?|splits?|trials?|folds?|iter(?:ation)?s?|epochs?|steps?|runs?)\b\W{0,3}\d+)
+  ref_spread: 0.03140318455188901
+  run_definition: 论文的完整协议：20 个随机 90/10 划分上的平均。
+  diagnostic_only: false
+- id: concrete_ngboost_rmse
+  metric: 测试集均方根误差（RMSE）
+  setting: 表 3，Concrete 行，NGBoost 列（取 ± 前的汇总指标）
+  unit: ''
+  value: 5.47828
+  tolerance:
+    abs: 0.1406930843687056
+  target: reference
+  paper_value: 5.06
+  evidence_pattern: (?:\[\d+/\d+\] BestIter=\d+)|(?i:\b(?:seeds?|splits?|trials?|folds?|iter(?:ation)?s?|epochs?|steps?|runs?)\b\W{0,3}\d+)
+  ref_spread: 0.0693991138271952
+  run_definition: 论文的完整协议：20 个随机 90/10 划分上的平均。
+  diagnostic_only: false
+discrepancies:
+- claim_id: concrete_ngboost_rmse
+  category: unknown
+  confidence: unresolved
+  summary: the official code itself misses the paper here (reference 5.478 vs paper
+    5.06); scored against the reference, the diagnosis should report the gap
+source:
+  spec: benchmark/v4/ngboost
+  split: dev

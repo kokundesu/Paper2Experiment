@@ -1,0 +1,83 @@
+{
+ "draft": {
+  "understanding": "用户希望复现 ICML 2019《Set Transformer》在二维合成四高斯混合的摊销聚类实验中，ISAB(16)+PMA 模型于表 3 报告的每点对数似然；按仓库默认的 Set Transformer 聚类运行方式，优先对应网络直接预测、未经 EM 更新的测试指标。",
+  "questions": [
+   {
+    "id": "synthetic_2d_isab16_pma_ll0_per_data",
+    "text": "在二维合成四高斯混合的摊销聚类任务中，ISAB(16)+PMA 直接预测混合模型参数后、未经 EM 更新时，测试集平均每点对数似然是多少？",
+    "metric": "LL0/data（平均每点对数似然，未经过 EM 更新）",
+    "unit": "",
+    "direction": "higher",
+    "locator": "正文表 3（Meta clustering results），Synthetic 数据集，ISAB (16) + PMA (ours) 行，LL0/data 列；补充材料表 5 的同名行列亦有列出",
+    "setting": "Synthetic 2D mixtures of Gaussians；每个输入集合包含 100–500 个二维点，来自四个高斯分量；编码器为使用 16 个诱导点的 ISAB，解码器为使用四个种子向量的 PMA；测试时不进行后续 EM 更新。",
+    "runs": 5,
+    "protocol_notes": "论文第 5 节说明所有实验重复五次，并在相应测试数据上报告指标；该单元格给出跨重复实验的均值及误差项。合成数据及训练步骤见补充材料 §2.3.1。"
+   }
+  ],
+  "open_issues": [
+   "您要复现的是模型直接输出的 LL0/data 吗？若您特指经过一次 EM 更新后的每点对数似然，则应改用同一行的 LL1/data 列。"
+  ]
+ },
+ "checks": {
+  "sonnet55": {
+   "items": [
+    {
+     "question_id": "synthetic_2d_isab16_pma_ll0_per_data",
+     "in_scope": "yes",
+     "locator_ok": "yes",
+     "underspecified": [
+      "none"
+     ],
+     "answer_type_ok": "yes",
+     "measurable": "yes",
+     "comment": "Table 3 has LL0 and LL1 columns. The user did not say which one. The draft picks LL0 and says so in the question, so the question itself is unambiguous. The repo's default num_inds may be 32 rather than 16, so the code needs to be set to 16 inducing points."
+    }
+   ],
+   "missing_questions": []
+  },
+  "haiku55": {
+   "items": [
+    {
+     "question_id": "synthetic_2d_isab16_pma_ll0_per_data",
+     "in_scope": "yes",
+     "locator_ok": "yes",
+     "underspecified": [
+      "variant"
+     ],
+     "answer_type_ok": "yes",
+     "measurable": "yes",
+     "comment": "Table 3 (Synthetic LL0/data, ISAB (16) + PMA row) and Table 5 in the supplement both list this value. The request says '每点对数似然（表 3）' without choosing LL0 or LL1. Table 3 has both columns, and they give different numbers (LL0 vs LL1 after one EM step), so the variant is ambiguous. The draft resolves it to LL0 and only mentions LL1 in open_issues. The task is small and PyTorch-based, so no GPU is clearly required."
+    }
+   ],
+   "missing_questions": [
+    "synthetic_2d_isab16_pma_ll1_per_data: 同一模型（ISAB(16)+PMA）在二维合成四高斯混合任务中，经过一次 EM 更新后的测试集平均每点对数似然（表 3 的 LL1/data 列；补充材料表 5 同名行）。用户请求的是表 3 中的每点对数似然，而草稿只覆盖了 LL0/data，LL1/data 未被列出。"
+   ]
+  }
+ },
+ "accepted": [
+  "synthetic_2d_isab16_pma_ll0_per_data"
+ ],
+ "queue": [
+  {
+   "kind": "draft_issue",
+   "by": "drafter",
+   "text": "您要复现的是模型直接输出的 LL0/data 吗？若您特指经过一次 EM 更新后的每点对数似然，则应改用同一行的 LL1/data 列。"
+  },
+  {
+   "kind": "missing",
+   "by": "haiku55",
+   "text": "synthetic_2d_isab16_pma_ll1_per_data: 同一模型（ISAB(16)+PMA）在二维合成四高斯混合任务中，经过一次 EM 更新后的测试集平均每点对数似然（表 3 的 LL1/data 列；补充材料表 5 同名行）。用户请求的是表 3 中的每点对数似然，而草稿只覆盖了 LL0/data，LL1/data 未被列出。"
+  }
+ ],
+ "notes": [
+  {
+   "question_id": "synthetic_2d_isab16_pma_ll0_per_data",
+   "text": "在二维合成四高斯混合的摊销聚类任务中，ISAB(16)+PMA 直接预测混合模型参数后、未经 EM 更新时，测试集平均每点对数似然是多少？",
+   "locator": "正文表 3（Meta clustering results），Synthetic 数据集，ISAB (16) + PMA (ours) 行，LL0/data 列；补充材料表 5 的同名行列亦有列出",
+   "notes": [
+    "haiku55: underspecified (variant) -- Table 3 (Synthetic LL0/data, ISAB (16) + PMA row) and Table 5 in the supplement both list this value. The request says '每点对数似然（表 3）' without choosing LL0 or LL1. Table 3 has both columns, and they give different numbers (LL0 vs LL1 after one EM step), so the variant is ambiguous. The draft resolves it to LL0 and only mentions LL1 in open_issues. The task is small and PyTorch-based, so no GPU is clearly required."
+   ]
+  }
+ ],
+ "cost_usd": 0.1389
+}

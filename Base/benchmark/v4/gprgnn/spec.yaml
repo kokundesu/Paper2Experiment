@@ -1,0 +1,37 @@
+# ReproSpec (agent-visible, no values). FROZEN: see ../FROZEN.yaml.
+id: gprgnn
+title: ''
+objective: 复现 GPR-GNN（ICLR 2021）在 Chameleon 数据集（60/20/20 划分）上的节点分类准确率，表 2 里 GPRGNN
+  那一行。
+task_prompt: ''
+language: Python
+paper:
+  url: https://arxiv.org/abs/2006.07988
+  pdf: null
+code:
+  repo_url: https://github.com/jianhao2016/GPRGNN
+  capsule: null
+questions:
+- id: chameleon_gprgnn_dense_mean_accuracy
+  text: 在 Chameleon 数据集采用 60%/20%/20% 训练、验证、测试划分时，GPRGNN 的测试节点分类平均准确率是多少？
+  answer_type: number
+  metric: 测试节点分类平均准确率（micro-F1）
+  direction: higher
+  unit: '%'
+  locator: 论文表 2（Results on real world benchmark datasets），GPRGNN 行、Chameleon 列；取“Mean
+    accuracy (%) ± 95% confidence interval”中的均值部分
+  setting: Chameleon 真实世界异配图节点分类，GPRGNN（非 GPRGNN(rand)），密集 60%/20%/20% 划分；按论文将原始有向图转换为无向图，使用节点特征和图结构
+    一次运行 = 10 个随机 60/20/20 划分上的平均（论文为 100 个划分）。
+  runs: 3
+  evidence: log
+origin:
+  source: user
+  reference: ''
+  prompt: 复现 GPR-GNN（ICLR 2021）在 Chameleon 数据集（60/20/20 划分）上的节点分类准确率，表 2 里 GPRGNN
+    那一行。
+  drafted_by:
+  - sol
+  checked_by:
+  - sonnet55
+  - haiku55
+  user_confirmed: true

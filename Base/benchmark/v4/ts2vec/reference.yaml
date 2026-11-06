@@ -1,0 +1,18 @@
+# Reference recipe (hidden; written by the benchmark builder). status: draft until the setup,
+# the command and one regex per question have been checked by an actual run.
+id: ts2vec
+status: draft
+repo: https://github.com/zhihanyue/ts2vec
+commit: ''
+setup:
+- git clone https://github.com/zhihanyue/ts2vec repo
+command: ''
+timeout_s: 1800
+seeded: true
+metrics: {}
+entry: '`scripts/ucr.sh`（按数据集逐行）'
+notes:
+- 'difficulty: 中; estimated time per run: 每个数据集 1–3 分钟'
+- 'risk: `--gpu 0` 会强制使用 CUDA，要改一行；UCR 压缩包 316 MB，需要公开的解压密码'
+- 'questions: ecg200_accuracy_b8, gunpoint_accuracy_b8, italypowerdemand_accuracy_b8,
+  twoleadecg_accuracy_b8, chinatown_accuracy_b8'

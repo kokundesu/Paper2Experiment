@@ -1,0 +1,39 @@
+# Hidden: tolerances from the reference re-runs (pre-registered before any workflow runs).
+id: bspm
+rule: docs/benchmark-redesign.md section 3.3
+reference_run_dir: /Users/allenhuw/Documents/Projects/Paper2Exp/Base/runs/reference/20261017-095037_bspm
+questions:
+  gowalla_bspm_em_recall20:
+    status: scored
+    paper_value: 0.192
+    ref_mean: 0.19207311
+    ref_s: 0.0
+    n: 5
+    m: 3
+    h: 5.0e-05
+    term: precision
+    noise: 0.0
+    precision: 5.0e-05
+    floor: 1.9207311000000003e-06
+    h_paper: 5.0e-05
+    paper_gap: 7.310999999998735e-05
+    justification: h = max(noise 0 [t(4)=2.776, s=0, n=5, m=3], precision 5e-05 [4
+      places], floor 1.92e-06) = 5e-05 (precision); paper gap 7.31e-05 vs h + h_paper
+      0.0001
+  gowalla_bspm_em_ndcg20:
+    status: scored
+    paper_value: 0.1597
+    ref_mean: 0.15972039
+    ref_s: 0.0
+    n: 5
+    m: 3
+    h: 5.0e-05
+    term: precision
+    noise: 0.0
+    precision: 5.0e-05
+    floor: 1.5972039e-06
+    h_paper: 5.0e-05
+    paper_gap: 2.0389999999981256e-05
+    justification: h = max(noise 0 [t(4)=2.776, s=0, n=5, m=3], precision 5e-05 [4
+      places], floor 1.6e-06) = 5e-05 (precision); paper gap 2.04e-05 vs h + h_paper
+      0.0001

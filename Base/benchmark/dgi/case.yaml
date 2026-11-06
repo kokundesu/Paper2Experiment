@@ -1,0 +1,32 @@
+# Benchmark case: hidden ground truth for the evaluator. Agents never see this file.
+# Added 2026-10-06 as a quick extra case WITHOUT a manual reproduction: the tolerance below was fixed before any run
+# of this paper (a priori), not calibrated from observed seed spread.
+id: dgi
+paper:
+  title: "Deep Graph Infomax"
+  authors: "Veličković, Fedus, Hamilton, Liò, Bengio, Hjelm"
+  venue: "ICLR 2019"
+  arxiv: "1809.10341"
+repo:
+  url: https://github.com/PetarV-/DGI
+  note: "Official PyTorch code; ships Cora only. execute.py trains the encoder once (Adam lr 0.001, patience 20 on the training loss, 512 units) and averages 50 logistic-regression runs; no random seed is set."
+difficulty: easy
+expected_runtime_cpu_min: 3
+
+# Table 2 (transductive), DGI row: 82.3 ± 0.6 % on Cora ("50 runs of training followed by logistic regression").
+# evidence_pattern matches the training trace only; the value must also appear in the same log. Case-insensitive
+# and format-tolerant (2026-10-06, after the first runs): the a-priori pattern "Loss: " missed a correct multi-agent
+# run whose agent had rewritten execute.py's logging to "Epoch 1/5000 loss=0.693135".
+claims:
+  - {id: cora_acc, metric: test_accuracy, setting: "Table 2, DGI, Cora", unit: "%", value: 82.3, tolerance: {abs: 1.5}, evidence_pattern: "(?i)\\bloss\\b\\W{0,3}(tensor\\()?[0-9]"}
+
+rubric:
+  min_seeds: 3
+  aggregate: mean
+  levels:
+    full: "all verdict claims within tolerance (diagnostic_only claims excluded)"
+    partial: "at least one verdict claim within tolerance"
+    fail: "no verdict claim reproduced or run did not finish"
+  tolerance_justification: >
+    A priori (no manual reproduction): 1.5 pp is 2.5x the paper's reported std (0.6 pp over 50 runs) and leaves room
+    for encoder-training variance across seeds, which the paper's std may understate; same width as the GCN case.

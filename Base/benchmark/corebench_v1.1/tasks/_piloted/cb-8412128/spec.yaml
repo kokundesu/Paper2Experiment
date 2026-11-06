@@ -1,0 +1,34 @@
+# CORE-Bench v1.1 task as a ReproSpec: what agents see. No answers.
+id: cb-8412128
+title: The Sovereign Constitution Fabric (SNF) v2.0 — Reproducible Synthetic-Floor
+  Capsule
+objective: 'Test the computational reproducibility of a scientific capsule (CORE-Bench,
+  Hard level): run its code and answer the questions from the output.'
+task_prompt: Run 'run_all.sh'.
+language: Python
+paper: null
+code:
+  repo_url: null
+  capsule: capsule-8412128
+questions:
+- id: q1
+  text: What is the mean of the snf_effectiveness_index?
+  answer_type: any
+  unit: ''
+  locator: program output
+  setting: ''
+  runs: 1
+  evidence: either
+- id: q2
+  text: What is the median of the dignity_score?
+  answer_type: any
+  unit: ''
+  locator: program output
+  setting: ''
+  runs: 1
+  evidence: either
+origin:
+  source: corebench
+  reference: core-bench-v1.1-mainline sha256:d4aa5ebb984df7f293e04f2dd120722f172fddea6fcb54a0c928e09bc6ef837d
+  drafted_by: []
+  user_confirmed: false

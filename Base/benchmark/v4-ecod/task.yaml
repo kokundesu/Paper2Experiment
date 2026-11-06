@@ -1,0 +1,28 @@
+# v4 task as agents see it (from the frozen ReproSpec). No target values.
+id: v4-ecod
+paper_pdf: paper/2201.00382.pdf
+paper_url: https://arxiv.org/pdf/2201.00382
+repo_url: https://github.com/yzhao062/pyod
+objective: 复现 ECOD（TKDE 2022）在 ODDS 的 Cardio、Breastw、Mammography 三个数据集上的 ROC-AUC（表
+  4）。
+claims:
+- id: cardio_ecod_roc_auc
+  metric: ROC-AUC
+  setting: 表 4，Cardio (mat) 行，ECOD 列（括号外的 ROC 分数）
+  unit: ''
+  description: '论文表 4 中，ECOD 在 ODDS Cardio（mat）数据集上的测试集 ROC-AUC 是多少？ Setting: ODDS
+    Cardio .mat 数据集；默认 ECOD，单进程版本；训练集占 60%，测试集占 40% 一次运行 = 论文的完整协议：10 个随机 60/40 划分上的平均。'
+- id: breastw_ecod_roc_auc
+  metric: ROC-AUC
+  setting: 表 4，Breastw (mat) 行，ECOD 列（括号外的 ROC 分数）
+  unit: ''
+  description: '论文表 4 中，ECOD 在 ODDS Breastw（mat）数据集上的测试集 ROC-AUC 是多少？ Setting: ODDS
+    Breastw .mat 数据集；默认 ECOD，单进程版本；训练集占 60%，测试集占 40% 一次运行 = 论文的完整协议：10 个随机 60/40 划分上的平均。'
+- id: mammography_ecod_roc_auc
+  metric: ROC-AUC
+  setting: 表 4，Mammography (mat) 行，ECOD 列（括号外的 ROC 分数）
+  unit: ''
+  description: '论文表 4 中，ECOD 在 ODDS Mammography（mat）数据集上的测试集 ROC-AUC 是多少？ Setting:
+    ODDS Mammography .mat 数据集；默认 ECOD，单进程版本；训练集占 60%，测试集占 40% 一次运行 = 论文的完整协议：10 个随机
+    60/40 划分上的平均。'
+seeds: 3

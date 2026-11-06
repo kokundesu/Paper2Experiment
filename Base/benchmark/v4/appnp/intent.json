@@ -1,0 +1,67 @@
+{
+ "draft": {
+  "understanding": "用户希望使用作者仓库中的 PyTorch 实现复现 APPNP 在 MS Academic 图上的节点分类表现，并与论文表 2 的平均测试准确率对照。",
+  "questions": [
+   {
+    "id": "appnp_ms_academic_accuracy",
+    "text": "论文表 2 中 APPNP 在 MS Academic 数据集上的平均测试准确率（micro-F1）是多少？",
+    "metric": "平均节点分类准确率（micro-F1）",
+    "unit": "%",
+    "direction": "higher",
+    "locator": "表 2，APPNP 行、MS ACADEMIC 列；取平均准确率，不取随附的置信区间半宽",
+    "setting": "MS Academic 最大连通分量；APPNP（非精确 PPNP）；训练集每类 20 个标注节点，早停集 500 个节点，固定留出测试集；使用作者 PyTorch 实现复现，对照论文表 2",
+    "runs": 100,
+    "protocol_notes": "论文每个实验采用 20 个随机数据划分、每个划分 5 次随机初始化；MS Academic 的可见集为 5000 个节点，其余为固定测试集。表 2 报告跨运行平均准确率，附带通过 bootstrap 计算的 95% 置信区间。APPNP 在此数据集使用 α=0.2、K=10；论文实验本身使用 TensorFlow。"
+   }
+  ],
+  "open_issues": [
+   "论文表 2 的结果来自 TensorFlow 实验，而用户指定作者的 PyTorch 实现：请确认是以表 2 的论文均值为复现目标，还是希望比较 PyTorch 复现笔记本自身给出的结果？"
+  ]
+ },
+ "checks": {
+  "sonnet55": {
+   "items": [
+    {
+     "question_id": "appnp_ms_academic_accuracy",
+     "in_scope": "yes",
+     "locator_ok": "yes",
+     "underspecified": [
+      "none"
+     ],
+     "answer_type_ok": "yes",
+     "measurable": "yes",
+     "comment": "Table 2 APPNP / MS Academic mean accuracy is a single number. The PyTorch vs TensorFlow note is settled by the target being the paper value. MS Academic is small enough for CPU."
+    }
+   ],
+   "missing_questions": []
+  },
+  "haiku55": {
+   "items": [
+    {
+     "question_id": "appnp_ms_academic_accuracy",
+     "in_scope": "yes",
+     "locator_ok": "yes",
+     "underspecified": [
+      "none"
+     ],
+     "answer_type_ok": "yes",
+     "measurable": "yes",
+     "comment": "Table 2, APPNP row, MS Academic column (93.27 ± 0.08); the question asks for the mean, not the CI half-width, which matches the draft. α=0.2 and K=10 for MS Academic match Section 5. The repo ships ms_academic.npz and a PyTorch implementation, so it can run without a GPU or paid API. The TensorFlow-vs-PyTorch point is already flagged in open_issues and does not change the target number."
+    }
+   ],
+   "missing_questions": []
+  }
+ },
+ "accepted": [
+  "appnp_ms_academic_accuracy"
+ ],
+ "queue": [
+  {
+   "kind": "draft_issue",
+   "by": "drafter",
+   "text": "论文表 2 的结果来自 TensorFlow 实验，而用户指定作者的 PyTorch 实现：请确认是以表 2 的论文均值为复现目标，还是希望比较 PyTorch 复现笔记本自身给出的结果？"
+  }
+ ],
+ "notes": [],
+ "cost_usd": 0.1177
+}

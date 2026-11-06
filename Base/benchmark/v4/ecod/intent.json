@@ -1,0 +1,144 @@
+{
+ "draft": {
+  "understanding": "复现论文表 4 中，ECOD 默认方法在 ODDS 来源的 Cardio、Breastw 和 Mammography 数据集上的测试集 ROC-AUC；每个数据集对应表 4 的 ECOD 列一个结果。",
+  "questions": [
+   {
+    "id": "cardio_ecod_roc_auc",
+    "text": "论文表 4 中，ECOD 在 ODDS Cardio（mat）数据集上的测试集 ROC-AUC 是多少？",
+    "metric": "ROC-AUC",
+    "unit": "",
+    "direction": "higher",
+    "locator": "表 4，Cardio (mat) 行，ECOD 列（括号外的 ROC 分数）",
+    "setting": "ODDS Cardio .mat 数据集；默认 ECOD，单进程版本；训练集占 60%，测试集占 40%",
+    "runs": 10,
+    "protocol_notes": "论文 §4.1 和表 4 注释：报告 10 次独立试验的测试集 ROC 分数平均值；不取括号内的排名。"
+   },
+   {
+    "id": "breastw_ecod_roc_auc",
+    "text": "论文表 4 中，ECOD 在 ODDS Breastw（mat）数据集上的测试集 ROC-AUC 是多少？",
+    "metric": "ROC-AUC",
+    "unit": "",
+    "direction": "higher",
+    "locator": "表 4，Breastw (mat) 行，ECOD 列（括号外的 ROC 分数）",
+    "setting": "ODDS Breastw .mat 数据集；默认 ECOD，单进程版本；训练集占 60%，测试集占 40%",
+    "runs": 10,
+    "protocol_notes": "论文 §4.1 和表 4 注释：报告 10 次独立试验的测试集 ROC 分数平均值；不取括号内的排名。"
+   },
+   {
+    "id": "mammography_ecod_roc_auc",
+    "text": "论文表 4 中，ECOD 在 ODDS Mammography（mat）数据集上的测试集 ROC-AUC 是多少？",
+    "metric": "ROC-AUC",
+    "unit": "",
+    "direction": "higher",
+    "locator": "表 4，Mammography (mat) 行，ECOD 列（括号外的 ROC 分数）",
+    "setting": "ODDS Mammography .mat 数据集；默认 ECOD，单进程版本；训练集占 60%，测试集占 40%",
+    "runs": 10,
+    "protocol_notes": "论文 §4.1 和表 4 注释：报告 10 次独立试验的测试集 ROC 分数平均值；不取括号内的排名。"
+   }
+  ],
+  "open_issues": []
+ },
+ "checks": {
+  "sonnet55": {
+   "items": [
+    {
+     "question_id": "cardio_ecod_roc_auc",
+     "in_scope": "yes",
+     "locator_ok": "yes",
+     "underspecified": [
+      "none"
+     ],
+     "answer_type_ok": "yes",
+     "measurable": "yes",
+     "comment": ""
+    },
+    {
+     "question_id": "breastw_ecod_roc_auc",
+     "in_scope": "yes",
+     "locator_ok": "yes",
+     "underspecified": [
+      "none"
+     ],
+     "answer_type_ok": "yes",
+     "measurable": "unclear",
+     "comment": "breastw.mat is not in the repo files; it would need downloading from ODDS."
+    },
+    {
+     "question_id": "mammography_ecod_roc_auc",
+     "in_scope": "yes",
+     "locator_ok": "yes",
+     "underspecified": [
+      "none"
+     ],
+     "answer_type_ok": "yes",
+     "measurable": "unclear",
+     "comment": "mammography.mat is not in the repo files; it would need downloading from ODDS."
+    }
+   ],
+   "missing_questions": []
+  },
+  "haiku55": {
+   "items": [
+    {
+     "question_id": "cardio_ecod_roc_auc",
+     "in_scope": "yes",
+     "locator_ok": "yes",
+     "underspecified": [
+      "none"
+     ],
+     "answer_type_ok": "yes",
+     "measurable": "yes",
+     "comment": "Table 4 Cardio (mat) row, ECOD column, is the value outside the parentheses. The 60/40 split and 10-trial average are stated in §4.1. Table 2 gives the same ECOD value, so there is no conflict."
+    },
+    {
+     "question_id": "breastw_ecod_roc_auc",
+     "in_scope": "yes",
+     "locator_ok": "yes",
+     "underspecified": [
+      "none"
+     ],
+     "answer_type_ok": "yes",
+     "measurable": "yes",
+     "comment": "Table 4 Breastw (mat) row, ECOD column. Table 2 (a variant table, not the requested one) lists 0.993 for the same dataset while Table 4 lists a different value in the last digit. The locator explicitly points to Table 4, so the question is not ambiguous, but the discrepancy is worth noting when comparing results."
+    },
+    {
+     "question_id": "mammography_ecod_roc_auc",
+     "in_scope": "yes",
+     "locator_ok": "yes",
+     "underspecified": [
+      "none"
+     ],
+     "answer_type_ok": "yes",
+     "measurable": "yes",
+     "comment": "Table 4 Mammography (mat) row, ECOD column, value outside the parentheses. Setup matches §4.1 (60/40 split, 10 trials). Table 2 gives the same ECOD value."
+    }
+   ],
+   "missing_questions": []
+  }
+ },
+ "accepted": [
+  "cardio_ecod_roc_auc",
+  "breastw_ecod_roc_auc",
+  "mammography_ecod_roc_auc"
+ ],
+ "queue": [],
+ "notes": [
+  {
+   "question_id": "breastw_ecod_roc_auc",
+   "text": "论文表 4 中，ECOD 在 ODDS Breastw（mat）数据集上的测试集 ROC-AUC 是多少？",
+   "locator": "表 4，Breastw (mat) 行，ECOD 列（括号外的 ROC 分数）",
+   "notes": [
+    "sonnet55: measurable on CPU unclear -- breastw.mat is not in the repo files; it would need downloading from ODDS."
+   ]
+  },
+  {
+   "question_id": "mammography_ecod_roc_auc",
+   "text": "论文表 4 中，ECOD 在 ODDS Mammography（mat）数据集上的测试集 ROC-AUC 是多少？",
+   "locator": "表 4，Mammography (mat) 行，ECOD 列（括号外的 ROC 分数）",
+   "notes": [
+    "sonnet55: measurable on CPU unclear -- mammography.mat is not in the repo files; it would need downloading from ODDS."
+   ]
+  }
+ ],
+ "cost_usd": 0.234
+}

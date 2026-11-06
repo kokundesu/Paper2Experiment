@@ -1,0 +1,11 @@
+# cmd (cwd manual/SGC): citation.py --dataset citeseer --tuned --epochs 150 --seed 6 
+# date: 2026-10-04 23:15:19
+/Users/allenhuw/Documents/Projects/Paper2Experiment/benchmark/sgc/manual/SGC/normalization.py:24: RuntimeWarning: divide by zero encountered in power
+  r_inv = np.power(rowsum, -1).flatten()
+/Users/allenhuw/Documents/Projects/Paper2Experiment/benchmark/sgc/manual/SGC/utils.py:30: UserWarning: torch.sparse.SparseTensor(indices, values, shape, *, device=) is deprecated.  Please use torch.sparse_coo_tensor(indices, values, shape, dtype=, device=). (Triggered internally at /Users/runner/work/pytorch/pytorch/torch/csrc/utils/tensor_new.cpp:655.)
+  return torch.sparse.FloatTensor(indices, values, shape)
+using tuned weight decay: 2.3545587233182368e-05
+0.0237s
+Validation Accuracy: 0.7280 Test Accuracy: 0.7180
+Pre-compute time: 0.0237s, train time: 0.0413s, total: 0.0650s
+# wall_s: 4.43

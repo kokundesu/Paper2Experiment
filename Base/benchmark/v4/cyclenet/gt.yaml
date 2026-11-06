@@ -1,0 +1,90 @@
+# Hidden ground truth from the paper (GT stage). Tolerances follow after the reference re-runs.
+id: cyclenet
+extractors:
+- haiku55
+- luna
+values:
+  weather_96_96_mlp_mse:
+    paper_value: 0.158
+    printed: '0.158'
+    precision: 3
+    quote: 96 0.217 0.296 0.172 0.220 0.174 0.214 0.170±0.001 0.216 ±0.001 0.158±0.001
+      0.203±0.001
+    page: 19
+    reported_spread: 0.001
+    spread_kind: std
+    spread_over: seeds
+    n_runs: 5
+    status: agreed
+    votes:
+      haiku55:
+        value: 0.158
+        verified: true
+        why: ''
+        printed: '0.158'
+        quote: 96 0.217 0.296 0.172 0.220 0.174 0.214 0.170±0.001 0.216 ±0.001 0.158±0.001
+          0.203±0.001
+        page: 19
+        spread: 0.001
+        spread_kind: std
+        spread_over: seeds
+        n_runs: 5
+        note: Table 7 Weather, L=96, horizon 96 row; CycleNet/MLP MSE column (last
+          model column). Mean over 5 seeds (2024-2028) is 0.158, std ±0.001.
+      luna:
+        value: 0.158
+        verified: true
+        why: ''
+        printed: '0.158'
+        quote: 'Weather
+
+          96 0.217 0.296 0.172 0.220 0.174 0.214 0.170±0.001 0.216 ±0.001 0.158±0.001
+          0.203±0.001'
+        page: 19
+        spread: 0.001
+        spread_kind: std
+        spread_over: runs
+        n_runs: 5
+        note: ''
+  weather_96_96_mlp_mae:
+    paper_value: 0.203
+    printed: '0.203'
+    precision: 3
+    quote: 96 0.217 0.296 0.172 0.220 0.174 0.214 0.170±0.001 0.216 ±0.001 0.158±0.001
+      0.203±0.001
+    page: 19
+    reported_spread: 0.001
+    spread_kind: std
+    spread_over: seeds
+    n_runs: 5
+    status: agreed
+    votes:
+      haiku55:
+        value: 0.203
+        verified: true
+        why: ''
+        printed: '0.203'
+        quote: 96 0.217 0.296 0.172 0.220 0.174 0.214 0.170±0.001 0.216 ±0.001 0.158±0.001
+          0.203±0.001
+        page: 19
+        spread: 0.001
+        spread_kind: std
+        spread_over: seeds
+        n_runs: 5
+        note: Table 7 Weather, L=96, horizon 96 row; CycleNet/MLP MAE column. Mean
+          over 5 seeds is 0.203, std ±0.001.
+      luna:
+        value: 0.203
+        verified: true
+        why: ''
+        printed: '0.203'
+        quote: 'Weather
+
+          96 0.217 0.296 0.172 0.220 0.174 0.214 0.170±0.001 0.216 ±0.001 0.158±0.001
+          0.203±0.001'
+        page: 19
+        spread: 0.001
+        spread_kind: std
+        spread_over: runs
+        n_runs: 5
+        note: ''

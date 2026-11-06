@@ -1,0 +1,4 @@
+cardio_ecod_roc_auc: 0.93555 ± 0.0019 (n=5)
+breastw_ecod_roc_auc: 0.99154 ± 0.00056 (n=5)
+mammography_ecod_roc_auc: 0.908582 ± 0.0032 (n=5)
+exit=0

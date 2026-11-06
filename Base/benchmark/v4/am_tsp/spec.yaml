@@ -1,0 +1,58 @@
+# ReproSpec (agent-visible, no values). FROZEN: see ../FROZEN.yaml.
+id: am_tsp
+title: ''
+objective: 复现 Attention, Learn to Solve Routing Problems!（ICLR 2019）在 TSP20、TSP50、TSP100
+  上 AM 贪心解码的平均路径长度（表 1），用仓库自带的预训练模型，只做推理。
+task_prompt: ''
+language: Python
+paper:
+  url: https://arxiv.org/abs/1803.08475
+  pdf: null
+code:
+  repo_url: https://github.com/wouterkool/attention-learn-to-route
+  capsule: null
+questions:
+- id: tsp20_am_greedy_mean_tour_length
+  text: 论文表 1 中，TSP20 的 AM (greedy) 平均回路长度（Obj.）是多少？
+  answer_type: number
+  metric: 平均 TSP 回路长度（Obj.）
+  direction: lower
+  unit: ''
+  locator: 表 1，TSP 部分，AM (greedy) 行，n = 20 的 Obj. 列
+  setting: 20 个节点的二维欧氏 TSP；节点坐标独立均匀采样于单位正方形；使用仓库 pretrained/tsp_20 的预训练 AM 模型，仅推理、逐步贪心选择节点；测试集为
+    10000 个实例（仓库对应 tsp20_test_seed1234.pkl）。
+  runs: 3
+  evidence: log
+- id: tsp50_am_greedy_mean_tour_length
+  text: 论文表 1 中，TSP50 的 AM (greedy) 平均回路长度（Obj.）是多少？
+  answer_type: number
+  metric: 平均 TSP 回路长度（Obj.）
+  direction: lower
+  unit: ''
+  locator: 表 1，TSP 部分，AM (greedy) 行，n = 50 的 Obj. 列
+  setting: 50 个节点的二维欧氏 TSP；节点坐标独立均匀采样于单位正方形；使用仓库 pretrained/tsp_50 的预训练 AM 模型，仅推理、逐步贪心选择节点；测试集为
+    10000 个实例（仓库对应 tsp50_test_seed1234.pkl）。
+  runs: 3
+  evidence: log
+- id: tsp100_am_greedy_mean_tour_length
+  text: 论文表 1 中，TSP100 的 AM (greedy) 平均回路长度（Obj.）是多少？
+  answer_type: number
+  metric: 平均 TSP 回路长度（Obj.）
+  direction: lower
+  unit: ''
+  locator: 表 1，TSP 部分，AM (greedy) 行，n = 100 的 Obj. 列
+  setting: 100 个节点的二维欧氏 TSP；节点坐标独立均匀采样于单位正方形；使用仓库 pretrained/tsp_100 的预训练 AM 模型，仅推理、逐步贪心选择节点；测试集为
+    10000 个实例（仓库对应 tsp100_test_seed1234.pkl）。
+  runs: 3
+  evidence: log
+origin:
+  source: user
+  reference: ''
+  prompt: 复现 Attention, Learn to Solve Routing Problems!（ICLR 2019）在 TSP20、TSP50、TSP100
+    上 AM 贪心解码的平均路径长度（表 1），用仓库自带的预训练模型，只做推理。
+  drafted_by:
+  - sol
+  checked_by:
+  - sonnet55
+  - haiku55
+  user_confirmed: true

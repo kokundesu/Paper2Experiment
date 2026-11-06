@@ -1,0 +1,118 @@
+{
+ "draft": {
+  "understanding": "复现论文表 3 中 ILI（流感样疾病）多变量长期预测、预测长度为 24 时，监督训练的 PatchTST/42 对应的测试集 MSE 和 MAE；以仓库的监督学习实现及 illness 脚本为起点，不涉及 PatchTST/64 或自监督结果。",
+  "questions": [
+   {
+    "id": "ili_24_patchtst42_mse",
+    "text": "论文表 3 中 ILI 数据集、预测长度 24、监督训练 PatchTST/42 的多变量预测 MSE 是多少？",
+    "metric": "MSE",
+    "unit": "",
+    "direction": "lower",
+    "locator": "表 3，ILI 数据集的预测长度 24 行，PatchTST/42 下的 MSE 列",
+    "setting": "ILI 每周多变量时间序列；监督训练 PatchTST/42；预测未来 24 个时间步；按论文附录表 9 和图 3 所示，ILI 使用历史输入长度 104，尽管 /42 在正文中以通常的历史长度 336 定义；补丁长度 16、步幅 8；仓库 PatchTST_supervised/scripts/PatchTST/illness.sh 对应的实验。",
+    "runs": 1,
+    "protocol_notes": "表 3 报告监督训练模型的多变量预测 MSE；附录 A.6.1 说明正文和前述附录结果使用固定随机种子 2021，另行报告的五种子均值不属于本题。"
+   },
+   {
+    "id": "ili_24_patchtst42_mae",
+    "text": "论文表 3 中 ILI 数据集、预测长度 24、监督训练 PatchTST/42 的多变量预测 MAE 是多少？",
+    "metric": "MAE",
+    "unit": "",
+    "direction": "lower",
+    "locator": "表 3，ILI 数据集的预测长度 24 行，PatchTST/42 下的 MAE 列",
+    "setting": "ILI 每周多变量时间序列；监督训练 PatchTST/42；预测未来 24 个时间步；按论文附录表 9 和图 3 所示，ILI 使用历史输入长度 104，尽管 /42 在正文中以通常的历史长度 336 定义；补丁长度 16、步幅 8；仓库 PatchTST_supervised/scripts/PatchTST/illness.sh 对应的实验。",
+    "runs": 1,
+    "protocol_notes": "表 3 报告监督训练模型的多变量预测 MAE；附录 A.6.1 说明正文和前述附录结果使用固定随机种子 2021，另行报告的五种子均值不属于本题。"
+   }
+  ],
+  "open_issues": [
+   "正文将 PatchTST/42 定义为历史输入长度 336，但附录表 9 和图 3 表明 ILI 的对应实验使用历史长度 104；是否以表 3 的 ILI 项及仓库 illness 脚本配置为准，而非要求严格使用长度 336 的 42 个输入补丁？"
+  ]
+ },
+ "checks": {
+  "sonnet55": {
+   "items": [
+    {
+     "question_id": "ili_24_patchtst42_mse",
+     "in_scope": "yes",
+     "locator_ok": "yes",
+     "underspecified": [
+      "none"
+     ],
+     "answer_type_ok": "yes",
+     "measurable": "yes",
+     "comment": "Table 3 ILI 24, PatchTST/42 MSE. Setting text mentions Table 9/Fig 3 for L=104; Table 9 L=336(104) column matches Table 3."
+    },
+    {
+     "question_id": "ili_24_patchtst42_mae",
+     "in_scope": "yes",
+     "locator_ok": "yes",
+     "underspecified": [
+      "none"
+     ],
+     "answer_type_ok": "yes",
+     "measurable": "yes",
+     "comment": "Table 3 ILI 24, PatchTST/42 MAE."
+    }
+   ],
+   "missing_questions": []
+  },
+  "haiku55": {
+   "items": [
+    {
+     "question_id": "ili_24_patchtst42_mse",
+     "in_scope": "yes",
+     "locator_ok": "yes",
+     "underspecified": [
+      "variant"
+     ],
+     "answer_type_ok": "yes",
+     "measurable": "yes",
+     "comment": "Table 3 ILI row 24, PatchTST/42 MSE column is the target. The text defines /42 as L=336, but Appendix A.4.2 Table 9 (column labelled 336(104)) and A.2 / Figure 3 show ILI uses L=104 for this result. The draft's setting matches the paper, but the look-back choice (336 vs 104) would give different numbers, so it is worth keeping explicit. ILI is small, so CPU runs are feasible."
+    },
+    {
+     "question_id": "ili_24_patchtst42_mae",
+     "in_scope": "yes",
+     "locator_ok": "yes",
+     "underspecified": [
+      "variant"
+     ],
+     "answer_type_ok": "yes",
+     "measurable": "yes",
+     "comment": "Table 3 ILI row 24, PatchTST/42 MAE column. Same look-back ambiguity as the MSE item (L=104 used for ILI per Table 9 and Figure 3, versus the nominal L=336 for /42). Same metric pairing as the MSE question."
+    }
+   ],
+   "missing_questions": []
+  }
+ },
+ "accepted": [
+  "ili_24_patchtst42_mse",
+  "ili_24_patchtst42_mae"
+ ],
+ "queue": [
+  {
+   "kind": "draft_issue",
+   "by": "drafter",
+   "text": "正文将 PatchTST/42 定义为历史输入长度 336，但附录表 9 和图 3 表明 ILI 的对应实验使用历史长度 104；是否以表 3 的 ILI 项及仓库 illness 脚本配置为准，而非要求严格使用长度 336 的 42 个输入补丁？"
+  }
+ ],
+ "notes": [
+  {
+   "question_id": "ili_24_patchtst42_mse",
+   "text": "论文表 3 中 ILI 数据集、预测长度 24、监督训练 PatchTST/42 的多变量预测 MSE 是多少？",
+   "locator": "表 3，ILI 数据集的预测长度 24 行，PatchTST/42 下的 MSE 列",
+   "notes": [
+    "haiku55: underspecified (variant) -- Table 3 ILI row 24, PatchTST/42 MSE column is the target. The text defines /42 as L=336, but Appendix A.4.2 Table 9 (column labelled 336(104)) and A.2 / Figure 3 show ILI uses L=104 for this result. The draft's setting matches the paper, but the look-back choice (336 vs 104) would give different numbers, so it is worth keeping explicit. ILI is small, so CPU runs are feasible."
+   ]
+  },
+  {
+   "question_id": "ili_24_patchtst42_mae",
+   "text": "论文表 3 中 ILI 数据集、预测长度 24、监督训练 PatchTST/42 的多变量预测 MAE 是多少？",
+   "locator": "表 3，ILI 数据集的预测长度 24 行，PatchTST/42 下的 MAE 列",
+   "notes": [
+    "haiku55: underspecified (variant) -- Table 3 ILI row 24, PatchTST/42 MAE column. Same look-back ambiguity as the MSE item (L=104 used for ILI per Table 9 and Figure 3, versus the nominal L=336 for /42). Same metric pairing as the MSE question."
+   ]
+  }
+ ],
+ "cost_usd": 0.2444
+}

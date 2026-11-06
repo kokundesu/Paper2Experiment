@@ -1,0 +1,37 @@
+# Hidden: pre-registered tolerances, computed from the 3 manual re-runs.
+capsule_id: capsule-3762736
+source: core-bench-v1.1-mainline core_test.json
+split: test
+data_sha256: d4aa5ebb984df7f293e04f2dd120722f172fddea6fcb54a0c928e09bc6ef837d
+rule: docs/benchmark-redesign.md section 3.3
+questions:
+- id: q1
+  question: What is the Task1_Only macro f1?
+  vision: false
+  kind: numeric
+  scored: true
+  tolerance:
+    mean: 0.7012
+    s: 0.0
+    n: 3
+    m: 1
+    noise: 0.0
+    precision: 5.0e-05
+    floor: 7.012000000000001e-06
+    h: 5.0e-05
+    term: precision
+- id: q2
+  question: What is the Winner_SCL RMSE?
+  vision: false
+  kind: numeric
+  scored: true
+  tolerance:
+    mean: 0.47079999999999994
+    s: 0.0
+    n: 3
+    m: 1
+    noise: 0.0
+    precision: 5.0e-05
+    floor: 4.708e-06
+    h: 5.0e-05
+    term: precision

@@ -1,0 +1,34 @@
+# CORE-Bench v1.1 task as a ReproSpec: what agents see. No answers.
+id: cb-9070543
+title: Intermittent Drug Treatment of BRAF<sup>V600E</sup> Melanoma Cells Delays Resistance
+  by Sensitizing Cells to Rechallenge
+objective: 'Test the computational reproducibility of a scientific capsule (CORE-Bench,
+  Hard level): run its code and answer the questions from the output.'
+task_prompt: 'Make the Dose_Response_Script_Output, RNA_Seq_Script_Output, Resistance_and_Sensitivity_Genes_Script_Output,
+  Fig6c_Script_Output folders in the results folder to store the outputs. Then run
+  the .Rmd files in this order: Dose_Response_Script.Rmd, RNA_Seq_Script.Rmd, Figure_6c_Script.Rmd.
+  Store the outputs in ../results in the respective results folders. '
+language: R
+paper: null
+code:
+  repo_url: null
+  capsule: capsule-9070543
+questions:
+- id: q1
+  text: fig From the figure 4 continuous dose response, report the name of the sample
+    with the highest normalized cell number at an LGX818 concentration of 0.
+  answer_type: any
+  metric: ''
+  direction: ''
+  unit: ''
+  locator: program output
+  setting: ''
+  runs: 1
+  evidence: either
+origin:
+  source: corebench
+  reference: core-bench (original) core_train.json sha256:3df47f1b3fa1cb60045018eb1a0f1ad4ecf6a53f72318c845a879ce0313b0730
+  prompt: ''
+  drafted_by: []
+  checked_by: []
+  user_confirmed: false

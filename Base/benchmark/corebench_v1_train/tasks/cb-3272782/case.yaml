@@ -1,0 +1,52 @@
+# Hidden: pre-registered tolerances, computed from the 3 manual re-runs.
+capsule_id: capsule-3272782
+source: core-bench (original) core_train.json
+split: dev
+data_sha256: 3df47f1b3fa1cb60045018eb1a0f1ad4ecf6a53f72318c845a879ce0313b0730
+rule: docs/benchmark-redesign.md section 3.3
+questions:
+- id: q1
+  question: Report Average accuracy for the VisGIN model.
+  vision: false
+  kind: numeric
+  scored: true
+  tolerance:
+    mean: 0.995
+    s: 0.0050000000000000044
+    n: 3
+    m: 1
+    noise: 0.02484338208322962
+    precision: 0.0005
+    floor: 9.950000000000001e-06
+    h: 0.02484338208322962
+    term: noise
+- id: q2
+  question: Report Average FNMR for the VisGIN model.
+  vision: false
+  kind: numeric
+  scored: false
+  tolerance:
+    mean: 0.009333333333333332
+    s: 0.009018499505645788
+    n: 3
+    m: 1
+    noise: 0.044810005807235105
+    precision: 0.0005
+    floor: 9.333333333333334e-08
+    h: 0.044810005807235105
+    term: noise
+- id: q3
+  question: Report Average FMR for the VisGIN model.
+  vision: false
+  kind: numeric
+  scored: true
+  tolerance:
+    mean: 0.0
+    s: 0.0
+    n: 3
+    m: 1
+    noise: 0.0
+    precision: 0.05
+    floor: 1.0e-08
+    h: 0.05
+    term: precision

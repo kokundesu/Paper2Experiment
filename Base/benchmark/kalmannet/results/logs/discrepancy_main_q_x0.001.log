@@ -1,0 +1,30 @@
+RUN name=main_q_x0.001 code=main inv_r2_db=30 seed=0 opts=[--q_scale 0.001]
+CONFIG {'inv_r2_db': 30.0, 'nu_db': 0.0, 'seed': 0, 'N_T': 200, 'T': 20, 'data': 'fixed', 'long_T': 2000, 'burn': 0, 'init_var': 100.0, 'ekf_init': 'm1x_0', 'P0': 0.0, 'q_scale': 0.001, 'r_scale': 1.0, 'h_jac': 'correct', 'tag': 'main_q_x0.001'}
+data: x0 mean |x0| = 1.73, mean |x_t| over test set = 26.37, test shape (200, 3, 20)
+Extended Kalman Filter - MSE LOSS: tensor(-16.0232) [dB]
+RESULT tag=main_q_x0.001 inv_r2_db=30.0 seed=0 ekf_dB=-16.023 mean_of_dB=-18.574 median_dB=-18.747 n_nonfinite=0 mean_rho=26.37 max_abs_K=0.214
+RUN name=main_q_x0.001 code=main inv_r2_db=30 seed=1 opts=[--q_scale 0.001]
+CONFIG {'inv_r2_db': 30.0, 'nu_db': 0.0, 'seed': 1, 'N_T': 200, 'T': 20, 'data': 'fixed', 'long_T': 2000, 'burn': 0, 'init_var': 100.0, 'ekf_init': 'm1x_0', 'P0': 0.0, 'q_scale': 0.001, 'r_scale': 1.0, 'h_jac': 'correct', 'tag': 'main_q_x0.001'}
+data: x0 mean |x0| = 1.73, mean |x_t| over test set = 26.35, test shape (200, 3, 20)
+Extended Kalman Filter - MSE LOSS: tensor(-16.2053) [dB]
+RESULT tag=main_q_x0.001 inv_r2_db=30.0 seed=1 ekf_dB=-16.205 mean_of_dB=-18.413 median_dB=-18.159 n_nonfinite=0 mean_rho=26.35 max_abs_K=0.214
+RUN name=main_q_x0.001 code=main inv_r2_db=30 seed=2 opts=[--q_scale 0.001]
+CONFIG {'inv_r2_db': 30.0, 'nu_db': 0.0, 'seed': 2, 'N_T': 200, 'T': 20, 'data': 'fixed', 'long_T': 2000, 'burn': 0, 'init_var': 100.0, 'ekf_init': 'm1x_0', 'P0': 0.0, 'q_scale': 0.001, 'r_scale': 1.0, 'h_jac': 'correct', 'tag': 'main_q_x0.001'}
+data: x0 mean |x0| = 1.73, mean |x_t| over test set = 26.41, test shape (200, 3, 20)
+Extended Kalman Filter - MSE LOSS: tensor(-16.1772) [dB]
+RESULT tag=main_q_x0.001 inv_r2_db=30.0 seed=2 ekf_dB=-16.177 mean_of_dB=-18.892 median_dB=-18.658 n_nonfinite=0 mean_rho=26.41 max_abs_K=0.214
+RUN name=main_q_x0.001 code=main inv_r2_db=10 seed=0 opts=[--q_scale 0.001]
+CONFIG {'inv_r2_db': 10.0, 'nu_db': 0.0, 'seed': 0, 'N_T': 200, 'T': 20, 'data': 'fixed', 'long_T': 2000, 'burn': 0, 'init_var': 100.0, 'ekf_init': 'm1x_0', 'P0': 0.0, 'q_scale': 0.001, 'r_scale': 1.0, 'h_jac': 'correct', 'tag': 'main_q_x0.001'}
+data: x0 mean |x0| = 1.73, mean |x_t| over test set = 25.62, test shape (200, 3, 20)
+Extended Kalman Filter - MSE LOSS: tensor(3.7662) [dB]
+RESULT tag=main_q_x0.001 inv_r2_db=10.0 seed=0 ekf_dB=3.766 mean_of_dB=1.338 median_dB=1.089 n_nonfinite=0 mean_rho=25.62 max_abs_K=0.255
+RUN name=main_q_x0.001 code=main inv_r2_db=10 seed=1 opts=[--q_scale 0.001]
+CONFIG {'inv_r2_db': 10.0, 'nu_db': 0.0, 'seed': 1, 'N_T': 200, 'T': 20, 'data': 'fixed', 'long_T': 2000, 'burn': 0, 'init_var': 100.0, 'ekf_init': 'm1x_0', 'P0': 0.0, 'q_scale': 0.001, 'r_scale': 1.0, 'h_jac': 'correct', 'tag': 'main_q_x0.001'}
+data: x0 mean |x0| = 1.73, mean |x_t| over test set = 25.44, test shape (200, 3, 20)
+Extended Kalman Filter - MSE LOSS: tensor(3.5478) [dB]
+RESULT tag=main_q_x0.001 inv_r2_db=10.0 seed=1 ekf_dB=3.548 mean_of_dB=1.479 median_dB=2.079 n_nonfinite=0 mean_rho=25.44 max_abs_K=0.256
+RUN name=main_q_x0.001 code=main inv_r2_db=10 seed=2 opts=[--q_scale 0.001]
+CONFIG {'inv_r2_db': 10.0, 'nu_db': 0.0, 'seed': 2, 'N_T': 200, 'T': 20, 'data': 'fixed', 'long_T': 2000, 'burn': 0, 'init_var': 100.0, 'ekf_init': 'm1x_0', 'P0': 0.0, 'q_scale': 0.001, 'r_scale': 1.0, 'h_jac': 'correct', 'tag': 'main_q_x0.001'}
+data: x0 mean |x0| = 1.73, mean |x_t| over test set = 26.07, test shape (200, 3, 20)
+Extended Kalman Filter - MSE LOSS: tensor(3.7347) [dB]
+RESULT tag=main_q_x0.001 inv_r2_db=10.0 seed=2 ekf_dB=3.735 mean_of_dB=1.043 median_dB=1.169 n_nonfinite=0 mean_rho=26.07 max_abs_K=0.261

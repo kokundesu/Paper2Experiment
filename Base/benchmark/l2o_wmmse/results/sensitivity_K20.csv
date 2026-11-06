@@ -1,0 +1,2 @@
+mode,K,seed,train_seed,test_seed,num_train,num_test,epochs,hidden,wmmse_sumrate,dnn_sumrate,dnn_pct_of_wmmse,maxpower_pct,random_pct,dnn_cpu_s,wmmse_py_cpu_s,train_s,wall_s
+train,20,0,0,7,1000000,10000,300,200-80-80,3.6326,3.3031,90.931,39.527,38.028,0.0239,10.828,862.2,912.9

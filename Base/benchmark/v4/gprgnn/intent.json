@@ -1,0 +1,59 @@
+{
+ "draft": {
+  "understanding": "用户要复现 ICLR 2021 GPR-GNN 论文表 2 中 GPRGNN 行、Chameleon 列的节点分类平均准确率，使用异配图数据集的 60%/20%/20% 训练、验证、测试划分；不要求单独复现置信区间或其他模型结果。",
+  "questions": [
+   {
+    "id": "chameleon_gprgnn_dense_mean_accuracy",
+    "text": "在 Chameleon 数据集采用 60%/20%/20% 训练、验证、测试划分时，GPRGNN 的测试节点分类平均准确率是多少？",
+    "metric": "测试节点分类平均准确率（micro-F1）",
+    "unit": "%",
+    "direction": "higher",
+    "locator": "论文表 2（Results on real world benchmark datasets），GPRGNN 行、Chameleon 列；取“Mean accuracy (%) ± 95% confidence interval”中的均值部分",
+    "setting": "Chameleon 真实世界异配图节点分类，GPRGNN（非 GPRGNN(rand)），密集 60%/20%/20% 划分；按论文将原始有向图转换为无向图，使用节点特征和图结构",
+    "runs": 100,
+    "protocol_notes": "论文第 5 节称实验重复 100 次，使用不同随机划分和初始化；异配数据集在表 2 使用密集划分，附录 A.9 说明训练集尽量类别均衡、验证集随机采样，其余为测试集。表 2 报告均值及 95% 置信区间，本问题仅询问均值。README 提供复现表 2 的脚本及 Chameleon 参数配置。"
+   }
+  ],
+  "open_issues": []
+ },
+ "checks": {
+  "sonnet55": {
+   "items": [
+    {
+     "question_id": "chameleon_gprgnn_dense_mean_accuracy",
+     "in_scope": "yes",
+     "locator_ok": "yes",
+     "underspecified": [
+      "none"
+     ],
+     "answer_type_ok": "yes",
+     "measurable": "yes",
+     "comment": "Table 2 GPRGNN row, Chameleon column, mean only. Chameleon data is in the repo, and Reproduce_GPRGNN.sh exists."
+    }
+   ],
+   "missing_questions": []
+  },
+  "haiku55": {
+   "items": [
+    {
+     "question_id": "chameleon_gprgnn_dense_mean_accuracy",
+     "in_scope": "yes",
+     "locator_ok": "yes",
+     "underspecified": [
+      "none"
+     ],
+     "answer_type_ok": "yes",
+     "measurable": "yes",
+     "comment": "Table 2 GPRGNN row, Chameleon column, is the mean accuracy with 95% CI. The dense 60/20/20 split is the one the paper uses for heterophilic datasets, and the 100-run protocol is stated. Chameleon is small, so a CPU run should be feasible. The hyperparameters are given in the README."
+    }
+   ],
+   "missing_questions": []
+  }
+ },
+ "accepted": [
+  "chameleon_gprgnn_dense_mean_accuracy"
+ ],
+ "queue": [],
+ "notes": [],
+ "cost_usd": 0.1899
+}

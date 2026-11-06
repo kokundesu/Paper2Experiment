@@ -1,0 +1,58 @@
+# Hidden: pre-registered tolerances, computed from the 3 manual re-runs.
+capsule_id: capsule-1108125
+source: core-bench (original) core_train.json
+split: dev
+data_sha256: 3df47f1b3fa1cb60045018eb1a0f1ad4ecf6a53f72318c845a879ce0313b0730
+rule: docs/benchmark-redesign.md section 3.3
+questions:
+- id: q1
+  question: Please report the mean of forestgroup.
+  vision: false
+  kind: numeric
+  scored: true
+  tolerance:
+    mean: 0.34
+    s: 0.0
+    n: 3
+    m: 1
+    noise: 0.0
+    precision: 0.005
+    floor: 3.4000000000000005e-06
+    h: 0.005
+    term: precision
+- id: q2
+  question: Please report the mean of gender.
+  vision: false
+  kind: numeric
+  scored: true
+  tolerance:
+    mean: 0.46
+    s: 0.0
+    n: 3
+    m: 1
+    noise: 0.0
+    precision: 0.005
+    floor: 4.600000000000001e-06
+    h: 0.005
+    term: precision
+- id: q3
+  question: Please report the mean of income.
+  vision: false
+  kind: numeric
+  scored: true
+  tolerance:
+    mean: 1.0
+    s: 0.0
+    n: 3
+    m: 1
+    noise: 0.0
+    precision: 0.05
+    floor: 1.0e-05
+    h: 0.05
+    term: precision
+- id: q4
+  question: fig Report 'decrease' if the eigen values of factors and components decreases
+    as the factor or component number increases. Report 'increase' otherwise.
+  vision: true
+  kind: string
+  scored: true

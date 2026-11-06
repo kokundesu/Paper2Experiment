@@ -1,0 +1,93 @@
+{
+ "draft": {
+  "understanding": "用户希望复现《Revisiting the Performance of iALS》表 5 中，MovieLens 1M 数据集按 NCF 留一法及采样候选集协议评估的作者重新调优的 iALS 在 HR@10 与 NDCG@10 上的测试结果；不包括先前文献报告的 iALS 或 eALS 行。",
+  "questions": [
+   {
+    "id": "ml1m_ncf_ials_hr10",
+    "text": "表 5 中作者的 iALS（our result）在 ML1M 的 NCF 留一法评估下，HR@10 是多少？",
+    "metric": "HR@10",
+    "unit": "",
+    "direction": "higher",
+    "locator": "表 5，iALS 行（Result from 为 our result），ML1M 下的 HR@10 列",
+    "setting": "MovieLens 1M（ML1M）隐式反馈；NCF 协议，每位用户留出一个交互作测试，在一个留出正例与随机抽取的 100 个候选负例组成的集合中排名；作者调优的 iALS，标准 iALS 求解器，嵌入维度 192，训练 12 轮，正则化系数 0.007，未观测项权重 0.3，频率缩放正则化指数 1，初始化尺度参数 0.1。",
+    "runs": 10,
+    "protocol_notes": "按论文第 4 节，在训练数据上另留出调参集；表中质量结果为 10 次重复实验的均值，而非调参集指标。仓库对应 ncf_benchmarks/ials_simple.py 的 ML1M 示例命令。"
+   },
+   {
+    "id": "ml1m_ncf_ials_ndcg10",
+    "text": "表 5 中作者的 iALS（our result）在 ML1M 的 NCF 留一法评估下，NDCG@10 是多少？",
+    "metric": "NDCG@10",
+    "unit": "",
+    "direction": "higher",
+    "locator": "表 5，iALS 行（Result from 为 our result），ML1M 下的 NDCG@10 列",
+    "setting": "MovieLens 1M（ML1M）隐式反馈；NCF 协议，每位用户留出一个交互作测试，在一个留出正例与随机抽取的 100 个候选负例组成的集合中排名；作者调优的 iALS，标准 iALS 求解器，嵌入维度 192，训练 12 轮，正则化系数 0.007，未观测项权重 0.3，频率缩放正则化指数 1，初始化尺度参数 0.1。",
+    "runs": 10,
+    "protocol_notes": "按论文第 4 节，在训练数据上另留出调参集；表中质量结果为 10 次重复实验的均值，而非调参集指标。仓库对应 ncf_benchmarks/ials_simple.py 的 ML1M 示例命令。"
+   }
+  ],
+  "open_issues": []
+ },
+ "checks": {
+  "sonnet55": {
+   "items": [
+    {
+     "question_id": "ml1m_ncf_ials_hr10",
+     "in_scope": "yes",
+     "locator_ok": "yes",
+     "underspecified": [
+      "none"
+     ],
+     "answer_type_ok": "yes",
+     "measurable": "yes",
+     "comment": "Table 5 iALS our result, ML1M HR@10."
+    },
+    {
+     "question_id": "ml1m_ncf_ials_ndcg10",
+     "in_scope": "yes",
+     "locator_ok": "yes",
+     "underspecified": [
+      "none"
+     ],
+     "answer_type_ok": "yes",
+     "measurable": "yes",
+     "comment": "Table 5 iALS our result, ML1M NDCG@10."
+    }
+   ],
+   "missing_questions": []
+  },
+  "haiku55": {
+   "items": [
+    {
+     "question_id": "ml1m_ncf_ials_hr10",
+     "in_scope": "yes",
+     "locator_ok": "yes",
+     "underspecified": [
+      "none"
+     ],
+     "answer_type_ok": "yes",
+     "measurable": "yes",
+     "comment": "Table 5, iALS row marked 'our result', ML1M HR@10 column. Setting matches Section 4.2 (101 candidates: 1 holdout + 100 random, tuning on holdout from training) and Table 2 (d=192, λ=0.007, α0=0.3, T=12). Repo README command matches. ML1M is small enough for a CPU run."
+    },
+    {
+     "question_id": "ml1m_ncf_ials_ndcg10",
+     "in_scope": "yes",
+     "locator_ok": "yes",
+     "underspecified": [
+      "none"
+     ],
+     "answer_type_ok": "yes",
+     "measurable": "yes",
+     "comment": "Table 5, iALS row marked 'our result', ML1M NDCG@10 column. Same protocol and hyperparameters as the HR@10 item. The d=64 variant in the text is not included, which is correct."
+    }
+   ],
+   "missing_questions": []
+  }
+ },
+ "accepted": [
+  "ml1m_ncf_ials_hr10",
+  "ml1m_ncf_ials_ndcg10"
+ ],
+ "queue": [],
+ "notes": [],
+ "cost_usd": 0.1164
+}

@@ -1,0 +1,15 @@
+# Task given to every workflow. Contains no target values.
+id: fits
+paper_url: https://arxiv.org/pdf/2307.03756
+paper_pdf: paper/2307.03756.pdf
+repo_url: https://github.com/VEWOXIC/FITS
+objective: >
+  Reproduce four FITS cells of Table 1 (long-term forecasting MSE on the ETT datasets)
+  using the official code and the paper's experimental setup (look-back window, cutoff
+  frequency and other hyperparameters as used by the authors).
+claims:
+  - {id: etth1_96_mse,  metric: test_mse, setting: "Table 1, FITS, ETTh1, horizon 96",  unit: "", description: "FITS multivariate test MSE on ETTh1, forecasting horizon 96"}
+  - {id: etth1_720_mse, metric: test_mse, setting: "Table 1, FITS, ETTh1, horizon 720", unit: "", description: "FITS multivariate test MSE on ETTh1, forecasting horizon 720"}
+  - {id: etth2_96_mse,  metric: test_mse, setting: "Table 1, FITS, ETTh2, horizon 96",  unit: "", description: "FITS multivariate test MSE on ETTh2, forecasting horizon 96"}
+  - {id: ettm1_96_mse,  metric: test_mse, setting: "Table 1, FITS, ETTm1, horizon 96",  unit: "", description: "FITS multivariate test MSE on ETTm1, forecasting horizon 96"}
+seeds: 3

@@ -1,0 +1,17 @@
+# Reference recipe (hidden; written by the benchmark builder). status: draft until the setup,
+# the command and one regex per question have been checked by an actual run.
+id: doc2vecc
+status: draft
+repo: https://github.com/mchen24/iclr2017
+commit: ''
+setup:
+- git clone https://github.com/mchen24/iclr2017 repo
+command: ''
+timeout_s: 1800
+seeded: true
+metrics: {}
+entry: '`go.sh`（C 代码 + liblinear）'
+notes:
+- 'difficulty: 中; estimated time per run: 10–15 分钟'
+- 'risk: Apple clang 可能不接受 `-march=native`；脚本用逻辑回归而论文写线性 SVM；多线程导致结果不完全确定'
+- 'questions: imdb_doc2vecc_include_test_error'

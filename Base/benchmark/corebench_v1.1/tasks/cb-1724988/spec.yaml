@@ -1,0 +1,41 @@
+# CORE-Bench v1.1 task as a ReproSpec: what agents see. No answers.
+id: cb-1724988
+title: Adapting the coordination of eyes and head to differences in task and environment
+  during fully-mobile visual exploration
+objective: 'Test the computational reproducibility of a scientific capsule (CORE-Bench,
+  Hard level): run its code and answer the questions from the output.'
+task_prompt: Run 'calibration_error.R', 'lss1_summary_analyses.R', 'lss2_summary_analyses.R',
+  and 'lss2_peak_analyses.R' all using Rscript.
+language: R
+paper: null
+code:
+  repo_url: null
+  capsule: capsule-1724988
+questions:
+- id: q1
+  text: fig Report the task name with the higher median walking speed (m/s).
+  answer_type: any
+  metric: ''
+  direction: ''
+  unit: ''
+  locator: program output
+  setting: ''
+  runs: 1
+  evidence: either
+- id: q2
+  text: fig Report the task name with the higher median straightness ratio.
+  answer_type: any
+  metric: ''
+  direction: ''
+  unit: ''
+  locator: program output
+  setting: ''
+  runs: 1
+  evidence: either
+origin:
+  source: corebench
+  reference: core-bench-v1.1-mainline core_test.json sha256:d4aa5ebb984df7f293e04f2dd120722f172fddea6fcb54a0c928e09bc6ef837d
+  prompt: ''
+  drafted_by: []
+  checked_by: []
+  user_confirmed: false

@@ -1,0 +1,83 @@
+# Hidden ground truth from the paper (GT stage).
+id: pinn_gradpath
+extractors:
+- haiku55
+- luna
+values:
+  helmholtz2d_m1_relative_l2_50x3:
+    paper_value: 0.106
+    printed: '1.06e-01'
+    precision: 3
+    quote: 50 units / 3 hidden layers 1.06e-01 1.12e-02 2.46e-02 3.87e-03
+    page: 15
+    reported_spread: null
+    spread_kind: none
+    spread_over: none
+    n_runs: 10
+    status: agreed
+    votes:
+      haiku55:
+        value: 0.106
+        verified: true
+        why: ''
+        printed: '1.06e-01'
+        quote: 50 units / 3 hidden layers 1.06e-01 1.12e-02 2.46e-02 3.87e-03
+        page: 15
+        spread: null
+        spread_kind: none
+        spread_over: none
+        n_runs: 10
+        note: Table 2 (Helmholtz), row '50 units / 3 hidden layers', column M1, printed
+          as 1.06e-01. Table averaged over 10 independent trials per the text, but
+          no ± spread is printed.
+      luna:
+        value: 0.106
+        verified: true
+        why: ''
+        printed: '1.06e-01'
+        quote: 50 units / 3 hidden layers 1.06e-01 1.12e-02 2.46e-02 3.87e-03
+        page: 14
+        spread: null
+        spread_kind: none
+        spread_over: none
+        n_runs: 10
+        note: Table 2 reports the average over 10 independent trials; no ± spread
+          is printed.
+  helmholtz2d_m2_relative_l2_50x3:
+    paper_value: 0.0112
+    printed: '1.12e-02'
+    precision: 4
+    quote: 50 units / 3 hidden layers 1.06e-01 1.12e-02 2.46e-02 3.87e-03
+    page: 15
+    reported_spread: null
+    spread_kind: none
+    spread_over: none
+    n_runs: 10
+    status: agreed
+    votes:
+      haiku55:
+        value: 0.0112
+        verified: true
+        why: ''
+        printed: '1.12e-02'
+        quote: 50 units / 3 hidden layers 1.06e-01 1.12e-02 2.46e-02 3.87e-03
+        page: 15
+        spread: null
+        spread_kind: none
+        spread_over: none
+        n_runs: 10
+        note: Table 2 (Helmholtz), row '50 units / 3 hidden layers', column M2, printed
+          as 1.12e-02. Averaged over 10 trials per the text; no ± spread printed.
+      luna:
+        value: 0.0112
+        verified: true
+        why: ''
+        printed: '1.12e-02'
+        quote: 50 units / 3 hidden layers 1.06e-01 1.12e-02 2.46e-02 3.87e-03
+        page: 14
+        spread: null
+        spread_kind: none
+        spread_over: none
+        n_runs: 10
+        note: Table 2 reports the average over 10 independent trials; no ± spread
+          is printed.

@@ -1,0 +1,80 @@
+# ReproSpec (agent-visible, no values). FROZEN: see ../FROZEN.yaml.
+id: ts2vec
+title: ''
+objective: 复现 TS2Vec（AAAI 2022）在 UCR 的 ECG200、GunPoint、ItalyPowerDemand、TwoLeadECG、Chinatown
+  五个数据集上的分类准确率（附录表 9，B=8 那一列）。
+task_prompt: ''
+language: Python
+paper:
+  url: https://arxiv.org/abs/2106.10466
+  pdf: null
+code:
+  repo_url: https://github.com/zhihanyue/ts2vec
+  capsule: null
+questions:
+- id: ecg200_accuracy_b8
+  text: TS2Vec 在 UCR ECG200 数据集上、批量大小 B=8 时的测试集分类准确率是多少？
+  answer_type: number
+  metric: 分类准确率（accuracy）
+  direction: higher
+  unit: ''
+  locator: 附录表 9（第 16 页），ECG200 行，TS2Vec 下 B=8 列
+  setting: UCR ECG200；TS2Vec，B=8，表示维度 320；原始训练/测试划分，训练集无监督学习表示，整条序列的表示经 RBF 核 SVM
+    分类，在测试集评估。
+  runs: 3
+  evidence: log
+- id: gunpoint_accuracy_b8
+  text: TS2Vec 在 UCR GunPoint 数据集上、批量大小 B=8 时的测试集分类准确率是多少？
+  answer_type: number
+  metric: 分类准确率（accuracy）
+  direction: higher
+  unit: ''
+  locator: 附录表 9（第 16 页），GunPoint 行，TS2Vec 下 B=8 列
+  setting: UCR GunPoint；TS2Vec，B=8，表示维度 320；原始训练/测试划分，训练集无监督学习表示，整条序列的表示经 RBF 核 SVM
+    分类，在测试集评估。
+  runs: 3
+  evidence: log
+- id: italypowerdemand_accuracy_b8
+  text: TS2Vec 在 UCR ItalyPowerDemand 数据集上、批量大小 B=8 时的测试集分类准确率是多少？
+  answer_type: number
+  metric: 分类准确率（accuracy）
+  direction: higher
+  unit: ''
+  locator: 附录表 9（第 16 页），ItalyPowerDemand 行，TS2Vec 下 B=8 列
+  setting: UCR ItalyPowerDemand；TS2Vec，B=8，表示维度 320；原始训练/测试划分，训练集无监督学习表示，整条序列的表示经
+    RBF 核 SVM 分类，在测试集评估。
+  runs: 3
+  evidence: log
+- id: twoleadecg_accuracy_b8
+  text: TS2Vec 在 UCR TwoLeadECG 数据集上、批量大小 B=8 时的测试集分类准确率是多少？
+  answer_type: number
+  metric: 分类准确率（accuracy）
+  direction: higher
+  unit: ''
+  locator: 附录表 9（第 17 页），TwoLeadECG 行，TS2Vec 下 B=8 列
+  setting: UCR TwoLeadECG；TS2Vec，B=8，表示维度 320；原始训练/测试划分，训练集无监督学习表示，整条序列的表示经 RBF 核
+    SVM 分类，在测试集评估。
+  runs: 3
+  evidence: log
+- id: chinatown_accuracy_b8
+  text: TS2Vec 在 UCR Chinatown 数据集上、批量大小 B=8 时的测试集分类准确率是多少？
+  answer_type: number
+  metric: 分类准确率（accuracy）
+  direction: higher
+  unit: ''
+  locator: 附录表 9（第 17 页），Chinatown 行，TS2Vec 下 B=8 列
+  setting: UCR Chinatown；TS2Vec，B=8，表示维度 320；原始训练/测试划分，训练集无监督学习表示，整条序列的表示经 RBF 核 SVM
+    分类，在测试集评估。
+  runs: 3
+  evidence: log
+origin:
+  source: user
+  reference: ''
+  prompt: 复现 TS2Vec（AAAI 2022）在 UCR 的 ECG200、GunPoint、ItalyPowerDemand、TwoLeadECG、Chinatown
+    五个数据集上的分类准确率（附录表 9，B=8 那一列）。
+  drafted_by:
+  - sol
+  checked_by:
+  - sonnet55
+  - haiku55
+  user_confirmed: true

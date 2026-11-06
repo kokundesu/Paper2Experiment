@@ -1,0 +1,31 @@
+# CORE-Bench v1.1 task as a ReproSpec: what agents see. No answers.
+id: cb-4671827
+title: 'SPT: Security Policy Translator for Network Security Functions in Cloud-Based
+  Security Services'
+objective: 'Test the computational reproducibility of a scientific capsule (CORE-Bench,
+  Hard level): run its code and answer the questions from the output.'
+task_prompt: Execute 'PerformanveEval.ipynb'. Save the results in html format in ../results.
+  For all the runs, disable the cell execution timeout and allow errors.
+language: Python
+paper: null
+code:
+  repo_url: null
+  capsule: capsule-4671827
+questions:
+- id: q1
+  text: fig Report the name of the mapping with the higher execution time at 44 elements.
+  answer_type: any
+  metric: ''
+  direction: ''
+  unit: ''
+  locator: program output
+  setting: ''
+  runs: 1
+  evidence: either
+origin:
+  source: corebench
+  reference: core-bench-v1.1-mainline core_test.json sha256:d4aa5ebb984df7f293e04f2dd120722f172fddea6fcb54a0c928e09bc6ef837d
+  prompt: ''
+  drafted_by: []
+  checked_by: []
+  user_confirmed: false

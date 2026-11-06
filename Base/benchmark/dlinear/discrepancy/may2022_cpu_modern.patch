@@ -1,0 +1,28 @@
+diff --git a/run_longExp.py b/run_longExp.py
+index b008141..a850a2e 100644
+--- a/run_longExp.py
++++ b/run_longExp.py
+@@ -5,7 +5,9 @@ from exp.exp_main import Exp_Main
+ import random
+ import numpy as np
+ 
+-fix_seed = 2021
++fix_seed = int(os.environ.get('SEED', 2021))  # P2E patch: seed from env (default = original 2021)
++torch.set_num_threads(int(os.environ.get('TORCH_NUM_THREADS', 4)))  # P2E patch: limit CPU threads
++print('seed:', fix_seed, 'threads:', torch.get_num_threads())
+ random.seed(fix_seed)
+ torch.manual_seed(fix_seed)
+ np.random.seed(fix_seed)
+diff --git a/utils/tools.py b/utils/tools.py
+index 9f48a6c..8697d93 100644
+--- a/utils/tools.py
++++ b/utils/tools.py
+@@ -37,7 +37,7 @@ class EarlyStopping:
+         self.counter = 0
+         self.best_score = None
+         self.early_stop = False
+-        self.val_loss_min = np.Inf
++        self.val_loss_min = np.inf
+         self.delta = delta
+ 
+     def __call__(self, val_loss, model, path):

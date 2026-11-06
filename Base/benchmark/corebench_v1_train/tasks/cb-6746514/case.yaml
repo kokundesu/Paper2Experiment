@@ -1,0 +1,52 @@
+# Hidden: pre-registered tolerances, computed from the 3 manual re-runs.
+capsule_id: capsule-6746514
+source: core-bench (original) core_train.json
+split: dev
+data_sha256: 3df47f1b3fa1cb60045018eb1a0f1ad4ecf6a53f72318c845a879ce0313b0730
+rule: docs/benchmark-redesign.md section 3.3
+questions:
+- id: q1
+  question: fig For dataset 1, report the score (%) for the GRU classifier for ACC.
+  vision: true
+  kind: numeric
+  scored: true
+  tolerance:
+    mean: 92.76
+    s: 0.0
+    n: 3
+    m: 1
+    noise: 0.0
+    precision: 0.005
+    floor: 0.0009276000000000001
+    h: 0.005
+    term: precision
+- id: q2
+  question: fig For dataset 1, report the score (%) for the SGRU classifier for ACC.
+  vision: true
+  kind: numeric
+  scored: true
+  tolerance:
+    mean: 97.33
+    s: 0.0
+    n: 3
+    m: 1
+    noise: 0.0
+    precision: 0.005
+    floor: 0.0009733000000000001
+    h: 0.005
+    term: precision
+- id: q3
+  question: fig Report the count of Class 3.
+  vision: true
+  kind: numeric
+  scored: true
+  tolerance:
+    mean: 2300.0
+    s: 0.0
+    n: 3
+    m: 1
+    noise: 0.0
+    precision: 0.05
+    floor: 0.023000000000000003
+    h: 0.05
+    term: precision

@@ -1,0 +1,45 @@
+# Hidden ground truth from the paper (GT stage). Tolerances follow after the reference re-runs.
+id: doc2vecc
+extractors:
+- haiku55
+- luna
+values:
+  imdb_doc2vecc_include_test_error:
+    paper_value: 10.48
+    printed: '10.48'
+    precision: 2
+    quote: Doc2VecC 10.48 11.70
+    page: 6
+    reported_spread: null
+    spread_kind: none
+    spread_over: none
+    n_runs: null
+    status: agreed
+    votes:
+      haiku55:
+        value: 10.48
+        verified: true
+        why: ''
+        printed: '10.48'
+        quote: Doc2VecC 10.48 11.70
+        page: 6
+        spread: null
+        spread_kind: none
+        spread_over: none
+        n_runs: null
+        note: Table 1, Doc2VecC row, Error rate % (include test) column = 10.48. The
+          paper does not report a spread; this is a single number, not a reproduction
+          run. The actual reproduction from go.sh was not executed (no code run available),
+          so this is the paper's printed value.
+      luna:
+        value: 10.48
+        verified: true
+        why: ''
+        printed: '10.48'
+        quote: Doc2VecC 10.48 11.70
+        page: 6
+        spread: null
+        spread_kind: none
+        spread_over: none
+        n_runs: null
+        note: 表 1 中 Doc2VecC 行的第一列错误率对应 Error rate % (include test)。

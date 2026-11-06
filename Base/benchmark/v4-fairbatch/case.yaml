@@ -1,0 +1,39 @@
+# Hidden: targets are the reference re-runs' means, tolerances their h.
+id: v4-fairbatch
+rubric:
+  min_seeds: 3
+  aggregate: mean
+claims:
+- id: synthetic_fairbatch_eo_accuracy
+  metric: Test accuracy
+  setting: Table 1, FairBatch row, Synthetic group, Acc. column
+  unit: ''
+  value: 0.8550000190734863
+  tolerance:
+    abs: 0.0005
+  target: reference
+  paper_value: 0.855
+  evidence_pattern: '(?:< Seed: \d+ >)|(?i:\b(?:seeds?|splits?|trials?|folds?|iter(?:ation)?s?|epochs?|steps?|runs?)\b\W{0,3}\d+)'
+  ref_spread: 0.0
+  run_definition: one complete run of the experiment with one seed; the three runs
+    use different seeds, and the seed must change what the code does
+  diagnostic_only: false
+- id: synthetic_fairbatch_eo_disparity
+  metric: EO disparity = max over sensitive groups z of |Pr(predicted positive | z,
+    true positive) − Pr(predicted positive | true positive)|
+  setting: Table 1, FairBatch row, Synthetic group, EO Disp. column
+  unit: ''
+  value: 0.012102903728662517
+  tolerance:
+    abs: 0.0005
+  target: reference
+  paper_value: 0.012
+  evidence_pattern: '(?:< Seed: \d+ >)|(?i:\b(?:seeds?|splits?|trials?|folds?|iter(?:ation)?s?|epochs?|steps?|runs?)\b\W{0,3}\d+)'
+  ref_spread: 0.0
+  run_definition: one complete run of the experiment with one seed; the three runs
+    use different seeds, and the seed must change what the code does
+  diagnostic_only: false
+discrepancies: []
+source:
+  spec: benchmark/v4/fairbatch
+  split: dev

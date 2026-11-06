@@ -1,0 +1,50 @@
+# CORE-Bench v1.1 task as a ReproSpec: what agents see. No answers.
+id: cb-3272782
+title: 'VisGIN: Visibility Graph Neural Network on One-Dimensional Data for Biometric
+  Authentication'
+objective: 'Test the computational reproducibility of a scientific capsule (CORE-Bench,
+  Hard level): run its code and answer the questions from the output.'
+task_prompt: Run 'VisGIN.py'
+language: Python
+paper: null
+code:
+  repo_url: null
+  capsule: capsule-3272782
+questions:
+- id: q1
+  text: Report Average accuracy for the VisGIN model.
+  answer_type: any
+  metric: ''
+  direction: ''
+  unit: ''
+  locator: program output
+  setting: ''
+  runs: 1
+  evidence: either
+- id: q2
+  text: Report Average FNMR for the VisGIN model.
+  answer_type: any
+  metric: ''
+  direction: ''
+  unit: ''
+  locator: program output
+  setting: ''
+  runs: 1
+  evidence: either
+- id: q3
+  text: Report Average FMR for the VisGIN model.
+  answer_type: any
+  metric: ''
+  direction: ''
+  unit: ''
+  locator: program output
+  setting: ''
+  runs: 1
+  evidence: either
+origin:
+  source: corebench
+  reference: core-bench (original) core_train.json sha256:3df47f1b3fa1cb60045018eb1a0f1ad4ecf6a53f72318c845a879ce0313b0730
+  prompt: ''
+  drafted_by: []
+  checked_by: []
+  user_confirmed: false

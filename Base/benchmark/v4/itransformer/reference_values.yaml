@@ -1,0 +1,87 @@
+# Reference re-runs of the official code (hidden).
+id: itransformer
+recipe_status: draft
+commit: c2426e68ca13f74aaec08045c5c724d8ad328124
+run_dir: /Users/allenhuw/Documents/Projects/Paper2Exp/Base/runs/reference/20261017-101310_itransformer
+n: 5
+setup_logs:
+- cmd_001_setup.log
+- cmd_002_setup.log
+- cmd_003_setup.log
+- cmd_004_setup.log
+- cmd_005_setup.log
+- cmd_006_setup.log
+runs:
+- i: 0
+  seed: 0
+  threads: default
+  exit: 0
+  wall_s: 109.2
+  log: cmd_007_ref_0.log
+  values:
+    exchange_96_96_mse: 0.08847998082637787
+    exchange_96_96_mae: 0.20898282527923584
+- i: 1
+  seed: 1
+  threads: '1'
+  exit: 0
+  wall_s: 127.8
+  log: cmd_008_ref_1.log
+  values:
+    exchange_96_96_mse: 0.08691981434822083
+    exchange_96_96_mae: 0.2070290595293045
+- i: 2
+  seed: 2
+  threads: default
+  exit: 0
+  wall_s: 137.9
+  log: cmd_009_ref_2.log
+  values:
+    exchange_96_96_mse: 0.08663785457611084
+    exchange_96_96_mae: 0.20680822432041168
+- i: 3
+  seed: 3
+  threads: '1'
+  exit: 0
+  wall_s: 151.9
+  log: cmd_010_ref_3.log
+  values:
+    exchange_96_96_mse: 0.08712511509656906
+    exchange_96_96_mae: 0.20750893652439117
+- i: 4
+  seed: 4
+  threads: default
+  exit: 0
+  wall_s: 128.1
+  log: cmd_011_ref_4.log
+  values:
+    exchange_96_96_mse: 0.08684250712394714
+    exchange_96_96_mae: 0.2067141830921173
+values:
+  exchange_96_96_mse:
+  - 0.08847998082637787
+  - 0.08691981434822083
+  - 0.08663785457611084
+  - 0.08712511509656906
+  - 0.08684250712394714
+  exchange_96_96_mae:
+  - 0.20898282527923584
+  - 0.2070290595293045
+  - 0.20680822432041168
+  - 0.20750893652439117
+  - 0.2067141830921173
+printed_places:
+  exchange_96_96_mse: 17
+  exchange_96_96_mae: 17
+manifest:
+  cmd_001_setup.log: 7f628c1270eb1ca0b5781530e37318319adbd5cb1e5edd3a4676d7abc9e908e5
+  cmd_002_setup.log: 67735b26852ba3dd7216625c165805a17f243bf93412e46d0a8a9d591136da59
+  cmd_003_setup.log: 5e3aec4e5779c6e22a6897f98b88968151415385342d46aca0143d82db1fef71
+  cmd_004_setup.log: f77b28932a53283047c5c017d4d14bc11b18883f95f15629aee2b29dfcf167cb
+  cmd_005_setup.log: e22744e770875d1e3d2db0288f1f7c3fbecc15739e3b4147fb6890abfccfc48a
+  cmd_006_setup.log: 9965f8281919f272c3180f9879b471b45a5745811e5b621271223563873c9f95
+  cmd_007_ref_0.log: a7d3fdc09377fdbf9a843fb37b73a78beded5f401b207727a0bbc0b53747f202
+  cmd_008_ref_1.log: f0d9e1a9754bf6da53fb82edf9800b19b5624193bb3a1dbc629dcd3c4de9d503
+  cmd_009_ref_2.log: 181fcfba2b69b8df4737ed856b099ff31bc8367dde857461817c69c231e39d13
+  cmd_010_ref_3.log: a87c01ef6eb8db646b3b7985742d80683742a6a6b469389b60dba21d6aa0497b
+  cmd_011_ref_4.log: 1579fde64d1b366fb77d75c7ea52725a1316d693eab622b31cb0f1715e6cc3d8

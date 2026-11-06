@@ -1,0 +1,49 @@
+# CORE-Bench v1.1 task as a ReproSpec: what agents see. No answers.
+id: cb-5367566
+title: 'HyperETA: A Non–Deep Learning Method for Estimated Time of Arrival'
+objective: 'Test the computational reproducibility of a scientific capsule (CORE-Bench,
+  Hard level): run its code and answer the questions from the output.'
+task_prompt: Run run.ipynb and convert the results to html.
+language: Python
+paper: null
+code:
+  repo_url: null
+  capsule: capsule-5367566
+questions:
+- id: q1
+  text: Report the HyperETA MAPE with no DTW.
+  answer_type: any
+  metric: ''
+  direction: ''
+  unit: ''
+  locator: program output
+  setting: ''
+  runs: 1
+  evidence: either
+- id: q2
+  text: Report the HyperETA RMSE with no DTW.
+  answer_type: any
+  metric: ''
+  direction: ''
+  unit: ''
+  locator: program output
+  setting: ''
+  runs: 1
+  evidence: either
+- id: q3
+  text: Report the HyperETA MAE with no DTW.
+  answer_type: any
+  metric: ''
+  direction: ''
+  unit: ''
+  locator: program output
+  setting: ''
+  runs: 1
+  evidence: either
+origin:
+  source: corebench
+  reference: core-bench (original) core_train.json sha256:3df47f1b3fa1cb60045018eb1a0f1ad4ecf6a53f72318c845a879ce0313b0730
+  prompt: ''
+  drafted_by: []
+  checked_by: []
+  user_confirmed: false

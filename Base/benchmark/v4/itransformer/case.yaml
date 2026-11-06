@@ -1,0 +1,39 @@
+# Hidden: tolerances from the reference re-runs (pre-registered before any workflow runs).
+id: itransformer
+rule: docs/benchmark-redesign.md section 3.3
+reference_run_dir: /Users/allenhuw/Documents/Projects/Paper2Exp/Base/runs/reference/20261017-101310_itransformer
+questions:
+  exchange_96_96_mse:
+    status: scored
+    paper_value: 0.086
+    ref_mean: 0.08720105439424515
+    ref_s: 0.0007359119749351309
+    n: 5
+    m: 3
+    h: 0.001491917113456226
+    term: noise
+    noise: 0.001491917113456226
+    precision: 0.0005
+    floor: 8.720105439424516e-07
+    h_paper: 0.001991917113456226
+    paper_gap: 0.0012010543942451574
+    justification: h = max(noise 0.00149 [t(4)=2.776, s=0.000736, n=5, m=3], precision
+      0.0005 [3 places], floor 8.72e-07) = 0.00149 (noise); paper gap 0.0012 vs h
+      + h_paper 0.00348
+  exchange_96_96_mae:
+    status: scored
+    paper_value: 0.206
+    ref_mean: 0.2074086457490921
+    ref_s: 0.0009320634909888665
+    n: 5
+    m: 3
+    h: 0.0018895758193860318
+    term: noise
+    noise: 0.0018895758193860318
+    precision: 0.0005
+    floor: 2.0740864574909213e-06
+    h_paper: 0.002389575819386032
+    paper_gap: 0.0014086457490921078
+    justification: h = max(noise 0.00189 [t(4)=2.776, s=0.000932, n=5, m=3], precision
+      0.0005 [3 places], floor 2.07e-06) = 0.00189 (noise); paper gap 0.00141 vs h
+      + h_paper 0.00428

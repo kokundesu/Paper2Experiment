@@ -1,0 +1,47 @@
+# ReproSpec (agent-visible, no values). FROZEN: see ../FROZEN.yaml.
+id: ials
+title: ''
+objective: 复现 Revisiting the Performance of iALS（RecSys 2022）中 ML-1M 上、按 NCF 留一法协议评估的
+  iALS 的 HR@10 和 NDCG@10（表 5）。
+task_prompt: ''
+language: Python
+paper:
+  url: https://arxiv.org/abs/2110.14037
+  pdf: null
+code:
+  repo_url: https://github.com/google-research/google-research/tree/master/ials
+  capsule: null
+questions:
+- id: ml1m_ncf_ials_hr10
+  text: 表 5 中作者的 iALS（our result）在 ML1M 的 NCF 留一法评估下，HR@10 是多少？
+  answer_type: number
+  metric: HR@10
+  direction: higher
+  unit: ''
+  locator: 表 5，iALS 行（Result from 为 our result），ML1M 下的 HR@10 列
+  setting: MovieLens 1M（ML1M）隐式反馈；NCF 协议，每位用户留出一个交互作测试，在一个留出正例与随机抽取的 100 个候选负例组成的集合中排名；作者调优的
+    iALS，标准 iALS 求解器，嵌入维度 192，训练 12 轮，正则化系数 0.007，未观测项权重 0.3，频率缩放正则化指数 1，初始化尺度参数 0.1。
+  runs: 3
+  evidence: log
+- id: ml1m_ncf_ials_ndcg10
+  text: 表 5 中作者的 iALS（our result）在 ML1M 的 NCF 留一法评估下，NDCG@10 是多少？
+  answer_type: number
+  metric: NDCG@10
+  direction: higher
+  unit: ''
+  locator: 表 5，iALS 行（Result from 为 our result），ML1M 下的 NDCG@10 列
+  setting: MovieLens 1M（ML1M）隐式反馈；NCF 协议，每位用户留出一个交互作测试，在一个留出正例与随机抽取的 100 个候选负例组成的集合中排名；作者调优的
+    iALS，标准 iALS 求解器，嵌入维度 192，训练 12 轮，正则化系数 0.007，未观测项权重 0.3，频率缩放正则化指数 1，初始化尺度参数 0.1。
+  runs: 3
+  evidence: log
+origin:
+  source: user
+  reference: ''
+  prompt: 复现 Revisiting the Performance of iALS（RecSys 2022）中 ML-1M 上、按 NCF 留一法协议评估的
+    iALS 的 HR@10 和 NDCG@10（表 5）。
+  drafted_by:
+  - sol
+  checked_by:
+  - sonnet55
+  - haiku55
+  user_confirmed: true

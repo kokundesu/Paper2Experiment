@@ -1,0 +1,36 @@
+# Hidden: pre-registered tolerances, computed from the 3 manual re-runs.
+capsule_id: capsule-6049678
+source: agent-evals/core-bench-v1.1-mainline core_test.json
+core_test_sha256: d4aa5ebb984df7f293e04f2dd120722f172fddea6fcb54a0c928e09bc6ef837d
+rule: docs/benchmark-redesign.md section 3.3
+questions:
+- id: q1
+  question: Report the f1 score for the Musk1+ dataset with the svm classifier.
+  vision: false
+  kind: numeric
+  scored: true
+  tolerance:
+    mean: 86.76
+    s: 0.6834237338576994
+    n: 3
+    m: 1
+    noise: 3.3957113889948483
+    precision: 0.0005
+    floor: 0.0008676000000000002
+    h: 3.3957113889948483
+    term: noise
+- id: q2
+  question: Report the f1 score for the Musk1+ dataset with the j48 classifier.
+  vision: false
+  kind: numeric
+  scored: true
+  tolerance:
+    mean: 79.304
+    s: 0.5797094099633024
+    n: 3
+    m: 1
+    noise: 2.8803884737923817
+    precision: 0.0005
+    floor: 0.0007930400000000001
+    h: 2.8803884737923817
+    term: noise

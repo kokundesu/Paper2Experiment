@@ -1,0 +1,89 @@
+{
+ "draft": {
+  "understanding": "复现论文《Deep Neural Networks as Gaussian Processes》表 1 中 MNIST 使用 1000 个训练样本时的 NNGP（表中标为 GP）测试分类准确率；由于表中分别报告 ReLU 和 tanh，暂按仓库 README 示例使用的 ReLU 版本确定目标。",
+  "questions": [
+   {
+    "id": "mnist_1k_relu_nngp_test_accuracy",
+    "text": "MNIST 使用 1000 个训练样本时，验证集选优的 ReLU NNGP 的测试分类准确率是多少？",
+    "metric": "测试分类准确率",
+    "unit": "",
+    "direction": "higher",
+    "locator": "表 1，MNIST:1k 分组，Model (ReLU) 下 GP 行对应的 Test accuracy 列",
+    "setting": "MNIST；1000 个训练样本；无限宽全连接网络对应的 ReLU NNGP/GP，以验证集选择网络深度、权重方差和偏置方差；在 MNIST 测试集评估。",
+    "runs": 1,
+    "protocol_notes": "论文使用 MNIST 训练/验证/测试划分；将分类视作对零均值 one-hot 标签的 GP 回归，按验证集选择超参数后报告测试准确率。表 1 未说明对独立随机运行取平均；准确率按比例而非百分数记录。"
+   }
+  ],
+  "open_issues": [
+   "表 1 同时列有 ReLU 和 tanh 的 GP 测试准确率：您希望复现的是按仓库 README 示例选定的 ReLU，还是 tanh？"
+  ]
+ },
+ "checks": {
+  "sonnet55": {
+   "items": [
+    {
+     "question_id": "mnist_1k_relu_nngp_test_accuracy",
+     "in_scope": "no",
+     "locator_ok": "yes",
+     "underspecified": [
+      "variant"
+     ],
+     "answer_type_ok": "yes",
+     "measurable": "yes",
+     "comment": "The user asked for MNIST 1k NNGP test accuracy from Table 1 and did not say ReLU or tanh. Table 1 reports both (ReLU 0.9279, tanh 0.9266), so the draft's choice of ReLU alone is one reading and leaves out the other. The draft should have one question per nonlinearity. This ReLU question is in scope as one of the two, but in_scope is set to no because the draft picked a single variant without the user's confirmation. The ReLU question itself can be run on a CPU."
+    }
+   ],
+   "missing_questions": [
+    "MNIST 1000 个训练样本时 tanh NNGP (GP) 的测试准确率（表 1）"
+   ]
+  },
+  "haiku55": {
+   "items": [
+    {
+     "question_id": "mnist_1k_relu_nngp_test_accuracy",
+     "in_scope": "yes",
+     "locator_ok": "yes",
+     "underspecified": [
+      "variant"
+     ],
+     "answer_type_ok": "yes",
+     "measurable": "yes",
+     "comment": "Table 1 MNIST:1k GP row, ReLU column (GP-20-1.45-0.28) matches the locator. The user did not name a nonlinearity, and Table 1 reports both ReLU and tanh for this setting, so choosing ReLU is an assumption that should be confirmed. The README example uses ReLU, which supports the choice. Runs on CPU with the provided grid data."
+    }
+   ],
+   "missing_questions": [
+    "MNIST 1000 个训练样本时 tanh 版本的 NNGP（表 1 中 Model (tanh) 下 GP 行的 Test accuracy）：用户未指定非线性，表中同时列有两者，若需要应补充此题"
+   ]
+  }
+ },
+ "accepted": [],
+ "queue": [
+  {
+   "kind": "question",
+   "question_id": "mnist_1k_relu_nngp_test_accuracy",
+   "text": "MNIST 使用 1000 个训练样本时，验证集选优的 ReLU NNGP 的测试分类准确率是多少？",
+   "locator": "表 1，MNIST:1k 分组，Model (ReLU) 下 GP 行对应的 Test accuracy 列",
+   "reasons": [
+    "sonnet55: not what the user asked for -- The user asked for MNIST 1k NNGP test accuracy from Table 1 and did not say ReLU or tanh. Table 1 reports both (ReLU 0.9279, tanh 0.9266), so the draft's choice of ReLU alone is one reading and leaves out the other. The draft should have one question per nonlinearity. This ReLU question is in scope as one of the two, but in_scope is set to no because the draft picked a single variant without the user's confirmation. The ReLU question itself can be run on a CPU.",
+    "all checkers: underspecified (variant) -- sonnet55: The user asked for MNIST 1k NNGP test accuracy from Table 1 and did not say ReLU or tanh. Table 1 reports both (ReLU 0.9279, tanh 0.9266), so the draft's choice of ReLU alone is one reading and leaves out the other. The draft should have one question per nonlinearity. This ReLU question is in scope as one of the two, but in_scope is set to no because the draft picked a single variant without the user's confirmation. The ReLU question itself can be run on a CPU. | haiku55: Table 1 MNIST:1k GP row, ReLU column (GP-20-1.45-0.28) matches the locator. The user did not name a nonlinearity, and Table 1 reports both ReLU and tanh for this setting, so choosing ReLU is an assumption that should be confirmed. The README example uses ReLU, which supports the choice. Runs on CPU with the provided grid data."
+   ]
+  },
+  {
+   "kind": "draft_issue",
+   "by": "drafter",
+   "text": "表 1 同时列有 ReLU 和 tanh 的 GP 测试准确率：您希望复现的是按仓库 README 示例选定的 ReLU，还是 tanh？"
+  },
+  {
+   "kind": "missing",
+   "by": "sonnet55",
+   "text": "MNIST 1000 个训练样本时 tanh NNGP (GP) 的测试准确率（表 1）"
+  },
+  {
+   "kind": "missing",
+   "by": "haiku55",
+   "text": "MNIST 1000 个训练样本时 tanh 版本的 NNGP（表 1 中 Model (tanh) 下 GP 行的 Test accuracy）：用户未指定非线性，表中同时列有两者，若需要应补充此题"
+  }
+ ],
+ "notes": [],
+ "cost_usd": 0.1329
+}

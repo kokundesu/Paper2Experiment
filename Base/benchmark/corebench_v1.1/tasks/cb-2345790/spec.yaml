@@ -1,0 +1,42 @@
+# CORE-Bench v1.1 task as a ReproSpec: what agents see. No answers.
+id: cb-2345790
+title: Attentional fluctuations and the temporal organization of memory - Jayakumar,
+  Balusu, & Aly (2023). Cognition.
+objective: 'Test the computational reproducibility of a scientific capsule (CORE-Bench,
+  Hard level): run its code and answer the questions from the output.'
+task_prompt: 'Set up the following subfolders in the ../results directory: intermediates,
+  figures, stats_figures_markdowns. Run all the .Rmd files using Rscript and render
+  them as html. Store the output files in ../results/stats_figures_markdowns.'
+language: R
+paper: null
+code:
+  repo_url: null
+  capsule: capsule-2345790
+questions:
+- id: q1
+  text: From Study 1, report the mean of the response rate across all participants.
+  answer_type: any
+  metric: ''
+  direction: ''
+  unit: ''
+  locator: program output
+  setting: ''
+  runs: 1
+  evidence: either
+- id: q2
+  text: From Study 2, report the mean of the response rate across all participants.
+  answer_type: any
+  metric: ''
+  direction: ''
+  unit: ''
+  locator: program output
+  setting: ''
+  runs: 1
+  evidence: either
+origin:
+  source: corebench
+  reference: core-bench-v1.1-mainline core_test.json sha256:d4aa5ebb984df7f293e04f2dd120722f172fddea6fcb54a0c928e09bc6ef837d
+  prompt: ''
+  drafted_by: []
+  checked_by: []
+  user_confirmed: false

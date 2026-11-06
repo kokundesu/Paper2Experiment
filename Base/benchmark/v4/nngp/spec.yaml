@@ -1,0 +1,36 @@
+# ReproSpec (agent-visible, no values). FROZEN: see ../FROZEN.yaml.
+id: nngp
+title: ''
+objective: 复现 Deep Neural Networks as Gaussian Processes（ICLR 2018）在 MNIST、1000 个训练样本时
+  NNGP 的测试准确率（表 1）。
+task_prompt: ''
+language: Python
+paper:
+  url: https://arxiv.org/abs/1711.00165
+  pdf: null
+code:
+  repo_url: https://github.com/brain-research/nngp
+  capsule: null
+questions:
+- id: mnist_1k_relu_nngp_test_accuracy
+  text: MNIST 使用 1000 个训练样本时，验证集选优的 ReLU NNGP 的测试分类准确率是多少？
+  answer_type: number
+  metric: 测试分类准确率
+  direction: higher
+  unit: ''
+  locator: 表 1，MNIST:1k 分组，Model (ReLU) 下 GP 行对应的 Test accuracy 列
+  setting: MNIST；1000 个训练样本；无限宽全连接网络对应的 ReLU NNGP/GP，以验证集选择网络深度、权重方差和偏置方差；在 MNIST
+    测试集评估。
+  runs: 3
+  evidence: log
+origin:
+  source: user
+  reference: ''
+  prompt: 复现 Deep Neural Networks as Gaussian Processes（ICLR 2018）在 MNIST、1000 个训练样本时
+    NNGP 的测试准确率（表 1）。
+  drafted_by:
+  - sol
+  checked_by:
+  - sonnet55
+  - haiku55
+  user_confirmed: true

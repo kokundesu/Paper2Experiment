@@ -1,0 +1,44 @@
+# Reference recipe (hidden; written by the benchmark builder).
+id: cyclenet
+status: validated
+repo: https://github.com/ACAT-SCUT/CycleNet
+commit: d807e51fc2dcd143885ee639d97965a7ab0926f4
+files: {}
+setup:
+- git clone -q https://github.com/ACAT-SCUT/CycleNet repo && git -C repo checkout
+  -q d807e51fc2dcd143885ee639d97965a7ab0926f4
+- uv venv -q --python 3.11 .venv
+- uv pip install -q -p .venv numpy==1.26.4 pandas==2.3.3 scikit-learn==1.9.1 scipy==1.17.1
+  matplotlib==3.11.2 torch==2.14.1 gdown==5.2.0
+- .venv/bin/gdown -q 1bNbw1y8VYp-8pkRTqbjoW-TA-G8T0EQf -O datasets.zip && echo 'ef3382f5049b91690194530fa1431bf81728e1521a4976245db9dd102eb8fe61  datasets.zip'
+  | shasum -a 256 -c
+- unzip -q -j datasets.zip 'weather.csv' -d repo/dataset && echo '34ee981d07313e51da2a50bb600072c8ae4a69cb4b0651f4cb93a069d7a2ba63  repo/dataset/weather.csv'
+  | shasum -a 256 -c
+command: cd repo && ../.venv/bin/python -u run.py --is_training 1 --root_path ./dataset/
+  --data_path weather.csv --model_id weather_96_96 --model CycleNet --data custom
+  --features M --seq_len 96 --pred_len 96 --enc_in 21 --cycle 144 --model_type mlp
+  --train_epochs 30 --patience 5 --itr 1 --batch_size 256 --learning_rate 0.005 --random_seed
+  $((2024 + {seed})) --num_workers 0
+timeout_s: 1800
+seeded: true
+metrics:
+  weather_96_96_mlp_mse:
+    regex: mse:([0-9.]+), mae
+    scale: 1.0
+  weather_96_96_mlp_mae:
+    regex: mae:([0-9.]+)
+    scale: 1.0
+entry: '`scripts/CycleNet/MLP-Input-96/weather.sh`（脚本自带 5 个 seed）'
+notes:
+- 'difficulty: 易; estimated time per run: 3–8 分钟'
+- 'risk: 依赖没有固定版本；Linear 版和 DLinear/FITS 太像，选 MLP 版'
+- 'questions: weather_96_96_mlp_mse, weather_96_96_mlp_mae'
+- the pred_len=96 line of scripts/CycleNet/MLP-Input-96/weather.sh with seeds 2024+{seed}
+  (the script's own 2024..2028), plus --num_workers 0
+- numpy 1.26 (the code uses np.Inf, removed in NumPy 2; the repo pins no versions)
+- 'data: the README''s Google Drive bundle (sha256 checked; weather.csv identical
+  to iTransformer''s)'
+- 'builder check, seed 2024 (2.1 min): MSE 0.1584, MAE 0.2033'
+- 'SHORTCUT RISK for agents: the repo ships result.txt with the authors'' numbers
+  for this setting, and checkpoints/'
+evidence_pattern: (?i)epoch:\s*\d+,\s*steps:\s*\d+\s*\|\s*train loss

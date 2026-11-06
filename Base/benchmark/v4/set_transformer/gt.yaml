@@ -1,0 +1,49 @@
+# Hidden ground truth from the paper (GT stage). Tolerances follow after the reference re-runs.
+id: set_transformer
+extractors:
+- haiku55
+- luna
+values:
+  synthetic_2d_isab16_pma_ll0_per_data:
+    paper_value: -1.5009
+    printed: '-1.5009'
+    precision: 4
+    quote: ISAB (16) + PMA (ours) -1.5009± 0.0068 -1.4530 ± 0.0037 0.9210 ± 0.0055
+      0.9223 ± 0.0056
+    page: 7
+    reported_spread: 0.0068
+    spread_kind: unknown
+    spread_over: runs
+    n_runs: 5
+    status: agreed
+    votes:
+      haiku55:
+        value: -1.5009
+        verified: true
+        why: ''
+        printed: '-1.5009'
+        quote: ISAB (16) + PMA (ours) -1.5009± 0.0068 -1.4530 ± 0.0037 0.9210 ± 0.0055
+          0.9223 ± 0.0056
+        page: 7
+        spread: 0.0068
+        spread_kind: unknown
+        spread_over: runs
+        n_runs: 5
+        note: Table 3 (main text), Synthetic LL0/data column, ISAB (16) + PMA row.
+          Same value appears in supplementary Table 5 as -1.5009 ± 0.0068. The paper
+          says experiments were repeated five times; the spread type (std/sem) is
+          not stated.
+      luna:
+        value: -1.5009
+        verified: true
+        why: ''
+        printed: '-1.5009'
+        quote: ISAB (16) + PMA (ours) -1.5009± 0.0068 -1.4530 ± 0.0037 0.9210 ± 0.0055
+          0.9223 ± 0.0056
+        page: 7
+        spread: 0.0068
+        spread_kind: unknown
+        spread_over: runs
+        n_runs: 5
+        note: Table 3 reports average likelihood per data. The paper says experiments
+          are repeated five times, but does not specify the type of ± spread.

@@ -1,0 +1,58 @@
+# ReproSpec (agent-visible, no values). FROZEN: see ../FROZEN.yaml.
+id: ecod
+title: ''
+objective: 复现 ECOD（TKDE 2022）在 ODDS 的 Cardio、Breastw、Mammography 三个数据集上的 ROC-AUC（表
+  4）。
+task_prompt: ''
+language: Python
+paper:
+  url: https://arxiv.org/abs/2201.00382
+  pdf: null
+code:
+  repo_url: https://github.com/yzhao062/pyod
+  capsule: null
+questions:
+- id: cardio_ecod_roc_auc
+  text: 论文表 4 中，ECOD 在 ODDS Cardio（mat）数据集上的测试集 ROC-AUC 是多少？
+  answer_type: number
+  metric: ROC-AUC
+  direction: higher
+  unit: ''
+  locator: 表 4，Cardio (mat) 行，ECOD 列（括号外的 ROC 分数）
+  setting: ODDS Cardio .mat 数据集；默认 ECOD，单进程版本；训练集占 60%，测试集占 40% 一次运行 = 论文的完整协议：10
+    个随机 60/40 划分上的平均。
+  runs: 3
+  evidence: log
+- id: breastw_ecod_roc_auc
+  text: 论文表 4 中，ECOD 在 ODDS Breastw（mat）数据集上的测试集 ROC-AUC 是多少？
+  answer_type: number
+  metric: ROC-AUC
+  direction: higher
+  unit: ''
+  locator: 表 4，Breastw (mat) 行，ECOD 列（括号外的 ROC 分数）
+  setting: ODDS Breastw .mat 数据集；默认 ECOD，单进程版本；训练集占 60%，测试集占 40% 一次运行 = 论文的完整协议：10
+    个随机 60/40 划分上的平均。
+  runs: 3
+  evidence: log
+- id: mammography_ecod_roc_auc
+  text: 论文表 4 中，ECOD 在 ODDS Mammography（mat）数据集上的测试集 ROC-AUC 是多少？
+  answer_type: number
+  metric: ROC-AUC
+  direction: higher
+  unit: ''
+  locator: 表 4，Mammography (mat) 行，ECOD 列（括号外的 ROC 分数）
+  setting: ODDS Mammography .mat 数据集；默认 ECOD，单进程版本；训练集占 60%，测试集占 40% 一次运行 = 论文的完整协议：10
+    个随机 60/40 划分上的平均。
+  runs: 3
+  evidence: log
+origin:
+  source: user
+  reference: ''
+  prompt: 复现 ECOD（TKDE 2022）在 ODDS 的 Cardio、Breastw、Mammography 三个数据集上的 ROC-AUC（表
+    4）。
+  drafted_by:
+  - sol
+  checked_by:
+  - sonnet55
+  - haiku55
+  user_confirmed: true

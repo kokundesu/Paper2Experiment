@@ -1,0 +1,93 @@
+{
+ "draft": {
+  "understanding": "用户要复现 ICLR 2024 iTransformer 在 Exchange 汇率数据集上的多变量长期预测结果：输入序列长度 96、预测长度 96，仅以附录表 10 的 iTransformer 列为对照，分别核对 MSE 和 MAE，而非跨预测长度的平均结果或其他模型。",
+  "questions": [
+   {
+    "id": "exchange_96_96_mse",
+    "text": "附录表 10 中，iTransformer 在 Exchange 数据集、输入长度 96、预测长度 96 的多变量长期预测测试 MSE 是多少？",
+    "metric": "MSE",
+    "unit": "",
+    "direction": "lower",
+    "locator": "附录 F.4 表 10（Full results of the long-term forecasting task），Exchange 数据集分组、预测长度 96 行、iTransformer (Ours) 的 MSE 列",
+    "setting": "Exchange；iTransformer 原模型；多变量长期预测；输入长度 96，预测长度 96；按 TimesNet 的时序训练/验证/测试划分协议。对应仓库 scripts/multivariate_forecasting/Exchange/iTransformer.sh，而非 Avg 行。",
+    "runs": 1,
+    "protocol_notes": "表 10 未说明该单项结果对多个独立随机种子取平均；按单次报告处理。附录表 5 是另行报告的五个随机种子稳健性实验，不应替代表 10 的目标。"
+   },
+   {
+    "id": "exchange_96_96_mae",
+    "text": "附录表 10 中，iTransformer 在 Exchange 数据集、输入长度 96、预测长度 96 的多变量长期预测测试 MAE 是多少？",
+    "metric": "MAE",
+    "unit": "",
+    "direction": "lower",
+    "locator": "附录 F.4 表 10（Full results of the long-term forecasting task），Exchange 数据集分组、预测长度 96 行、iTransformer (Ours) 的 MAE 列",
+    "setting": "Exchange；iTransformer 原模型；多变量长期预测；输入长度 96，预测长度 96；按 TimesNet 的时序训练/验证/测试划分协议。对应仓库 scripts/multivariate_forecasting/Exchange/iTransformer.sh，而非 Avg 行。",
+    "runs": 1,
+    "protocol_notes": "表 10 未说明该单项结果对多个独立随机种子取平均；按单次报告处理。附录表 5 是另行报告的五个随机种子稳健性实验，不应替代表 10 的目标。"
+   }
+  ],
+  "open_issues": []
+ },
+ "checks": {
+  "sonnet55": {
+   "items": [
+    {
+     "question_id": "exchange_96_96_mse",
+     "in_scope": "yes",
+     "locator_ok": "yes",
+     "underspecified": [
+      "none"
+     ],
+     "answer_type_ok": "yes",
+     "measurable": "yes",
+     "comment": "Table 10 Exchange 96 iTransformer MSE; Table 5 gives a slightly different value (0.088), but the draft handles it."
+    },
+    {
+     "question_id": "exchange_96_96_mae",
+     "in_scope": "yes",
+     "locator_ok": "yes",
+     "underspecified": [
+      "none"
+     ],
+     "answer_type_ok": "yes",
+     "measurable": "yes",
+     "comment": "Table 10 Exchange 96 iTransformer MAE."
+    }
+   ],
+   "missing_questions": []
+  },
+  "haiku55": {
+   "items": [
+    {
+     "question_id": "exchange_96_96_mse",
+     "in_scope": "yes",
+     "locator_ok": "yes",
+     "underspecified": [
+      "none"
+     ],
+     "answer_type_ok": "yes",
+     "measurable": "yes",
+     "comment": "Table 10 (Appendix F.4) Exchange block, 96-step row, iTransformer column is the first MSE column. The locator matches. The Avg row is correctly excluded. Exchange is small, so a CPU run is feasible."
+    },
+    {
+     "question_id": "exchange_96_96_mae",
+     "in_scope": "yes",
+     "locator_ok": "yes",
+     "underspecified": [
+      "none"
+     ],
+     "answer_type_ok": "yes",
+     "measurable": "yes",
+     "comment": "Same Table 10 Exchange 96-row cell, MAE column for iTransformer. The locator matches. Single-number answer, measurable on CPU."
+    }
+   ],
+   "missing_questions": []
+  }
+ },
+ "accepted": [
+  "exchange_96_96_mse",
+  "exchange_96_96_mae"
+ ],
+ "queue": [],
+ "notes": [],
+ "cost_usd": 0.2537
+}

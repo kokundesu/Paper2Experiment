@@ -1,0 +1,90 @@
+# Hidden ground truth from the paper (GT stage). Tolerances follow after the reference re-runs.
+id: ngboost
+extractors:
+- haiku55
+- luna
+values:
+  concrete_ngboost_nll:
+    paper_value: 3.04
+    printed: '3.04'
+    precision: 2
+    quote: Concrete 1030 3.04 ± 0.17 3.04 ± 0.09 3.06 ± 0.18 3.51 ± 0.00 3.03 ± 0.11
+      3.24 ± 0.08 3.38 ± 0.05
+    page: 7
+    reported_spread: 0.17
+    spread_kind: sem
+    spread_over: splits
+    n_runs: 20
+    status: agreed
+    votes:
+      haiku55:
+        value: 3.04
+        verified: true
+        why: ''
+        printed: '3.04'
+        quote: Concrete 1030 3.04 ± 0.17 3.04 ± 0.09 3.06 ± 0.18 3.51 ± 0.00 3.03
+          ± 0.11 3.24 ± 0.08 3.38 ± 0.05
+        page: 7
+        spread: 0.17
+        spread_kind: sem
+        spread_over: splits
+        n_runs: 20
+        note: Table 1 Concrete row, NGBoost column. The ± value is 0.17; the caption
+          refers to standard errors. The protocol repeats the split 20 times for Concrete,
+          so n_runs is 20.
+      luna:
+        value: 3.04
+        verified: true
+        why: ''
+        printed: '3.04'
+        quote: Concrete 1030 3.04 ± 0.17 3.04 ± 0.09 3.06 ± 0.18 3.51 ± 0.00 3.03
+          ± 0.11 3.24 ± 0.08 3.38 ± 0.05
+        page: 7
+        spread: 0.17
+        spread_kind: sem
+        spread_over: runs
+        n_runs: 20
+        note: Table 1 reports standard errors; the experimental protocol says the
+          process is repeated 20 times for these datasets.
+  concrete_ngboost_rmse:
+    paper_value: 5.06
+    printed: '5.06'
+    precision: 2
+    quote: Concrete 1030 5.06 ± 0.61 12.1 ± 0.05 5.29 ± 0.16 4.46 ± 0.29 6.72 ± 0.59
+      6.61 ± 0.83
+    page: 8
+    reported_spread: 0.61
+    spread_kind: unknown
+    spread_over: splits
+    n_runs: 20
+    status: agreed
+    votes:
+      haiku55:
+        value: 5.06
+        verified: true
+        why: ''
+        printed: '5.06'
+        quote: Concrete 1030 5.06 ± 0.61 12.1 ± 0.05 5.29 ± 0.16 4.46 ± 0.29 6.72
+          ± 0.59 6.61 ± 0.83
+        page: 8
+        spread: 0.61
+        spread_kind: unknown
+        spread_over: splits
+        n_runs: 20
+        note: Table 3 Concrete row, NGBoost column. The ± value is 0.61; the paper
+          does not say whether it is std or SEM. Repeats are the same 20-split protocol
+          as Table 1, so n_runs is 20.
+      luna:
+        value: 5.06
+        verified: true
+        why: ''
+        printed: '5.06'
+        quote: Concrete 1030 5.06 ± 0.61 12.1 ± 0.05 5.29 ± 0.16 4.46 ± 0.29 6.72
+          ± 0.59 6.61 ± 0.83
+        page: 8
+        spread: 0.61
+        spread_kind: sem
+        spread_over: runs
+        n_runs: 20
+        note: The result is from Table 3; the protocol states 20 repetitions for datasets
+          other than Protein and Year MSD.

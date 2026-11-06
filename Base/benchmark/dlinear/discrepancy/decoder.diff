@@ -1,0 +1,10 @@
+--- a/models/DLinear.py	2026-10-04 14:50:27
++++ b/models/DLinear.py	2026-10-05 17:19:20
+@@ -64,6 +64,7 @@
+         else:
+             self.Linear_Seasonal = nn.Linear(self.seq_len,self.pred_len)
+             self.Linear_Trend = nn.Linear(self.seq_len,self.pred_len)
++            self.Linear_Decoder = nn.Linear(self.seq_len,self.pred_len)  # [p2e diag] unused layer of the paper-era code, restored only for its RNG draws
+             
+             # Use this two lines if you want to visualize the weights
+             # self.Linear_Seasonal.weight = nn.Parameter((1/self.seq_len)*torch.ones([self.pred_len,self.seq_len]))

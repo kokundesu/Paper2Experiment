@@ -1,0 +1,45 @@
+# CORE-Bench v1.1 task as a ReproSpec: what agents see. No answers.
+id: cb-9348218
+title: 'Best Practices in Supervised Machine Learning: A Tutorial for Psychologists'
+objective: 'Test the computational reproducibility of a scientific capsule (CORE-Bench,
+  Hard level): run its code and answer the questions from the output.'
+task_prompt: Run manuscript.Rmd using Rscript and render it as a pdf. Record package
+  information as sessionInfo_manuscript.txt. Clear all newly created files in /code
+  between runs. Run electronic_supplemental_material.Rmd using Rscript and render
+  it as a pdf. Record package information as sessionInfo_electronic_supplemental_material.txt.
+  Clear all newly created files in /code between runs. Save all output for both parts
+  in ../results.
+language: R
+paper: null
+code:
+  repo_url: null
+  capsule: capsule-9348218
+questions:
+- id: q1
+  text: fig From Figure 3 panel A, report the label of the green line.
+  answer_type: any
+  metric: ''
+  direction: ''
+  unit: ''
+  locator: program output
+  setting: ''
+  runs: 1
+  evidence: either
+- id: q2
+  text: fig From Figure 1, report the numerical value of N for example 1 (the first
+    row).
+  answer_type: any
+  metric: ''
+  direction: ''
+  unit: ''
+  locator: program output
+  setting: ''
+  runs: 1
+  evidence: either
+origin:
+  source: corebench
+  reference: core-bench (original) core_train.json sha256:3df47f1b3fa1cb60045018eb1a0f1ad4ecf6a53f72318c845a879ce0313b0730
+  prompt: ''
+  drafted_by: []
+  checked_by: []
+  user_confirmed: false

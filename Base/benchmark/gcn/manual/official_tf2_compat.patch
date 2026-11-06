@@ -1,0 +1,64 @@
+diff -ru repos/gcn/gcn/inits.py manual/gcn/gcn/inits.py
+--- repos/gcn/gcn/inits.py	2026-10-01 09:31:54
++++ manual/gcn/gcn/inits.py	2026-10-01 09:33:38
+@@ -1,4 +1,5 @@
+-import tensorflow as tf
++import tensorflow.compat.v1 as tf
++tf.disable_v2_behavior()
+ import numpy as np
+ 
+ 
+diff -ru repos/gcn/gcn/layers.py manual/gcn/gcn/layers.py
+--- repos/gcn/gcn/layers.py	2026-10-01 09:31:54
++++ manual/gcn/gcn/layers.py	2026-10-01 09:33:38
+@@ -1,5 +1,6 @@
+ from gcn.inits import *
+-import tensorflow as tf
++import tensorflow.compat.v1 as tf
++tf.disable_v2_behavior()
+ 
+ flags = tf.app.flags
+ FLAGS = flags.FLAGS
+diff -ru repos/gcn/gcn/metrics.py manual/gcn/gcn/metrics.py
+--- repos/gcn/gcn/metrics.py	2026-10-01 09:31:54
++++ manual/gcn/gcn/metrics.py	2026-10-01 09:33:39
+@@ -1,4 +1,5 @@
+-import tensorflow as tf
++import tensorflow.compat.v1 as tf
++tf.disable_v2_behavior()
+ 
+ 
+ def masked_softmax_cross_entropy(preds, labels, mask):
+diff -ru repos/gcn/gcn/train.py manual/gcn/gcn/train.py
+--- repos/gcn/gcn/train.py	2026-10-01 09:31:54
++++ manual/gcn/gcn/train.py	2026-10-01 09:33:51
+@@ -2,13 +2,15 @@
+ from __future__ import print_function
+ 
+ import time
+-import tensorflow as tf
++import os
++import tensorflow.compat.v1 as tf
++tf.disable_v2_behavior()
+ 
+ from gcn.utils import *
+ from gcn.models import GCN, MLP
+ 
+ # Set random seed
+-seed = 123
++seed = int(os.environ.get("SEED", 123))
+ np.random.seed(seed)
+ tf.set_random_seed(seed)
+ 
+diff -ru repos/gcn/gcn/utils.py manual/gcn/gcn/utils.py
+--- repos/gcn/gcn/utils.py	2026-10-01 09:31:54
++++ manual/gcn/gcn/utils.py	2026-10-01 09:33:39
+@@ -2,7 +2,7 @@
+ import pickle as pkl
+ import networkx as nx
+ import scipy.sparse as sp
+-from scipy.sparse.linalg.eigen.arpack import eigsh
++from scipy.sparse.linalg import eigsh
+ import sys
+ 
+ 

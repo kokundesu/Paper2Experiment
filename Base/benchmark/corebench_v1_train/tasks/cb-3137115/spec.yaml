@@ -1,0 +1,69 @@
+# CORE-Bench v1.1 task as a ReproSpec: what agents see. No answers.
+id: cb-3137115
+title: 'Analytic reproducibility in articles receiving open data badges at the journal
+  Psychological Science: An observational study'
+objective: 'Test the computational reproducibility of a scientific capsule (CORE-Bench,
+  Hard level): run its code and answer the questions from the output.'
+task_prompt: 'Run the manuscript.Rmd file using Rscript and render it as html. Put
+  the results in the "../results" folder. '
+language: R
+paper: null
+code:
+  repo_url: null
+  capsule: capsule-3137115
+questions:
+- id: q1
+  text: Report the final outcomes of reproducibility checks at the article level after
+    original authors were contacted (Table 1 of the manuscript). You should report
+    n for row 1 in the table (ignore the confidence interval).
+  answer_type: any
+  metric: ''
+  direction: ''
+  unit: ''
+  locator: program output
+  setting: ''
+  runs: 1
+  evidence: either
+- id: q2
+  text: Report the final outcomes of reproducibility checks at the article level after
+    original authors were contacted (Table 1 of the manuscript). You should report
+    n for row 2 in the table (ignore the confidence interval).
+  answer_type: any
+  metric: ''
+  direction: ''
+  unit: ''
+  locator: program output
+  setting: ''
+  runs: 1
+  evidence: either
+- id: q3
+  text: Report the final outcomes of reproducibility checks at the article level after
+    original authors were contacted (Table 1 of the manuscript). You should report
+    n for row 3 in the table (ignore the confidence interval).
+  answer_type: any
+  metric: ''
+  direction: ''
+  unit: ''
+  locator: program output
+  setting: ''
+  runs: 1
+  evidence: either
+- id: q4
+  text: fig From Figure 1, report the proportion of articles with fully reproducible
+    target values from the random effects model after author contact. Ignore the confidence
+    intervals
+  answer_type: any
+  metric: ''
+  direction: ''
+  unit: ''
+  locator: program output
+  setting: ''
+  runs: 1
+  evidence: either
+origin:
+  source: corebench
+  reference: core-bench (original) core_train.json sha256:3df47f1b3fa1cb60045018eb1a0f1ad4ecf6a53f72318c845a879ce0313b0730
+  prompt: ''
+  drafted_by: []
+  checked_by: []
+  user_confirmed: false

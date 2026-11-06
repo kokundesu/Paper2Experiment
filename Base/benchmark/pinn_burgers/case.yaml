@@ -1,0 +1,62 @@
+# Benchmark case: hidden ground truth for the evaluator. Agents never see this file
+# (they get task.yaml instead).
+id: pinn_burgers
+paper:
+  title: "Physics Informed Deep Learning (Part I): Data-driven Solutions of Nonlinear Partial Differential Equations"
+  authors: "Raissi, Perdikaris & Karniadakis"
+  venue: "arXiv 2017 (journal version: Physics-informed neural networks, J. Comput. Phys. 378, 2019)"
+  arxiv: "1711.10561"   # numbers below are from arXiv v1 (28 Nov 2017), Section 2.1
+repo:
+  url: https://github.com/maziarraissi/PINNs
+  path: "appendix/continuous_time_inference (Burgers)/Burgers.py"
+  data: "appendix/Data/burgers_shock.mat"   # NOT main/Data (main/ holds Schrodinger, NS, KdV, AC)
+  commit: 932f50a2d8ef4e80d1456bbae6887a73ff5166ef
+  note: "Official TF1 code (tf.contrib.opt.ScipyOptimizerInterface, L-BFGS-B). Burgers_systematic.py in the same folder generated Tables 1-2."
+difficulty: medium
+expected_runtime_cpu_min: 15   # 9 runs (3 claims x 3 seeds), 0.5-3 min each on Apple M4 CPU
+
+# Section 2.1 (continuous-time inference, Burgers). Relative L2 error of u(t,x) on the
+# full 256 x 100 grid. "9-layer" = 8 hidden tanh layers of 20 + linear output (3021 params).
+# A claim is reproduced when the aggregate over seeds is within tolerance:
+#   abs: |agg - value| <= abs      rel: |agg - value| / |value| <= rel
+#   factor: value / factor <= agg <= value * factor   (for error metrics)
+# evidence_pattern matches the training trace only (2026-10-05): the value itself must also appear in the same
+# log, which the evaluator checks separately. Patterns that also pinned the final print line failed a correct
+# FITS run whose agent had (legitimately) patched the output format.
+claims:
+  - {id: burgers_main_l2,  metric: relative_l2_error, setting: "N_u=100, N_f=10000, 8 hidden x 20 (text p.7, Fig. 1 caption, Table 1 row 100 col 10000)", unit: "dimensionless", value: 6.7e-4, tolerance: {factor: 10}, evidence_pattern: "Eval \\d+ Loss: "}
+  - {id: burgers_nu200_l2, metric: relative_l2_error, setting: "N_u=200, N_f=10000, 8 hidden x 20 (Table 1 row 200 col 10000)",                             unit: "dimensionless", value: 4.9e-4, tolerance: {factor: 10}, evidence_pattern: "Eval \\d+ Loss: "}
+  - {id: burgers_l4n20_l2, metric: relative_l2_error, setting: "4 hidden x 20, N_u=100, N_f=10000 (Table 2 row Layers=4 col Neurons=20)",                  unit: "dimensionless", value: 9.4e-4, tolerance: {factor: 10}, evidence_pattern: "Eval \\d+ Loss: "}
+
+rubric:
+  min_seeds: 3
+  aggregate: median   # not mean: per-seed errors are heavy-tailed (one seed in 11 is ~4x the median)
+  levels:
+    full: "all claims within tolerance"
+    partial: "at least one claim within tolerance"
+    fail: "no claim reproduced or run did not finish"
+  tolerance_justification: >
+    The paper reports single runs, and its own numbers are noisy: the same 8x20, N_u=100,
+    N_f=10000 network appears as 6.7e-4 (text/Table 1) and 9.6e-4 (Table 2), and Table 1
+    jumps by up to 400x between neighbouring cells (e.g. N_u=100: 2.7e-1 at N_f=4000 vs
+    6.8e-4 at N_f=7000). Our faithful re-run spans 7.8e-4 to 1.1e-2 over 11 seeds
+    (median 2.6e-3, i.e. 3.9x the paper). A factor-3 bound would sit inside that seed
+    distribution, so the verdict for a correct reproduction would be a coin flip. Factor 10
+    (same order of magnitude) passes faithful reproductions reliably, but still fails
+    clearly failed training, which lands at 1e-2 to 1e0. Examples: L-BFGS capped at 200
+    evaluations gave 3.2e-1 here, and the paper's own failed cells are 1e-1 to 1.2e0.
+    Under a strict factor 3, only burgers_nu200_l2 passes (partial).
+
+# Known obstacles on a modern environment (Python 3.11, TF 2.21, SciPy 1.17, numpy 2.4, matplotlib 3.11)
+known_issues:
+  - "Script and data are under appendix/, not main/: appendix/continuous_time_inference (Burgers)/Burgers.py and appendix/Data/burgers_shock.mat. Folder names contain spaces and parentheses, so quote them in shell commands."
+  - "Relative paths ('../Data/burgers_shock.mat', '../../Utilities/'): the script must be run from its own directory."
+  - "`pip install pyDOE` now resolves to pydoe 1.5.0, which installs the lowercase module `pydoe` -> `ModuleNotFoundError: No module named 'pyDOE'`. Pin pyDOE==0.3.8 (or use `from pydoe import lhs`)."
+  - "Utilities/plotting.py fails on import with matplotlib >= 3.x: `ValueError: Key pgf.preamble: Could not convert [...] to str`. It also needs LaTeX (text.usetex). Plotting is not needed for the metric; drop the import and the plotting block."
+  - "TF1 API on TF 2.x: `AttributeError: module 'tensorflow' has no attribute 'set_random_seed'` -> `import tensorflow.compat.v1 as tf; tf.disable_v2_behavior()`."
+  - "`AttributeError: module 'tensorflow.compat.v1' has no attribute 'contrib'`: tf.contrib.opt.ScipyOptimizerInterface was removed in TF2. Replace it with scipy.optimize.minimize(method='L-BFGS-B', jac=True) on the flattened variables, using the same options (maxiter=maxfun=50000, maxcor=50, maxls=50, ftol=eps)."
+  - "log_device_placement=True and a print on every loss evaluation flood the log (cosmetic)."
+  - "L-BFGS-B stops after only 3-7k iterations (0.5-3 min on CPU) with 'RELATIVE REDUCTION OF F <= FACTR*EPSMCH', although maxiter=50000. The float32 loss stops changing; ftol=0 gives bit-identical results. This is expected, so no iteration cap is needed. Agents may wrongly cap iterations, or swap in Adam, because they assume 50k L-BFGS steps are too slow."
+  - "Paper/code mismatch in Burgers_systematic.py: the Table 1 loop uses num_layers[-1]=8 and num_neurons[-1]=40 (paper says 20 neurons). The Table 2 loop uses N_u[-1]=200 (paper says N_u=100). Claims follow the paper text. A 3-seed 8x40 diagnostic gives a median of 1.55e-3."
+  - "Large seed variance with a heavy tail: 11 seeds give 7.8e-4 to 1.1e-2. The script's own seed 1234 is the worst (1.1e-2). The paper's 6.7e-4 sits at the lower tail of the reproduced distribution; the typical error is 2-5x higher."
+  - "The SciPy version changes the optimisation trajectory (SciPy 1.15 replaced the Fortran L-BFGS-B with a C port). The same seeds 0-2 on SciPy 1.11.4 gave 5.6e-3, 1.3e-3 and 2.3e-2 vs 2.1e-3, 1.5e-3 and 2.9e-3 on 1.17.1; neither is systematically better. CPU runs are bit-reproducible for a fixed seed and version."

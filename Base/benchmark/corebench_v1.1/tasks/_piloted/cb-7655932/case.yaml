@@ -1,0 +1,28 @@
+# Hidden: pre-registered tolerances, computed from the 3 manual re-runs.
+capsule_id: capsule-7655932
+source: agent-evals/core-bench-v1.1-mainline core_test.json
+core_test_sha256: d4aa5ebb984df7f293e04f2dd120722f172fddea6fcb54a0c928e09bc6ef837d
+rule: docs/benchmark-redesign.md section 3.3
+questions:
+- id: q1
+  question: What is the point estimate (deaths averted synthetic) from the child wasting
+    impact model? Give results as integer.
+  vision: false
+  kind: numeric
+  scored: true
+  tolerance:
+    mean: 280000.0
+    s: 0.0
+    n: 3
+    m: 1
+    noise: 0.0
+    precision: 0.05
+    floor: 2.8000000000000003
+    h: 2.8000000000000003
+    term: floor
+- id: q2
+  question: What is the child wasting impact model reported 95% interval (synthetic)?
+    Give a list of 2 integer value for the confidence interval.
+  vision: false
+  kind: list
+  scored: true

@@ -1,0 +1,37 @@
+# Hidden: pre-registered tolerances, computed from the 3 manual re-runs.
+capsule_id: capsule-9168639
+source: core-bench (original) core_train.json
+split: dev
+data_sha256: 3df47f1b3fa1cb60045018eb1a0f1ad4ecf6a53f72318c845a879ce0313b0730
+rule: docs/benchmark-redesign.md section 3.3
+questions:
+- id: q1
+  question: fig Report Institutions Sampled for US in Table 1.
+  vision: true
+  kind: numeric
+  scored: true
+  tolerance:
+    mean: 19.0
+    s: 0.0
+    n: 3
+    m: 1
+    noise: 0.0
+    precision: 0.05
+    floor: 0.00019
+    h: 0.05
+    term: precision
+- id: q2
+  question: fig Report Institutions Sampled for UK in Table 1.
+  vision: true
+  kind: numeric
+  scored: true
+  tolerance:
+    mean: 14.0
+    s: 0.0
+    n: 3
+    m: 1
+    noise: 0.0
+    precision: 0.05
+    floor: 0.00014000000000000001
+    h: 0.05
+    term: precision

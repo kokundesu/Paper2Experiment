@@ -1,0 +1,39 @@
+# Hidden: tolerances from the reference re-runs (pre-registered before any workflow runs).
+id: cyclenet
+rule: docs/benchmark-redesign.md section 3.3
+reference_run_dir: /Users/allenhuw/Documents/Projects/Paper2Exp/Base/runs/reference/20261017-101638_cyclenet
+questions:
+  weather_96_96_mlp_mse:
+    status: scored
+    paper_value: 0.158
+    ref_mean: 0.15897639989852905
+    ref_s: 0.0003737107397024373
+    n: 5
+    m: 3
+    h: 0.0007576251875689315
+    term: noise
+    noise: 0.0007576251875689315
+    precision: 0.0005
+    floor: 1.5897639989852906e-06
+    h_paper: 0.0008944271909999158
+    paper_gap: 0.0009763998985290456
+    justification: h = max(noise 0.000758 [t(4)=2.776, s=0.000374, n=5, m=3], precision
+      0.0005 [3 places], floor 1.59e-06) = 0.000758 (noise); paper gap 0.000976 vs
+      h + h_paper 0.00165
+  weather_96_96_mlp_mae:
+    status: scored
+    paper_value: 0.203
+    ref_mean: 0.20355448126792908
+    ref_s: 0.00028699230291518124
+    n: 5
+    m: 3
+    h: 0.000581820574651084
+    term: noise
+    noise: 0.000581820574651084
+    precision: 0.0005
+    floor: 2.035544812679291e-06
+    h_paper: 0.0008944271909999158
+    paper_gap: 0.0005544812679290634
+    justification: h = max(noise 0.000582 [t(4)=2.776, s=0.000287, n=5, m=3], precision
+      0.0005 [3 places], floor 2.04e-06) = 0.000582 (noise); paper gap 0.000554 vs
+      h + h_paper 0.00148

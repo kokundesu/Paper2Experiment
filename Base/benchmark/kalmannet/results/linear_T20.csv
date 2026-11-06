@@ -1,0 +1,4 @@
+claim,seed,knet_mse_db,baseline,baseline_mse_db,gap_db,train_steps,best_cv_step,wall_s,log
+lin_T20,0,-21.8535,KF,-21.8909,0.0374,4000,3975,76,results/logs/lin_T20_s0.log
+lin_T20,1,-21.8913,KF,-21.9999,0.1086,4000,3999,77,results/logs/lin_T20_s1.log
+lin_T20,2,-21.916,KF,-22.074,0.158,4000,3999,82,results/logs/lin_T20_s2.log

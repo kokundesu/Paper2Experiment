@@ -1,0 +1,17 @@
+# Reference recipe (hidden; written by the benchmark builder). status: draft until the setup,
+# the command and one regex per question have been checked by an actual run.
+id: set_transformer
+status: draft
+repo: https://github.com/juho-lee/set_transformer
+commit: ''
+setup:
+- git clone https://github.com/juho-lee/set_transformer repo
+command: ''
+timeout_s: 1800
+seeded: true
+metrics: {}
+entry: '`run.py --net=set_transformer`'
+notes:
+- 'difficulty: 难; estimated time per run: 10–20 分钟'
+- 'risk: 写死 `.cuda()`；仓库默认值和论文有 3 处不同（每组点数、学习率衰减步数、诱导点数），是"按论文还是按代码"的考验'
+- 'questions: synthetic_2d_isab16_pma_ll0_per_data'

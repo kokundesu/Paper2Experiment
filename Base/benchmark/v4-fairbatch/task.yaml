@@ -1,0 +1,24 @@
+# v4 task as agents see it (from the frozen ReproSpec). No target values.
+id: v4-fairbatch
+paper_pdf: paper/2012.01696.pdf
+paper_url: https://arxiv.org/pdf/2012.01696
+repo_url: https://github.com/yuji-roh/fairbatch
+objective: 复现 FairBatch（ICLR 2021）在合成数据上用逻辑回归、equal opportunity 公平性下的 accuracy 和 EO
+  disparity（表 1）。
+claims:
+- id: synthetic_fairbatch_eo_accuracy
+  metric: Test accuracy
+  setting: Table 1, FairBatch row, Synthetic group, Acc. column
+  unit: ''
+  description: '论文表 1 中，合成数据集上采用 FairBatch、逻辑回归模型并以 equal opportunity 为公平性目标时，测试集
+    accuracy 的跨次实验平均值是多少？ Setting: Synthetic dataset; logistic regression trained
+    with FairBatch for equal opportunity; separate test set'
+- id: synthetic_fairbatch_eo_disparity
+  metric: EO disparity = max over sensitive groups z of |Pr(predicted positive | z,
+    true positive) − Pr(predicted positive | true positive)|
+  setting: Table 1, FairBatch row, Synthetic group, EO Disp. column
+  unit: ''
+  description: '论文表 1 中，合成数据集上采用 FairBatch、逻辑回归模型并以 equal opportunity 为公平性目标时，测试集
+    EO disparity 的跨次实验平均值是多少？ Setting: Synthetic dataset; logistic regression trained
+    with FairBatch for equal opportunity; separate test set'
+seeds: 3

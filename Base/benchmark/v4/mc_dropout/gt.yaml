@@ -1,0 +1,92 @@
+# Hidden ground truth from the paper (GT stage). Tolerances follow after the reference re-runs.
+id: mc_dropout
+extractors:
+- haiku55
+- luna
+values:
+  boston_mc_dropout_test_rmse:
+    paper_value: 2.97
+    printed: '2.97'
+    precision: 2
+    quote: Boston Housing 506 13 4.32 ±0.29 3.01 ±0.18 2.97 ±0.19 -2.90 ±0.07 -2.57
+      ±0.09 -2.46 ±0.06
+    page: 7
+    reported_spread: 0.19
+    spread_kind: sem
+    spread_over: splits
+    n_runs: 20
+    status: agreed
+    votes:
+      haiku55:
+        value: 2.97
+        verified: true
+        why: ''
+        printed: '2.97'
+        quote: Boston Housing 506 13 4.32 ±0.29 3.01 ±0.18 2.97 ±0.19 -2.90 ±0.07
+          -2.57 ±0.09 -2.46 ±0.06
+        page: 7
+        spread: 0.19
+        spread_kind: sem
+        spread_over: splits
+        n_runs: 20
+        note: Table 1, Boston Housing row, Dropout column under 'Avg. Test RMSE and
+          Std. Errors'. Column header says Std. Errors (standard error). Footnote
+          3 says the earlier version's SE was erroneously scaled; 0.19 is the corrected
+          value. The paper says averages over 20 random splits. The readme's re-run
+          table gives 2.83 ± 0.17 (BayesOpt, paper) and 2.90 ± 0.18 (grid search,
+          new), which is not the Table 1 value.
+      luna:
+        value: 2.97
+        verified: true
+        why: ''
+        printed: '2.97'
+        quote: Boston Housing 506 13 4.32 ±0.29 3.01 ±0.18 2.97 ±0.19 -2.90 ±0.07
+          -2.57 ±0.09 -2.46 ±0.06
+        page: 7
+        spread: 0.19
+        spread_kind: sem
+        spread_over: splits
+        n_runs: 20
+        note: 表 1 的 Dropout 平均测试 RMSE；正文说明结果除注明外均基于 20 个随机数据划分平均，±为标准误。
+  boston_mc_dropout_test_ll:
+    paper_value: -2.46
+    printed: '-2.46'
+    precision: 2
+    quote: Boston Housing 506 13 4.32 ±0.29 3.01 ±0.18 2.97 ±0.19 -2.90 ±0.07 -2.57
+      ±0.09 -2.46 ±0.06
+    page: 7
+    reported_spread: 0.06
+    spread_kind: sem
+    spread_over: splits
+    n_runs: 20
+    status: agreed
+    votes:
+      haiku55:
+        value: -2.46
+        verified: true
+        why: ''
+        printed: '-2.46'
+        quote: Boston Housing 506 13 4.32 ±0.29 3.01 ±0.18 2.97 ±0.19 -2.90 ±0.07
+          -2.57 ±0.09 -2.46 ±0.06
+        page: 7
+        spread: 0.06
+        spread_kind: sem
+        spread_over: splits
+        n_runs: 20
+        note: Table 1, Boston Housing row, Dropout column under 'Avg. Test LL and
+          Std. Errors'. Standard error, averaged over 20 random splits. Readme re-run
+          values (-2.40 ± 0.04 for both BayesOpt and grid search) differ from the
+          paper's table value.
+      luna:
+        value: -2.46
+        verified: true
+        why: ''
+        printed: '-2.46'
+        quote: Boston Housing 506 13 4.32 ±0.29 3.01 ±0.18 2.97 ±0.19 -2.90 ±0.07
+          -2.57 ±0.09 -2.46 ±0.06
+        page: 7
+        spread: 0.06
+        spread_kind: sem
+        spread_over: splits
+        n_runs: 20
+        note: 表 1 的 Dropout 平均测试预测对数似然；正文说明结果除注明外均基于 20 个随机数据划分平均，±为标准误。

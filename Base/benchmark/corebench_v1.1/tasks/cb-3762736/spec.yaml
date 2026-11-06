@@ -1,0 +1,41 @@
+# CORE-Bench v1.1 task as a ReproSpec: what agents see. No answers.
+id: cb-3762736
+title: 'PM-Score-Net: A Disjoint-Label Multi-Task Learning Framework for Automated
+  Continuous Severity Assessment of Myopic Maculopathy'
+objective: 'Test the computational reproducibility of a scientific capsule (CORE-Bench,
+  Hard level): run its code and answer the questions from the output.'
+task_prompt: 'Run the evaluation scripts: run_baseline_eval.sh, run_convnext_eval.sh,
+  run_scl_eval.sh, run_task1_eval.sh, run_palm_eval.sh, and run_rigor_eval.sh.'
+language: Python
+paper: null
+code:
+  repo_url: null
+  capsule: capsule-3762736
+questions:
+- id: q1
+  text: What is the Task1_Only macro f1?
+  answer_type: any
+  metric: ''
+  direction: ''
+  unit: ''
+  locator: program output
+  setting: ''
+  runs: 1
+  evidence: either
+- id: q2
+  text: What is the Winner_SCL RMSE?
+  answer_type: any
+  metric: ''
+  direction: ''
+  unit: ''
+  locator: program output
+  setting: ''
+  runs: 1
+  evidence: either
+origin:
+  source: corebench
+  reference: core-bench-v1.1-mainline core_test.json sha256:d4aa5ebb984df7f293e04f2dd120722f172fddea6fcb54a0c928e09bc6ef837d
+  prompt: ''
+  drafted_by: []
+  checked_by: []
+  user_confirmed: false

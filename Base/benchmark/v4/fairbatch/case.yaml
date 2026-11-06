@@ -1,0 +1,39 @@
+# Hidden: tolerances from the reference re-runs (pre-registered before any workflow runs).
+id: fairbatch
+rule: docs/benchmark-redesign.md section 3.3
+reference_run_dir: /Users/allenhuw/Documents/Projects/Paper2Exp/Base/runs/reference/20261017-095521_fairbatch
+questions:
+  synthetic_fairbatch_eo_accuracy:
+    status: scored
+    paper_value: 0.855
+    ref_mean: 0.8550000190734863
+    ref_s: 0.0
+    n: 5
+    m: 3
+    h: 0.0005
+    term: precision
+    noise: 0.0
+    precision: 0.0005
+    floor: 8.550000190734863e-06
+    h_paper: 0.0005
+    paper_gap: 1.907348634588857e-08
+    justification: h = max(noise 0 [t(4)=2.776, s=0, n=5, m=3], precision 0.0005 [3
+      places], floor 8.55e-06) = 0.0005 (precision); paper gap 1.91e-08 vs h + h_paper
+      0.001
+  synthetic_fairbatch_eo_disparity:
+    status: scored
+    paper_value: 0.012
+    ref_mean: 0.012102903728662517
+    ref_s: 0.0
+    n: 5
+    m: 3
+    h: 0.0005
+    term: precision
+    noise: 0.0
+    precision: 0.0005
+    floor: 1.210290372866252e-07
+    h_paper: 0.0006324555320336759
+    paper_gap: 0.00010290372866251715
+    justification: h = max(noise 0 [t(4)=2.776, s=0, n=5, m=3], precision 0.0005 [3
+      places], floor 1.21e-07) = 0.0005 (precision); paper gap 0.000103 vs h + h_paper
+      0.00113

@@ -1,0 +1,17 @@
+# Reference recipe (hidden; written by the benchmark builder). status: draft until the setup,
+# the command and one regex per question have been checked by an actual run.
+id: appnp
+status: draft
+repo: https://github.com/gasteigerjo/ppnp
+commit: ''
+setup:
+- git clone https://github.com/gasteigerjo/ppnp repo
+command: ''
+timeout_s: 1800
+seeded: true
+metrics: {}
+entry: '`reproduce_results_pytorch.ipynb`（作者的 PyTorch 版本）'
+notes:
+- 'difficulty: 难; estimated time per run: 每个划分 1–3 分钟；论文跑 100 次，需要减少'
+- 'risk: notebook 里的数据集名称和文件名对不上，会**悄悄**改用默认超参；TF1 原版在 arm64 上不能用'
+- 'questions: appnp_ms_academic_accuracy'

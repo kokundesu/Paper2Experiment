@@ -1,0 +1,41 @@
+# CORE-Bench v1.1 task as a ReproSpec: what agents see. No answers.
+id: cb-4933686
+title: A global and integrated analysis of CINSARC-associated genetic defects
+objective: 'Test the computational reproducibility of a scientific capsule (CORE-Bench,
+  Hard level): run its code and answer the questions from the output.'
+task_prompt: Run "Main.R" using Rscript and xvfb-run.
+language: R
+paper: null
+code:
+  repo_url: null
+  capsule: capsule-4933686
+questions:
+- id: q1
+  text: fig From Figure 2 plot A, report Fisher's P. If the value is in scientific
+    notion, convert it to a floating point number.
+  answer_type: any
+  metric: ''
+  direction: ''
+  unit: ''
+  locator: program output
+  setting: ''
+  runs: 1
+  evidence: either
+- id: q2
+  text: fig From Figure 1 plot A, measuring time vs. metastasis-free survival, report
+    the numerical value of HR (ignore the confidence interval).
+  answer_type: any
+  metric: ''
+  direction: ''
+  unit: ''
+  locator: program output
+  setting: ''
+  runs: 1
+  evidence: either
+origin:
+  source: corebench
+  reference: core-bench-v1.1-mainline core_test.json sha256:d4aa5ebb984df7f293e04f2dd120722f172fddea6fcb54a0c928e09bc6ef837d
+  prompt: ''
+  drafted_by: []
+  checked_by: []
+  user_confirmed: false

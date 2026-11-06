@@ -1,0 +1,35 @@
+created: '2026-10-17T12:01:01'
+seed: 20261017
+method: stratified by difficulty (dataset-candidates.md), random.Random(seed).sample
+  per stratum, quotas by largest remainder; written before any agent run on v4
+rule: 'dev: may be run and inspected while the system is developed. test: run once,
+  after the code is frozen (commit + tag); a fix after seeing test results means re-running
+  every test paper and saying so'
+test:
+  easy:
+  - bspm
+  - cyclenet
+  medium:
+  - correct_smooth
+  - nngp
+  hard:
+  - appnp
+dev:
+  easy:
+  - ecod
+  - fairbatch
+  - itransformer
+  - ngboost
+  medium:
+  - am_tsp
+  - doc2vecc
+  - gprgnn
+  - ials
+  - patchtst
+  - ts2vec
+  - tstcc
+  hard:
+  - mc_dropout
+  - pinn_gradpath
+  - set_transformer
+  - svgd

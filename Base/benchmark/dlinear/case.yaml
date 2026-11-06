@@ -1,0 +1,93 @@
+# Benchmark case: hidden ground truth for the evaluator. Agents never see this file
+# (they get task.yaml instead).
+id: dlinear
+paper:
+  title: "Are Transformers Effective for Time Series Forecasting?"
+  authors: "Zeng, Chen, Zhang & Xu"
+  venue: "AAAI 2023"
+  arxiv: "2205.13504"
+  version_note: >
+    Targets copied from arXiv v3 (17 Aug 2022) Table 2, DLinear* columns. The four cells are
+    identical in the AAAI 2023 proceedings Table 2 and in arXiv v1/v2 Table 2 ("DLinear-S").
+repo:
+  url: https://github.com/cure-lab/LTSF-Linear
+  commit: 0c113668a3b88c4c4ee586b8c5ec3e539c4de5a6
+  note: >
+    Official PyTorch code (built on the Autoformer code base). Hyperparameters per dataset are in
+    scripts/EXP-LongForecasting/Linear/{etth1,etth2,ettm1}.sh (unchanged since 2022-08-15 apart from
+    a comment line). Data: ETT CSVs from the official ETDataset repo (paper footnote 2), identical
+    file layout to the Autoformer Google Drive copy the README points to.
+difficulty: easy
+expected_runtime_cpu_min: 1   # longest single run (ETTm1, batch 8) is 19-40 s on an M4 CPU with 4 threads
+
+# Paper Table 2 ("Multivariate long-term forecasting errors"), DLinear*, MSE on the
+# z-score-normalised test split (scaler fitted on the train split), look-back L=336.
+# A claim is reproduced when the MEDIAN over seeds is within tolerance:
+#   rel: |median - value| / |value| <= rel
+# evidence_pattern matches the training trace only (2026-10-05): the value itself must also appear in the same
+# log, which the evaluator checks separately. Patterns that also pinned the final print line failed a correct
+# FITS run whose agent had (legitimately) patched the output format.
+claims:
+  - {id: etth1_96_mse,  metric: test_mse, setting: "Table 2, DLinear, ETTh1, multivariate, horizon T=96",  unit: "", value: 0.375, tolerance: {rel: 0.05}, evidence_pattern: "Epoch: 1, Steps: \\d+ \\| Train Loss"}
+  - {id: etth1_336_mse, metric: test_mse, setting: "Table 2, DLinear, ETTh1, multivariate, horizon T=336", unit: "", value: 0.439, tolerance: {rel: 0.10}, evidence_pattern: "Epoch: 1, Steps: \\d+ \\| Train Loss"}
+  - {id: etth2_96_mse,  metric: test_mse, setting: "Table 2, DLinear, ETTh2, multivariate, horizon T=96",  unit: "", value: 0.289, tolerance: {rel: 0.07}, evidence_pattern: "Epoch: 1, Steps: \\d+ \\| Train Loss"}
+  - {id: ettm1_96_mse,  metric: test_mse, setting: "Table 2, DLinear, ETTm1, multivariate, horizon T=96",  unit: "", value: 0.299, tolerance: {rel: 0.03}, evidence_pattern: "Epoch: 1, Steps: \\d+ \\| Train Loss"}
+  # Does not reproduce from the released code (see DISCREPANCY.md): graded through the diagnosis only.
+  # The median of 3 faithful seeds passes rel 3% in only ~18% of runs, so most runs leave a gap to explain.
+  - {id: etth1_720_mse, metric: test_mse, setting: "Table 2, DLinear, ETTh1, multivariate, horizon T=720", unit: "", value: 0.472, tolerance: {rel: 0.03}, evidence_pattern: "Epoch: 1, Steps: \\d+ \\| Train Loss", diagnostic_only: true}
+
+rubric:
+  min_seeds: 3
+  aggregate: median
+  levels:
+    full: "all verdict claims within tolerance (diagnostic_only claims excluded)"
+    partial: "at least one verdict claim within tolerance"
+    fail: "no verdict claim reproduced or run did not finish"
+  tolerance_justification: >
+    10 seeds per claim (2021 = upstream default, 0-8), official scripts, CPU. Early stopping
+    (patience 3, LR halved every epoch, max 10 epochs) occasionally stops a seed after 4-6 epochs,
+    which gives a heavy upper tail (ETTh1-336: 0.437-0.521), so the median is used. Tolerances were
+    set from all C(10,3)=120 three-seed subsets of our faithful runs: the median-of-3 passes in
+    100% / 93% / 100% / 100% of subsets for etth1_96 (max dev 3.9%) / etth1_336 (10%: 93%) /
+    etth2_96 (max dev 5.0%, hence 7%) / ettm1_96 (max dev 0.9%, std 0.0012, hence 3%).
+    Faithful 10-seed medians: 0.374 (-0.3%), 0.447 (+1.9%), 0.294 (+1.6%), 0.301 (+0.7%).
+    Discrimination: a wrong look-back window (L=96 instead of 336) gives ETTm1-96 = 0.345 (+15%,
+    fails); MSE on inverse-transformed (raw-unit) data gives ~8.6 on ETTh1-96 (fails); the
+    univariate ('S') setting is ~0.056 in the paper's own univariate table for ETTh1-96 (fails; not run here). Limitation: L=96 on ETTh1-96 gives a median
+    of 0.391 (+4.3%) and would still pass that one claim, so ettm1_96 is the claim that catches it.
+
+# Known obstacles on a modern environment (Python 3.11, torch 2.14 CPU, NumPy 2.x, pandas, macOS)
+known_issues:
+  - "NumPy 2.x: `AttributeError: np.Inf was removed` in utils/tools.py EarlyStopping; use np.inf."
+  - "macOS (spawn start method) + default --num_workers 10 + no `if __name__ == '__main__'` guard in run_longExp.py: DataLoader workers re-import the script and crash/hang with the multiprocessing 'bootstrapping phase' RuntimeError. Pass --num_workers 0 (does not change results: the sampler runs in the main process)."
+  - "Seed hard-coded (fix_seed = 2021) in run_longExp.py; multi-seed runs need a small patch (SEED env var). Paper reports a single run (itr 1); --itr 2+ re-trains without re-seeding."
+  - "CPU is used automatically (use_gpu is overridden when CUDA is unavailable); MPS is never used. Note `--use_gpu False` is parsed as True (type=bool), so do not rely on that flag."
+  - "Checkpoints/results directories are keyed by the setting string, not the seed: concurrent runs of the same setting overwrite each other's checkpoint.pth. Run seeds sequentially or vary --des / --checkpoints."
+  - "Hyperparameters differ per dataset (ETTh1: bs 32, lr 0.005; ETTh2: bs 32, lr 0.05; ETTm1: bs 8, lr 1e-4); all use seq_len 336, enc_in 7, features M, train_epochs 10, patience 3, lradj type1 (defaults)."
+  - "Test loader drop_last was True when the paper was written and was changed to False on 2023-03-15 (commit 6fe4c28). Effect on these claims is < 0.0002 MSE at T=96/336 (1 of 2785 windows dropped at T=96, 17 of 2545 at T=336) and ~0.001 at T=720."
+  - "Trap: the reported metric is MSE on z-score normalised data (scaler fitted on the train split) averaged over all 7 variates; inverse-transforming gives values ~20x larger (ETTh1-96: ~8.6)."
+  - "Trap: Table 2 is the multivariate (features M) setting; the univariate (features S, target OT) table in the appendix has much smaller numbers. The look-back is L=336 for LTSF-Linear (Appendix B.2), not the Transformer default 96."
+  - "Trap: the per-epoch 'Test Loss' lines in the log are not the reported metric (they are an unweighted mean of per-batch losses, so the short last batch is over-weighted); use the final `mse:..., mae:...` line. An unanchored regex `mse:([0-9.]+)` also matches our patched `droplast_mse:` line."
+  - "Trap: the Table 2 header row is mangled by text extraction ('Linear* NLinear* DLinear* ... MSE MSE MAE'); DLinear MSE is the 6th value after the horizon (IMP., Linear MSE/MAE, NLinear MSE/MAE, DLinear MSE), e.g. ETTh1 '96 0.80% 0.375 0.397 0.374 0.394 0.375 0.399'."
+
+# Root cause of the claims that do not reproduce, established by the human reproduction (DISCREPANCY.md).
+discrepancies:
+  - claim_id: etth1_720_mse
+    category: paper_code_mismatch
+    also_acceptable: [underspecified_paper]
+    summary: "Table 2's DLinear numbers were produced by the pre-August-2022 version of the official code (linear weights initialised to 1/L, ETTh1 script with batch 8 and default lr 1e-4); the released code uses random init with batch 32 / lr 0.005, which at T=720 early-stops on a noisy validation loss and lands ~6% higher (median of 10 seeds 0.499 vs 0.472)."
+    key_evidence:
+      # Short, checkable facts (graded by keyword overlap); full numbers in DISCREPANCY.md
+      - "old commit 721ab58 (before the August 2022 update 7f7a25b) reproduces the paper exactly"
+      - "the update changed the ETTh1 batch size and learning rate"
+      - "the update removed the 1/L weight initialisation"
+      - "every seed of the current code is above the paper value, so not a lucky seed"
+      - "paper gives no learning rate or batch size and refers to the code"
+    confirmed_by: "results/discrepancy_etth1_720.csv, DISCREPANCY.md"
+    confidence: confirmed
+    # Strict attribution: category right AND at least one of these mechanisms named (case-insensitive phrases).
+    # No "1/L init" item: our ablation shows the init change alone has no effect (0.498 vs 0.499), so naming it
+    # is not decisive; formal runs r1/r2 named it only to rule it out. Removed 2026-10-04 before re-scoring.
+    decisive_evidence:
+      - fact: "an older version of the code (before the August 2022 update) reproduces the paper"
+        any_of: ["721ab58", "7f7a25b", "older commit", "earlier commit", "previous commit", "older version of the code", "earlier version of the code", "old version of the code", "august 2022", "2022-08"]

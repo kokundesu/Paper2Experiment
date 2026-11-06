@@ -1,0 +1,37 @@
+Generate Data (batched) ... (seed = 0)
+training data generated in 82.9 s
+train: 990000  validation: 10000 
+epoch:0,  train:12.16%,  validation:12.20%.
+epoch:12,  train:7.17%,  validation:7.23%.
+epoch:24,  train:6.79%,  validation:6.89%.
+epoch:36,  train:6.52%,  validation:6.74%.
+epoch:48,  train:6.48%,  validation:6.68%.
+epoch:60,  train:6.57%,  validation:6.68%.
+epoch:72,  train:6.37%,  validation:6.57%.
+epoch:84,  train:6.26%,  validation:6.61%.
+epoch:96,  train:6.34%,  validation:6.65%.
+epoch:108,  train:6.26%,  validation:6.49%.
+training time: 499.22 s
+Generate Data ... (seed = 7)
+Sum-rate: WMMSE: 4.143, DNN: 3.517, Max Power: 1.441, Random Power: 1.406
+Ratio: DNN: 84.891%, Max Power: 34.776%, Random Power: 33.941%
+wmmse time: 20.992 s, dnn time: 0.026 s, time speed up: 800.7 X
+{'mode': 'train', 'K': 30, 'seed': 1, 'train_seed': 0, 'test_seed': 7, 'num_train': 1000000, 'num_test': 10000, 'epochs': 120, 'hidden': '200-80-80', 'wmmse_sumrate': np.float64(4.1433), 'dnn_sumrate': np.float64(3.5173), 'dnn_pct_of_wmmse': np.float64(84.891), 'maxpower_pct': np.float64(34.776), 'random_pct': np.float64(33.941), 'dnn_cpu_s': 0.0262, 'wmmse_py_cpu_s': 20.992, 'train_s': 499.4, 'wall_s': 608.5}
+      611.96 real      2374.32 user       205.85 sys
+          4827299840  maximum resident set size
+                   0  average shared memory size
+                   0  average unshared data size
+                   0  average unshared stack size
+              658414  page reclaims
+                   1  page faults
+                   0  swaps
+                   0  block input operations
+                   0  block output operations
+                   0  messages sent
+                   0  messages received
+                   0  signals received
+                   8  voluntary context switches
+            52280328  involuntary context switches
+      30111777572351  instructions retired
+       8826047885906  cycles elapsed
+          4897509792  peak memory footprint

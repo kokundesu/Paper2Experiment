@@ -1,0 +1,15 @@
+# Task given to every workflow. Contains no target values.
+id: rocket
+paper_url: https://arxiv.org/pdf/1910.13051
+paper_pdf: paper/1910.13051.pdf
+repo_url: https://github.com/angus924/rocket
+objective: >
+  Reproduce ROCKET's test accuracy on three UCR datasets (ECG200, FaceAll,
+  ArrowHead) from Table 1 of Appendix D ("Classification Accuracy, 'Bake Off'
+  Datasets"), using the official code and the paper's experimental setup
+  (default train/test splits of the UCR archive).
+claims:
+  - {id: ecg200_acc,    metric: test_accuracy, setting: "Appendix D Table 1, Rocket, ECG200",    unit: "%", description: "ROCKET test accuracy on ECG200"}
+  - {id: faceall_acc,   metric: test_accuracy, setting: "Appendix D Table 1, Rocket, FaceAll",   unit: "%", description: "ROCKET test accuracy on FaceAll"}
+  - {id: arrowhead_acc, metric: test_accuracy, setting: "Appendix D Table 1, Rocket, ArrowHead", unit: "%", description: "ROCKET test accuracy on ArrowHead"}
+seeds: 3

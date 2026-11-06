@@ -1,0 +1,30 @@
+RUN name=main_attractor_known_x0 code=main inv_r2_db=30 seed=0 opts=[--data attractor --ekf_init true]
+CONFIG {'inv_r2_db': 30.0, 'nu_db': 0.0, 'seed': 0, 'N_T': 200, 'T': 20, 'data': 'attractor', 'long_T': 2000, 'burn': 0, 'init_var': 100.0, 'ekf_init': 'true', 'P0': 0.0, 'q_scale': 1.0, 'r_scale': 1.0, 'h_jac': 'correct', 'tag': 'main_attractor_known_x0'}
+data: x0 mean |x0| = 28.18, mean |x_t| over test set = 28.68, test shape (200, 3, 20)
+Extended Kalman Filter - MSE LOSS: tensor(-12.8288) [dB]
+RESULT tag=main_attractor_known_x0 inv_r2_db=30.0 seed=0 ekf_dB=-12.829 mean_of_dB=-25.867 median_dB=-26.495 n_nonfinite=0 mean_rho=28.68 max_abs_K=2.06
+RUN name=main_attractor_known_x0 code=main inv_r2_db=30 seed=1 opts=[--data attractor --ekf_init true]
+CONFIG {'inv_r2_db': 30.0, 'nu_db': 0.0, 'seed': 1, 'N_T': 200, 'T': 20, 'data': 'attractor', 'long_T': 2000, 'burn': 0, 'init_var': 100.0, 'ekf_init': 'true', 'P0': 0.0, 'q_scale': 1.0, 'r_scale': 1.0, 'h_jac': 'correct', 'tag': 'main_attractor_known_x0'}
+data: x0 mean |x0| = 28.29, mean |x_t| over test set = 28.28, test shape (200, 3, 20)
+Extended Kalman Filter - MSE LOSS: tensor(-14.0261) [dB]
+RESULT tag=main_attractor_known_x0 inv_r2_db=30.0 seed=1 ekf_dB=-14.026 mean_of_dB=-25.915 median_dB=-26.426 n_nonfinite=0 mean_rho=28.28 max_abs_K=2.18
+RUN name=main_attractor_known_x0 code=main inv_r2_db=30 seed=2 opts=[--data attractor --ekf_init true]
+CONFIG {'inv_r2_db': 30.0, 'nu_db': 0.0, 'seed': 2, 'N_T': 200, 'T': 20, 'data': 'attractor', 'long_T': 2000, 'burn': 0, 'init_var': 100.0, 'ekf_init': 'true', 'P0': 0.0, 'q_scale': 1.0, 'r_scale': 1.0, 'h_jac': 'correct', 'tag': 'main_attractor_known_x0'}
+data: x0 mean |x0| = 28.24, mean |x_t| over test set = 28.60, test shape (200, 3, 20)
+Extended Kalman Filter - MSE LOSS: tensor(-17.9539) [dB]
+RESULT tag=main_attractor_known_x0 inv_r2_db=30.0 seed=2 ekf_dB=-17.954 mean_of_dB=-25.661 median_dB=-26.480 n_nonfinite=0 mean_rho=28.60 max_abs_K=2.23
+RUN name=main_attractor_known_x0 code=main inv_r2_db=10 seed=0 opts=[--data attractor --ekf_init true]
+CONFIG {'inv_r2_db': 10.0, 'nu_db': 0.0, 'seed': 0, 'N_T': 200, 'T': 20, 'data': 'attractor', 'long_T': 2000, 'burn': 0, 'init_var': 100.0, 'ekf_init': 'true', 'P0': 0.0, 'q_scale': 1.0, 'r_scale': 1.0, 'h_jac': 'correct', 'tag': 'main_attractor_known_x0'}
+data: x0 mean |x0| = 28.07, mean |x_t| over test set = 28.48, test shape (200, 3, 20)
+Extended Kalman Filter - MSE LOSS: tensor(-0.6424) [dB]
+RESULT tag=main_attractor_known_x0 inv_r2_db=10.0 seed=0 ekf_dB=-0.642 mean_of_dB=-5.228 median_dB=-6.190 n_nonfinite=0 mean_rho=28.48 max_abs_K=1.77
+RUN name=main_attractor_known_x0 code=main inv_r2_db=10 seed=1 opts=[--data attractor --ekf_init true]
+CONFIG {'inv_r2_db': 10.0, 'nu_db': 0.0, 'seed': 1, 'N_T': 200, 'T': 20, 'data': 'attractor', 'long_T': 2000, 'burn': 0, 'init_var': 100.0, 'ekf_init': 'true', 'P0': 0.0, 'q_scale': 1.0, 'r_scale': 1.0, 'h_jac': 'correct', 'tag': 'main_attractor_known_x0'}
+data: x0 mean |x0| = 28.09, mean |x_t| over test set = 28.58, test shape (200, 3, 20)
+Extended Kalman Filter - MSE LOSS: tensor(-2.4855) [dB]
+RESULT tag=main_attractor_known_x0 inv_r2_db=10.0 seed=1 ekf_dB=-2.485 mean_of_dB=-5.596 median_dB=-6.352 n_nonfinite=0 mean_rho=28.58 max_abs_K=1.87
+RUN name=main_attractor_known_x0 code=main inv_r2_db=10 seed=2 opts=[--data attractor --ekf_init true]
+CONFIG {'inv_r2_db': 10.0, 'nu_db': 0.0, 'seed': 2, 'N_T': 200, 'T': 20, 'data': 'attractor', 'long_T': 2000, 'burn': 0, 'init_var': 100.0, 'ekf_init': 'true', 'P0': 0.0, 'q_scale': 1.0, 'r_scale': 1.0, 'h_jac': 'correct', 'tag': 'main_attractor_known_x0'}
+data: x0 mean |x0| = 28.66, mean |x_t| over test set = 28.85, test shape (200, 3, 20)
+Extended Kalman Filter - MSE LOSS: tensor(-0.6773) [dB]
+RESULT tag=main_attractor_known_x0 inv_r2_db=10.0 seed=2 ekf_dB=-0.677 mean_of_dB=-5.352 median_dB=-6.155 n_nonfinite=0 mean_rho=28.85 max_abs_K=1.93

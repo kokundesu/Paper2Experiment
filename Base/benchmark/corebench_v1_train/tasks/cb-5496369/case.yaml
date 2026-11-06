@@ -1,0 +1,39 @@
+# Hidden: pre-registered tolerances, computed from the 3 manual re-runs.
+capsule_id: capsule-5496369
+source: core-bench (original) core_train.json
+split: dev
+data_sha256: 3df47f1b3fa1cb60045018eb1a0f1ad4ecf6a53f72318c845a879ce0313b0730
+rule: docs/benchmark-redesign.md section 3.3
+questions:
+- id: q1
+  question: fig For the GC diagnosis model's AUROC curve of test data, report the
+    Lasso AUROC of the test data.
+  vision: true
+  kind: numeric
+  scored: true
+  tolerance:
+    mean: 0.967
+    s: 0.0
+    n: 3
+    m: 1
+    noise: 0.0
+    precision: 0.0005
+    floor: 9.67e-06
+    h: 0.0005
+    term: precision
+- id: q2
+  question: fig From the GC prognosis model's AUROC curve, report the Lasso AUROC
+    of the test data.
+  vision: true
+  kind: numeric
+  scored: true
+  tolerance:
+    mean: 0.832
+    s: 0.0
+    n: 3
+    m: 1
+    noise: 0.0
+    precision: 0.0005
+    floor: 8.32e-06
+    h: 0.0005
+    term: precision

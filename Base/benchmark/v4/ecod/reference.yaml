@@ -1,0 +1,63 @@
+# Reference recipe (hidden; written by the benchmark builder).
+id: ecod
+status: validated
+repo: https://github.com/yzhao062/pyod
+commit: f0d0967d162ed46150cfa39ca61ffd1e7f78404b
+files:
+  ecod_run.py: "\"\"\"ECOD on ODDS Cardio / Breastw / Mammography, the protocol of\
+    \ pyod's notebooks/benchmark.py: 60/40 split with\nRandomState(i), standardizer,\
+    \ ECOD(contamination = outlier share), test ROC-AUC. One run = the mean over 10\
+    \ splits,\ni = 10*seed .. 10*seed + 9 (seed 0 = the benchmark's own splits 0..9).\"\
+    \"\"\nimport sys\nimport numpy as np\nimport scipy.io as sio\nfrom sklearn.model_selection\
+    \ import train_test_split\nfrom sklearn.metrics import roc_auc_score\nfrom pyod.models.ecod\
+    \ import ECOD\nfrom pyod.utils.utility import standardizer\n\nseed = int(sys.argv[sys.argv.index(\"\
+    --seed\") + 1])\ndata_dir = sys.argv[sys.argv.index(\"--data\") + 1]\n\n\ndef\
+    \ load(name):\n    if name == \"cardio\":\n        m = sio.loadmat(f\"{data_dir}/cardio.mat\"\
+    )\n        return m[\"X\"], m[\"y\"].ravel().astype(int)\n    z = np.load(f\"\
+    {data_dir}/{name}.npz\", allow_pickle=False)\n    return z[\"X\"], z[\"y\"].astype(int)\n\
+    \n\nfor label, name in [(\"Cardio\", \"cardio\"), (\"Breastw\", \"4_breastw\"\
+    ), (\"Mammography\", \"23_mammography\")]:\n    X, y = load(name)\n    rocs =\
+    \ []\n    for i in range(10 * seed, 10 * seed + 10):\n        X_tr, X_te, y_tr,\
+    \ y_te = train_test_split(X, y, test_size=0.4, random_state=np.random.RandomState(i))\n\
+    \        X_tr, X_te = standardizer(X_tr, X_te)\n        clf = ECOD(contamination=np.count_nonzero(y)\
+    \ / len(y))\n        clf.fit(X_tr)\n        roc = roc_auc_score(y_te, clf.decision_function(X_te))\n\
+    \        rocs.append(roc)\n        print(f\"{label} split {i} ROC-AUC {roc:.6f}\"\
+    )\n    print(f\"{label} mean ROC-AUC over 10 splits: {np.mean(rocs):.6f}\")\n"
+setup:
+- git clone -q https://github.com/yzhao062/pyod repo && git -C repo checkout -q f0d0967d162ed46150cfa39ca61ffd1e7f78404b
+- uv venv -q --python 3.11 .venv
+- uv pip install -q -p .venv -e repo numpy==2.4.6 scipy==1.17.1 scikit-learn==1.9.1
+  numba==0.68.0 joblib==1.6.0 matplotlib==3.11.2
+- mkdir -p data && cp repo/notebooks/data/cardio.mat data/ && curl -sSL -o data/4_breastw.npz
+  https://raw.githubusercontent.com/Minqi824/ADBench/main/adbench/datasets/Classical/4_breastw.npz
+  && curl -sSL -o data/23_mammography.npz https://raw.githubusercontent.com/Minqi824/ADBench/main/adbench/datasets/Classical/23_mammography.npz
+- echo '4f37ce07dbc25ddad8178fdc6d664ab46d2d0000ee28c2787c3c7ff3c03ef9f6  data/4_breastw.npz'
+  | shasum -a 256 -c && echo 'a0308ac9712d78321073b1c2dc98dc37665c0f35c1cc33019416fe8f8d7de7ea  data/23_mammography.npz'
+  | shasum -a 256 -c
+command: .venv/bin/python ecod_run.py --seed {seed} --data data
+timeout_s: 600
+seeded: true
+metrics:
+  cardio_ecod_roc_auc:
+    regex: 'Cardio mean ROC-AUC over 10 splits: ([0-9.]+)'
+    scale: 1.0
+  breastw_ecod_roc_auc:
+    regex: 'Breastw mean ROC-AUC over 10 splits: ([0-9.]+)'
+    scale: 1.0
+  mammography_ecod_roc_auc:
+    regex: 'Mammography mean ROC-AUC over 10 splits: ([0-9.]+)'
+    scale: 1.0
+entry: '`notebooks/benchmark.py`（60/40 划分，10 次）'
+notes:
+- 'difficulty: 易; estimated time per run: 几秒'
+- 'risk: 方法确定性，seed 只影响划分；脚本默认只跑 1 次，数据集列表也不同；期刊信息在 arXiv 里没有写明（待核实）'
+- 'questions: cardio_ecod_roc_auc, breastw_ecod_roc_auc, mammography_ecod_roc_auc'
+- 'driver follows notebooks/benchmark.py: 60/40 split with RandomState(i), standardizer,
+  ECOD(contamination); one run = mean over splits 10*seed..10*seed+9 (paper: average
+  of 10 independent trials, Sec. 4)'
+- 'data: cardio.mat from the repo; breastw and mammography from the ADBench mirror
+  of ODDS (odds.cs.stonybrook.edu returns 403); the mirror''s cardio is identical
+  to the repo''s cardio.mat, sizes match the paper''s Table 1'
+- 'builder check, seed 0: Cardio is about 0.04 above the paper with pyod master, 1.0.0
+  and 0.9.7 alike; expected paper_mismatch on Cardio'
+evidence_pattern: (?i)\becod\b|roc[-_ ]?auc|\bsplit\b|iteration

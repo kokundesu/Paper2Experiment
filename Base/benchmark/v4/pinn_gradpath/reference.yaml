@@ -1,0 +1,18 @@
+# Reference recipe (hidden; written by the benchmark builder). status: draft until the setup,
+# the command and one regex per question have been checked by an actual run.
+id: pinn_gradpath
+status: draft
+repo: https://github.com/PredictiveIntelligenceLab/GradientPathologiesPINNs
+commit: ''
+setup:
+- git clone https://github.com/PredictiveIntelligenceLab/GradientPathologiesPINNs
+  repo
+command: ''
+timeout_s: 1800
+seeded: true
+metrics: {}
+entry: '`Helmholtz/Helmholtz2D.py`（`mode=''M2''`）'
+notes:
+- 'difficulty: 难; estimated time per run: 3–8 分钟'
+- 'risk: TF1 代码，要用 `tf.compat.v1`；默认是 M1，要改成 M2；期刊版的表号待核实'
+- 'questions: helmholtz2d_m1_relative_l2_50x3, helmholtz2d_m2_relative_l2_50x3'

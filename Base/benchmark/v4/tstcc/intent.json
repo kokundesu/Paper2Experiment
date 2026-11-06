@@ -1,0 +1,110 @@
+{
+ "draft": {
+  "understanding": "复现 IJCAI 2021 论文 TS-TCC 在 Epilepsy 脑电数据集上使用冻结的自监督预训练编码器与线性分类器评估的表 2 结果，仅关注 ACC 和宏平均 F1（MF1）。",
+  "questions": [
+   {
+    "id": "epilepsy_ts_tcc_linear_acc",
+    "text": "论文表 2 中 TS-TCC (ours) 在 Epilepsy 数据集上线性评估的平均分类准确率（ACC）是多少？",
+    "metric": "Accuracy (ACC), mean across independent runs",
+    "unit": "%",
+    "direction": "higher",
+    "locator": "表 2，TS-TCC (ours) 行，Epilepsy → ACC 列",
+    "setting": "Epileptic Seizure Recognition 脑电数据集；癫痫发作与非发作二分类；TS-TCC 自监督预训练编码器冻结，在其特征上训练单层线性分类器（仓库先运行 self_supervised，再运行 train_linear，选择 Epilepsy 数据集）；测试集评估。",
+    "runs": 5,
+    "protocol_notes": "论文称训练、验证、测试按 60%/20%/20% 划分；使用不同随机种子重复实验，表格以均值±标准差呈现。所问为 ACC 均值，复现时同时记录标准差。"
+   },
+   {
+    "id": "epilepsy_ts_tcc_linear_mf1",
+    "text": "论文表 2 中 TS-TCC (ours) 在 Epilepsy 数据集上线性评估的平均宏平均 F1（MF1）是多少？",
+    "metric": "Macro-averaged F1-score (MF1), mean across independent runs",
+    "unit": "%",
+    "direction": "higher",
+    "locator": "表 2，TS-TCC (ours) 行，Epilepsy → MF1 列",
+    "setting": "Epileptic Seizure Recognition 脑电数据集；癫痫发作与非发作二分类；TS-TCC 自监督预训练编码器冻结，在其特征上训练单层线性分类器（仓库先运行 self_supervised，再运行 train_linear，选择 Epilepsy 数据集）；测试集评估。",
+    "runs": 5,
+    "protocol_notes": "论文称训练、验证、测试按 60%/20%/20% 划分；使用不同随机种子重复实验，表格以均值±标准差呈现。所问为 MF1 均值，复现时同时记录标准差。"
+   }
+  ],
+  "open_issues": []
+ },
+ "checks": {
+  "sonnet55": {
+   "items": [
+    {
+     "question_id": "epilepsy_ts_tcc_linear_acc",
+     "in_scope": "yes",
+     "locator_ok": "yes",
+     "underspecified": [
+      "none"
+     ],
+     "answer_type_ok": "yes",
+     "measurable": "yes",
+     "comment": ""
+    },
+    {
+     "question_id": "epilepsy_ts_tcc_linear_mf1",
+     "in_scope": "yes",
+     "locator_ok": "yes",
+     "underspecified": [
+      "none"
+     ],
+     "answer_type_ok": "yes",
+     "measurable": "yes",
+     "comment": ""
+    }
+   ],
+   "missing_questions": []
+  },
+  "haiku55": {
+   "items": [
+    {
+     "question_id": "epilepsy_ts_tcc_linear_acc",
+     "in_scope": "yes",
+     "locator_ok": "yes",
+     "underspecified": [
+      "split"
+     ],
+     "answer_type_ok": "yes",
+     "measurable": "yes",
+     "comment": "Table 2 TS-TCC (ours), Epilepsy ACC column matches the request. The text says 60/20/20 split, but Table 1 lists 9200 train and 2300 test samples, which is an 80/20 division of 11500. The split used is therefore ambiguous and could change the number, so it is flagged."
+    },
+    {
+     "question_id": "epilepsy_ts_tcc_linear_mf1",
+     "in_scope": "yes",
+     "locator_ok": "yes",
+     "underspecified": [
+      "split"
+     ],
+     "answer_type_ok": "yes",
+     "measurable": "yes",
+     "comment": "Table 2 TS-TCC (ours), Epilepsy MF1 column matches the request. Same split ambiguity as the ACC item (text 60/20/20 vs. Table 1 counts 9200/2300)."
+    }
+   ],
+   "missing_questions": []
+  }
+ },
+ "accepted": [
+  "epilepsy_ts_tcc_linear_acc",
+  "epilepsy_ts_tcc_linear_mf1"
+ ],
+ "queue": [],
+ "notes": [
+  {
+   "question_id": "epilepsy_ts_tcc_linear_acc",
+   "text": "论文表 2 中 TS-TCC (ours) 在 Epilepsy 数据集上线性评估的平均分类准确率（ACC）是多少？",
+   "locator": "表 2，TS-TCC (ours) 行，Epilepsy → ACC 列",
+   "notes": [
+    "haiku55: underspecified (split) -- Table 2 TS-TCC (ours), Epilepsy ACC column matches the request. The text says 60/20/20 split, but Table 1 lists 9200 train and 2300 test samples, which is an 80/20 division of 11500. The split used is therefore ambiguous and could change the number, so it is flagged."
+   ]
+  },
+  {
+   "question_id": "epilepsy_ts_tcc_linear_mf1",
+   "text": "论文表 2 中 TS-TCC (ours) 在 Epilepsy 数据集上线性评估的平均宏平均 F1（MF1）是多少？",
+   "locator": "表 2，TS-TCC (ours) 行，Epilepsy → MF1 列",
+   "notes": [
+    "haiku55: underspecified (split) -- Table 2 TS-TCC (ours), Epilepsy MF1 column matches the request. Same split ambiguity as the ACC item (text 60/20/20 vs. Table 1 counts 9200/2300)."
+   ]
+  }
+ ],
+ "cost_usd": 0.0993
+}

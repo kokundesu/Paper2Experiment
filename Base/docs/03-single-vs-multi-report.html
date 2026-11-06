@@ -1,0 +1,171 @@
+<article data-hub-format="plain" data-title="Single-agent 与 Multi-agent 对比报告" data-subtitle="Paper2Experiment · 64 次系统运行、5 个版本（V0–V2）· 全部用 2026-10-05 的评估器与 case.yaml 统一重新打分 · 数据：runs/all_versions_rescored.json">
+
+<section id="conclusion" data-group="先看结论" data-group-note="两种 workflow 谁更好，以及这些数字来自哪几个版本。">
+<h2>01 / 结论</h2>
+<p>Paper2Experiment 对比两种 LLM workflow：single-agent 是一个拿着全部工具的 agent 包办整个复现；multi-agent 把复现拆给 6 个角色（Paper Analyst、Env Agent、Planner、Result Reviewer、Debugger、Discrepancy Analyst），数字只从 Executor 的日志里解析。这份报告把到 10 月 5 日为止的全部 64 次系统运行按代码版本分组，比较两者在复现、花费和诊断上的表现。</p>
+<aside class="takeaway"><b>四句话</b>
+<ul>
+<li><b>复现：</b>没有稳定的赢家。所有版本合计 single 26/32 判 full，multi 27/32；差距几乎全部来自 KalmanNet，而且方向随版本反转。</li>
+<li><b>花费：</b>multi 在每个版本都更慢、更贵，约为 single 的 1.4 倍，请求数和工具调用约 1.6–1.7 倍。</li>
+<li><b>诊断：</b>两者一样诚实（V2 假成功、误报都为 0）；multi 更深入，但原因归类的准确率因 case 而异，两者都找不到真正的机制。</li>
+<li><b>架构：</b>multi 的优势（独立 smoke test、用时稳定、诊断深）和弱点（Reviewer 只判一次、诊断结果不能触发重跑）都是结构性的。</li>
+</ul>
+</aside>
+<div class="tablewrap"><table>
+<thead><tr><th>维度</th><th>Single-agent</th><th>Multi-agent</th></tr></thead>
+<tbody>
+<tr><td>全版本判定 full</td><td>26/32</td><td>27/32</td></tr>
+<tr><td>V2 判定 full</td><td>14/16</td><td>15/16</td></tr>
+<tr><td>V2 平均用时 / 花费</td><td>11.1 分钟 / $0.027</td><td>15.4 分钟 / $0.039</td></tr>
+<tr><td>V2 假成功 / 误报</td><td>0 / 0</td><td>0 / 0</td></tr>
+<tr><td>严格归类（人工复核后，全部版本）</td><td>0</td><td>0.5</td></tr>
+</tbody>
+</table></div>
+</section>
+
+<section id="versions" data-group="先看结论">
+<h2>02 / 各版本一览</h2>
+<p>64 次运行按当时的代码状态分成 5 个版本。所有运行都用当前的评估器和 <code>case.yaml</code> 重新打分，规则一致；但各版本里 agent 看到的 prompt 和规则不同，所以跨版本的变化既有系统改进，也有随机波动。</p>
+
+<h3>版本划分</h3>
+<p><b>V0 到 V0.2 是冒烟测试，每个 case 只有一次；V1 和 V2 是正式实验，每格 3 次重复。</b></p>
+<div class="tablewrap"><table>
+<thead><tr><th>版本</th><th>时间</th><th>运行数</th><th>系统状态</th></tr></thead>
+<tbody>
+<tr><td>V0</td><td>10/4 14:08</td><td>2</td><td>刚迁到 OpenAI，没有诊断和审查角色；只跑 GCN</td></tr>
+<tr><td>V0.1</td><td>10/4 16:28</td><td>4</td><td>加入 Discrepancy Analyst；冒烟第一轮（DLinear、KalmanNet）</td></tr>
+<tr><td>V0.2</td><td>10/4 17:37</td><td>4</td><td>加入 Result Reviewer、证据规则、日志完整性、严格归类；冒烟第二轮</td></tr>
+<tr><td>V1</td><td>10/4 18:40</td><td>22</td><td>加入「2–3% 算一致」规则、审查角色推理强度 high；正式 v1 18 次 + 新 case 首跑 4 次</td></tr>
+<tr><td>V2</td><td>10/5</td><td>32</td><td>预注册判定标准、冲突规则、每 seed 一值、新证据规则；正式 v2 30 次 + SGC 重跑 2 次</td></tr>
+</tbody>
+</table></div>
+
+<h3>各版本总表</h3>
+<p><b>从 V1 起两者的判定 full 比例都在 73–94% 之间，交替领先；multi 的花费始终更高。</b></p>
+<div class="tablewrap"><table>
+<thead><tr><th>版本</th><th>流程</th><th>判定 full</th><th>计入判定的 claim</th><th>假成功 / 误报</th><th>分钟/次</th><th>花费/次</th></tr></thead>
+<tbody>
+<tr><td>V0</td><td>single</td><td>1/1</td><td>3/3</td><td>0 / 0</td><td>2.5</td><td>$0.012</td></tr>
+<tr><td>V0</td><td>multi</td><td>1/1</td><td>3/3</td><td>0 / 0</td><td>2.5</td><td>$0.011</td></tr>
+<tr><td>V0.1</td><td>single</td><td>0/2</td><td>1/6</td><td>0 / 0</td><td>22.5</td><td>$0.024</td></tr>
+<tr><td>V0.1</td><td>multi</td><td>1/2</td><td>4/6</td><td>0 / 0</td><td>8.2</td><td>$0.040</td></tr>
+<tr><td>V0.2</td><td>single</td><td>1/2</td><td>4/6</td><td>0 / 1</td><td>13.7</td><td>$0.039</td></tr>
+<tr><td>V0.2</td><td>multi</td><td>2/2</td><td>6/6</td><td>0 / 4</td><td>13.9</td><td>$0.041</td></tr>
+<tr><td>V1</td><td>single</td><td><b>10/11</b></td><td>31/34</td><td>1 / 0</td><td>12.0</td><td>$0.034</td></tr>
+<tr><td>V1</td><td>multi</td><td>8/11</td><td>29/34</td><td>1 / 0</td><td>13.8</td><td>$0.044</td></tr>
+<tr><td>V2</td><td>single</td><td>14/16</td><td>47/51</td><td>0 / 0</td><td>11.1</td><td>$0.027</td></tr>
+<tr><td>V2</td><td>multi</td><td><b>15/16</b></td><td>49/51</td><td>0 / 0</td><td>15.4</td><td>$0.039</td></tr>
+</tbody>
+</table></div>
+<p class="table-cap">重新打分改变了两次判定：V1 的 SGC multi 从 full 变为 partial（当时用的是临时容差 ±1 pp，定稿为 ±0.5 pp）；V2 的 FITS single r1 从 partial 变为 full（证据模式改为只匹配训练痕迹）。</p>
+</section>
+
+<section id="by-case" data-group="拆开看" data-group-note="差距来自哪个 case、花了多少代价、诊断各自做到了什么。">
+<h2>01 / 差距从哪里来</h2>
+<p>按 case 拆开后，五个 case 里有四个两种 workflow 的结果完全一样；唯一拉开差距的是 KalmanNet。</p>
+
+<h3>按 case 的判定</h3>
+<p><b>GCN、DLinear、FITS 两者始终一样；SGC 两者在 V1 一起掉进同一个陷阱、在 V2 一起走出来。</b></p>
+<div class="tablewrap"><table>
+<thead><tr><th>Case</th><th>V1 single</th><th>V1 multi</th><th>V2 single</th><th>V2 multi</th></tr></thead>
+<tbody>
+<tr><td>GCN</td><td>3/3</td><td>3/3</td><td>3/3</td><td>3/3</td></tr>
+<tr><td>DLinear</td><td>3/3</td><td>3/3</td><td>3/3</td><td>3/3</td></tr>
+<tr><td><b>KalmanNet</b></td><td><b>3/3</b></td><td><b>1/3</b></td><td><b>1/3</b></td><td><b>2/3</b></td></tr>
+<tr><td>SGC</td><td>0/1</td><td>0/1</td><td>4/4</td><td>4/4</td></tr>
+<tr><td>FITS</td><td>1/1</td><td>1/1</td><td>3/3</td><td>3/3</td></tr>
+</tbody>
+</table></div>
+
+<h3>KalmanNet 的一步推断</h3>
+<p><b>论文只写了 ν = 0 dB、没写噪声的绝对大小；从不需要训练的 KF 值反推出 1/r² = 20 dB 的运行全部 full，没反推的全部 fail。合计两者都是 4/8。</b></p>
+<div class="tablewrap"><table>
+<thead><tr><th>版本</th><th>single 做到反推</th><th>multi 做到反推</th></tr></thead>
+<tbody>
+<tr><td>V0.1 / V0.2</td><td>0/2</td><td>1/2</td></tr>
+<tr><td>V1</td><td>3/3</td><td>1/3</td></tr>
+<tr><td>V2</td><td>1/3</td><td>2/3</td></tr>
+<tr><td><b>合计</b></td><td><b>4/8</b></td><td><b>4/8</b></td></tr>
+</tbody>
+</table></div>
+<p>所以「V1 single 领先、V2 multi 领先」这个表面排名，主要是这一步判断的抽样波动，不是架构差异。两者失败的方式不同：single 偏保守，按论文用 ν = 0 dB，但噪声绝对大小留在仓库默认值，如实报告差异却不修正；multi 的 Result Reviewer 只有一次判断机会，既出现过过于保守（直接把差异交给诊断），也出现过过度修正（V1 r2 按论文正文改了观测矩阵，而正文和论文自己的表格矛盾）。</p>
+<aside class="note" data-label="解读"><b>信息只能往下游流</b>
+<p>V1 KalmanNet multi r0 里，Discrepancy Analyst 准确诊断出「噪声取 0.01 能精确复现论文」，但诊断不能回头改测量，这次运行仍然是 fail。single-agent 在同一个上下文里能反复试错，没有这个问题。这是 multi 架构最明确的改进方向：让诊断发现的设置错误能触发一次重跑。</p>
+</aside>
+</section>
+
+<section id="cost" data-group="拆开看">
+<h2>02 / 花费与效率</h2>
+<p>花费是两种 workflow 之间唯一在每个版本都稳定的差别。</p>
+<div class="tablewrap"><table>
+<thead><tr><th>指标（V2）</th><th>Single</th><th>Multi</th><th>倍数</th></tr></thead>
+<tbody>
+<tr><td>平均用时</td><td>11.1 分钟</td><td>15.4 分钟</td><td>1.4×</td></tr>
+<tr><td>平均花费</td><td>$0.027</td><td>$0.039</td><td>1.4×</td></tr>
+<tr><td>平均 LLM 请求数</td><td>29</td><td>46</td><td>1.6×</td></tr>
+<tr><td>平均工具调用</td><td>44</td><td>76</td><td>1.7×</td></tr>
+</tbody>
+</table></div>
+<p>从 V1 起，multi 每个版本都贵 1.3–1.4 倍，请求数多 1.5–1.7 倍。原因是结构性的：6 个角色各自重新读论文和代码，再加上 pilot 审查和诊断两个阶段。唯一的例外是 V0.1，single 在 macOS 卡死的命令上白等了两次，反而更慢（22.5 对 8.2 分钟）；加入短超时规则后不再出现。</p>
+<p>multi 在用时稳定性上有优势：V1 的 DLinear 上 single 的用时波动很大（±8.2 分钟），multi 只有 ±0.9 分钟。multi 的 Env Agent 会先做 smoke test 并实测运行时间，Executor 的运行一次就能跑通。</p>
+</section>
+
+<section id="diagnosis" data-group="拆开看">
+<h2>03 / 诊断能力</h2>
+<p>两者都能如实发现复现失败；深度上 multi 更强，但更深不等于更准。</p>
+<div class="tablewrap"><table>
+<thead><tr><th>维度</th><th>Single</th><th>Multi</th></tr></thead>
+<tbody>
+<tr><td>检出（V0.2 起）</td><td>25/26</td><td>26/27</td></tr>
+<tr><td>假成功</td><td>1（V1 SGC）</td><td>1（V1 SGC）</td></tr>
+<tr><td>误报</td><td>1（V0.2）</td><td>4（V0.2）</td></tr>
+<tr><td>原因归类：DLinear</td><td>V1 0/2，V2 0/2</td><td>V1 2/3，V2 3/3</td></tr>
+<tr><td>原因归类：KalmanNet</td><td>V1 6/6，V2 6/6</td><td>V1 4/6，V2 2/6</td></tr>
+<tr><td>严格归类</td><td>0</td><td>0.5</td></tr>
+</tbody>
+</table></div>
+<p class="table-cap">两边各漏检的 1 个就是 V1 SGC 的那次假成功。V1 的两次假成功是同一个原因：「2–3% 算一致」这条全局规则把 SGC Citeseer 差 0.7 pp（容差 0.5 pp）判成了一致，V2 改为预注册标准后清零。V0.1 的 multi 诊断报告结论为空、全部无效，检出记 0，属于当时的 schema 问题，V0.2 已修复。</p>
+
+<h3>multi 更深</h3>
+<p><b>multi 的 Discrepancy Analyst 以 high 推理强度运行，每次 17–22 个 shell 调用，会翻 git 历史、做单因素实验。</b></p>
+<p>最深的一次是 V2 DLinear multi r2：它找到 2022 年 8 月的代码更新，隔离出旧代码里一个从不参与计算的 decoder 层，3 个 seed 下结果回到容差内。10 个 seed 复核后，这个层只改变随机数流，不改变结果分布，所以判为方向对、机制错（0.5）。single 的诊断多停在表面：例如 V1 DLinear single r1 分别测了两个改动，单独都没效果，就排除了整个代码版本，而两者合起来才能回到论文的数值。</p>
+
+<h3>但不一定更准</h3>
+<p><b>在 KalmanNet 上，single 的原因归类反而一直更准。</b></p>
+<p>KalmanNet Table VI 的 ground truth 是「论文数字有问题」，同样接受「论文与代码不一致」。single 6 次都选了后者；multi 多次选「论文没写清」，不在可接受范围内。两者都没想到「论文的 EKF 等价于零增益滤波器」这个真正的机制。</p>
+</section>
+
+<section id="confounders" data-group="怎么读这份结果" data-group-note="写报告时必须交代的混杂因素，以及建议的表述。">
+<h2>01 / 混杂因素</h2>
+<div class="tablewrap"><table>
+<thead><tr><th>混杂因素</th><th>影响</th></tr></thead>
+<tbody>
+<tr><td>推理强度不对等：multi 的两个审查角色为 high，single 全程 medium</td><td>multi 的诊断深度至少部分来自「想得更多」，不能全部归功于分工；需要等强度对照来区分</td></tr>
+<tr><td>样本量小：每个版本每格最多 3–4 次，V0–V0.2 只有 1 次</td><td>只能用「倾向」类措辞</td></tr>
+<tr><td>multi 每次用相同 seed</td><td>multi 的重复只反映决策差异，single 的重复还包含训练噪声，方差不能直接比</td></tr>
+<tr><td>评分规则统一，但 agent 看到的 prompt 随版本变化</td><td>跨版本的变化混合了系统改进和随机波动</td></tr>
+<tr><td>benchmark 区分度有限</td><td>5 个 case 里只有 KalmanNet 能拉开两者，其余四个两者都能稳定成功</td></tr>
+</tbody>
+</table></div>
+</section>
+
+<section id="assessment" data-group="怎么读这份结果">
+<h2>02 / 总体判断</h2>
+<ol class="flow steps">
+<li><b>复现</b>在这个 benchmark 上，multi-agent 没有表现出稳定的优势（26/32 对 27/32）；仅有的差距来自一个 case 的一步判断，方向随版本反转。</li>
+<li><b>花费</b>multi-agent 稳定地贵约 1.4 倍，请求数和工具调用多 1.6–1.7 倍。</li>
+<li><b>诊断</b>两者一样诚实；multi 更深入，但原因归类的准确率因 case 而异（DLinear 更好，KalmanNet 更差），都找不到真正的机制。</li>
+<li><b>架构</b>multi 的优势（独立 smoke test、用时稳定、分析员深入）和弱点（一次性判断、信息不能回流）都是结构性的；后者是最明确的改进方向。</li>
+</ol>
+<aside class="clarify"><b>报告里建议的表述</b>
+<p>「在本 benchmark 上，multi-agent 的价值体现在诊断深度和运行稳定性，而不是复现成功率，代价约为 1.4 倍的花费；真正的区分集中在需要判断的设置推断上，两种架构的成功率都在一半左右。」</p>
+</aside>
+<aside class="action"><b>如果要让结论更有说服力</b>
+<ul>
+<li><b>等强度对照：</b>设 <code>P2E_REVIEW_EFFORT=medium</code>，multi 再跑 5 个 case × 3 次（约 4 小时、$0.6），区分「分工」和「推理强度」的贡献。</li>
+<li><b>信息回流：</b>让 Discrepancy Analyst 发现的设置错误能触发一次重跑，只在 KalmanNet 上验证。</li>
+</ul>
+</aside>
+</section>
+
+</article>

@@ -1,0 +1,35 @@
+# Hidden: pre-registered tolerances, computed from the 3 manual re-runs.
+capsule_id: capsule-0152700
+source: core-bench-v1.1-mainline core_test.json
+split: test
+data_sha256: d4aa5ebb984df7f293e04f2dd120722f172fddea6fcb54a0c928e09bc6ef837d
+rule: docs/benchmark-redesign.md section 3.3
+questions:
+- id: q1
+  question: fig are there more than 2 features with accuracy exceeding 0.4? Respond
+    with yes or no.
+  vision: true
+  kind: string
+  scored: true
+- id: q2
+  question: fig which joint has the lowest absolute spearman correlation for acceleration?
+  vision: true
+  kind: string
+  scored: true
+- id: q3
+  question: Given the Kruskal-Wallis for Group 0-2 (Group 1 vs. Group 3), what is
+    the p-value?
+  vision: false
+  kind: numeric
+  scored: true
+  tolerance:
+    mean: 2.341092434893948e-10
+    s: 0.0
+    n: 3
+    m: 1
+    noise: 0.0
+    precision: 5.0e-26
+    floor: 2.3410924348939482e-15
+    h: 2.3410924348939482e-15
+    term: floor
+  alternates_pending: three deterministic p-values in the results; all accepted

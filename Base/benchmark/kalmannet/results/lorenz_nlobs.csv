@@ -1,0 +1,7 @@
+claim,seed,knet_mse_db,baseline,baseline_mse_db,gap_db,train_steps,best_cv_step,wall_s,log
+nlobs_30dB,0,-25.829,EKF,-24.7686,-1.0604,2000,1907,67,results/logs/nlobs_30dB_s0.log
+nlobs_30dB,1,-25.8942,EKF,-24.8901,-1.0041,2000,1997,66,results/logs/nlobs_30dB_s1.log
+nlobs_30dB,2,-26.2618,EKF,-25.4691,-0.7927,2000,1654,70,results/logs/nlobs_30dB_s2.log
+nlobs_10dB,0,-5.7944,EKF,-4.5333,-1.2611,2000,1999,66,results/logs/nlobs_10dB_s0.log
+nlobs_10dB,1,-5.7449,EKF,-4.5232,-1.2217,2000,1999,63,results/logs/nlobs_10dB_s1.log
+nlobs_10dB,2,-6.253,EKF,-5.2429,-1.0101,2000,1999,72,results/logs/nlobs_10dB_s2.log

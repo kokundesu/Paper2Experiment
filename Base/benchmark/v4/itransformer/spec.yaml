@@ -1,0 +1,49 @@
+# ReproSpec (agent-visible, no values). FROZEN: see ../FROZEN.yaml.
+id: itransformer
+title: ''
+objective: 复现 iTransformer（ICLR 2024）在 Exchange 数据集上输入长度 96、预测长度 96 的 MSE 和 MAE（附录的完整结果表，表
+  10）。
+task_prompt: ''
+language: Python
+paper:
+  url: https://arxiv.org/abs/2310.06625
+  pdf: null
+code:
+  repo_url: https://github.com/thuml/iTransformer
+  capsule: null
+questions:
+- id: exchange_96_96_mse
+  text: 附录表 10 中，iTransformer 在 Exchange 数据集、输入长度 96、预测长度 96 的多变量长期预测测试 MSE 是多少？
+  answer_type: number
+  metric: MSE
+  direction: lower
+  unit: ''
+  locator: 附录 F.4 表 10（Full results of the long-term forecasting task），Exchange 数据集分组、预测长度
+    96 行、iTransformer (Ours) 的 MSE 列
+  setting: Exchange；iTransformer 原模型；多变量长期预测；输入长度 96，预测长度 96；按 TimesNet 的时序训练/验证/测试划分协议。对应仓库
+    scripts/multivariate_forecasting/Exchange/iTransformer.sh，而非 Avg 行。
+  runs: 3
+  evidence: log
+- id: exchange_96_96_mae
+  text: 附录表 10 中，iTransformer 在 Exchange 数据集、输入长度 96、预测长度 96 的多变量长期预测测试 MAE 是多少？
+  answer_type: number
+  metric: MAE
+  direction: lower
+  unit: ''
+  locator: 附录 F.4 表 10（Full results of the long-term forecasting task），Exchange 数据集分组、预测长度
+    96 行、iTransformer (Ours) 的 MAE 列
+  setting: Exchange；iTransformer 原模型；多变量长期预测；输入长度 96，预测长度 96；按 TimesNet 的时序训练/验证/测试划分协议。对应仓库
+    scripts/multivariate_forecasting/Exchange/iTransformer.sh，而非 Avg 行。
+  runs: 3
+  evidence: log
+origin:
+  source: user
+  reference: ''
+  prompt: 复现 iTransformer（ICLR 2024）在 Exchange 数据集上输入长度 96、预测长度 96 的 MSE 和 MAE（附录的完整结果表，表
+    10）。
+  drafted_by:
+  - sol
+  checked_by:
+  - sonnet55
+  - haiku55
+  user_confirmed: true

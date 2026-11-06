@@ -1,0 +1,31 @@
+# CORE-Bench v1.1 task as a ReproSpec: what agents see. No answers.
+id: cb-0504157
+title: No Evaluative Conditioning Effects with Briefly Presented Stimuli
+objective: 'Test the computational reproducibility of a scientific capsule (CORE-Bench,
+  Hard level): run its code and answer the questions from the output.'
+task_prompt: Run 'manuscript.Rmd' using Rscript and render it as a pdf. Store the
+  output in the ../results directory. Set clean to 'TRUE'.
+language: R
+paper: null
+code:
+  repo_url: null
+  capsule: capsule-0504157
+questions:
+- id: q1
+  text: fig From figure 1, report the CS presentation time with the greatest mean
+    EC effect (ignore units).
+  answer_type: any
+  metric: ''
+  direction: ''
+  unit: ''
+  locator: program output
+  setting: ''
+  runs: 1
+  evidence: either
+origin:
+  source: corebench
+  reference: core-bench-v1.1-mainline core_test.json sha256:d4aa5ebb984df7f293e04f2dd120722f172fddea6fcb54a0c928e09bc6ef837d
+  prompt: ''
+  drafted_by: []
+  checked_by: []
+  user_confirmed: false

@@ -1,0 +1,172 @@
+# Frozen v4 dataset: specs and paper values. Change nothing below without re-freezing and saying why.
+frozen_at: '2026-10-17T09:43:23'
+code: 5a97f5886c14465f
+decisions:
+  confirmed_by: user
+  date: '2026-10-17'
+  papers:
+    doc2vecc:
+      decision: 表 1 的 include test 列（表示学习时包含测试文档）；草稿已是这一列，不改。
+    pinn_gradpath:
+      decision: 表 2 的 "50 units / 3 hidden layers" 这一行（草稿选的是 50 × 5，改掉）。
+      revise:
+        helmholtz2d_m1_relative_l2_50x5:
+          id: helmholtz2d_m1_relative_l2_50x3
+          text: 二维 Helmholtz 方程实验中，采用每层 50 个单元、3 个隐藏层的 M1 原始 PINN，表 2 所报告的预测解相对 L2
+            误差是多少？
+          locator: 表 2（Helmholtz equation），行“50 units / 3 hidden layers”，列“M1”
+          setting: 二维 Helmholtz 方程；解析解 u(x,y)=sin(πx)sin(4πy)；M1 为原始全连接 PINN，不使用自适应损失权重；50
+            units / 3 hidden layers；40,000 次 Adam 更新。
+        helmholtz2d_m2_relative_l2_50x5:
+          id: helmholtz2d_m2_relative_l2_50x3
+          text: 二维 Helmholtz 方程实验中，采用每层 50 个单元、3 个隐藏层的 M2 PINN（学习率退火算法），表 2 所报告的预测解相对
+            L2 误差是多少？
+          locator: 表 2（Helmholtz equation），行“50 units / 3 hidden layers”，列“M2”
+          setting: 二维 Helmholtz 方程；解析解 u(x,y)=sin(πx)sin(4πy)；M2 为常规全连接 PINN 加自适应学习率退火/损失权重调整；50
+            units / 3 hidden layers；40,000 次 Adam 更新。
+    set_transformer:
+      decision: 表 3 的 LL0/data（不经 EM 更新）；草稿已是这一列，不改。
+    nngp:
+      decision: 表 1 MNIST:1k 的 ReLU 列；草稿已是这一列，不改。
+    appnp:
+      decision: 以论文表 2 的数值为目标；作者的 PyTorch 实现只是运行环境。
+    patchtst:
+      decision: 回看窗口用 104（附录表 9 和仓库 illness.sh）；草稿的 setting 已写明，不改。
+    mc_dropout:
+      decision: 以论文表 1 为目标（论文的调参协议）；仓库 README 里的重跑值只作参考，不计分。
+  protocol:
+    decision: 'Every question: the agent submits 3 runs (seeds). Where the paper averages
+      over data splits, one run is the paper''s full split protocol (its mean over
+      the splits); GPR-GNN and APPNP use 10 splits instead of 100. Where the paper
+      averages over seeds or initialisations, one run is one seed.
+
+      '
+    all_questions:
+      runs: 3
+    splits:
+      gprgnn: 一次运行 = 10 个随机 60/20/20 划分上的平均（论文为 100 个划分）。
+      appnp: 一次运行 = 10 个随机划分上的平均（论文为 100 次）。
+      ngboost: 一次运行 = 论文的完整协议：20 个随机 90/10 划分上的平均。
+      svgd: 一次运行 = 论文的完整协议：20 个随机训练/测试划分上的平均。
+      mc_dropout: 一次运行 = 论文的完整协议：仓库里 20 个固定划分上的平均。
+      ecod: 一次运行 = 论文的完整协议：10 个随机 60/40 划分上的平均。
+papers:
+  bspm:
+    questions:
+    - gowalla_bspm_em_recall20
+    - gowalla_bspm_em_ndcg20
+    spec_sha256: d3977c63ae3b08e64c8004009658621c65805e216101c88c54eee5c3c3441ff1
+    gt_sha256: 21391d9537880464e791f796f1bb16ec78615f06bf73d8cb02c436337b14d7d5
+  ials:
+    questions:
+    - ml1m_ncf_ials_hr10
+    - ml1m_ncf_ials_ndcg10
+    spec_sha256: a0c897dac8b5c427c33613504a78353dae451e4c95e8f55ff612f66398dfa0f3
+    gt_sha256: 73a16a59450bb22d4d62cddb5f746afd5fbdf4b5c94aa62365eec5ce847e1b30
+  gprgnn:
+    questions:
+    - chameleon_gprgnn_dense_mean_accuracy
+    spec_sha256: b8750e85906279cad2d429dc5d9535819dd6882a59715107ff1ff60a7a5cd08e
+    gt_sha256: 252ec315270bb09ec5a529a3bdf868cd786fbe29ed035e586a4884a75289b4b9
+  correct_smooth:
+    questions:
+    - arxiv_plain_linear_cs_autoscale_test_accuracy
+    spec_sha256: 12eb00930f01d15fe37a08fbd9c2792601ff6e72fb91eea0b34ea1d40ad830c3
+    gt_sha256: c9b46b8eb2436c0b8fd3f21fa29eb5008452782daf8432db5e7afbedca7e41fb
+  appnp:
+    questions:
+    - appnp_ms_academic_accuracy
+    spec_sha256: ec20691eb7f2db17a46b87a30b596008547e9f0caaf819fcf8efa4810556e745
+    gt_sha256: 542bcb2da2f56533c22752be2a298ba61aa04cb5b4fdd9bfef28d44495ca8461
+  itransformer:
+    questions:
+    - exchange_96_96_mse
+    - exchange_96_96_mae
+    spec_sha256: 7615fe2623b6af845033de8ef1b4c0a13d7fea22b2b620676b8ffb2b262b37a3
+    gt_sha256: 6b9ad4701000b4e502b6e08723054ffbaf9808ae61de1184dbdf8ef0fa355c77
+  tstcc:
+    questions:
+    - epilepsy_ts_tcc_linear_acc
+    - epilepsy_ts_tcc_linear_mf1
+    spec_sha256: a292c579f6dc95ea2bb30b747536e9e0deaa354fcf89db3d1aec74cd3341bcc9
+    gt_sha256: 1d1ffebed25ffc317059b56430a0658e5bf3559cec56b1dd7578205dabf3c9b4
+  ts2vec:
+    questions:
+    - ecg200_accuracy_b8
+    - gunpoint_accuracy_b8
+    - italypowerdemand_accuracy_b8
+    - twoleadecg_accuracy_b8
+    - chinatown_accuracy_b8
+    spec_sha256: e1175558e947c3f2200b068e177ea20a8d0ce6c8b72b2041f6cadc9c98febf49
+    gt_sha256: c8c95e828474ed69a7fd441c0fc02212d9a3f3ed2c98335a2c898c6fd5262a46
+  cyclenet:
+    questions:
+    - weather_96_96_mlp_mse
+    - weather_96_96_mlp_mae
+    spec_sha256: 77c2120e32f080481b2da0a7ec8685dc4c5a0823b450e7f515306ac5f70766f2
+    gt_sha256: 5fad071e2a9cb2231c16836e8b6939200ff981faa54ba67cd8f9593f2336231a
+  patchtst:
+    questions:
+    - ili_24_patchtst42_mse
+    - ili_24_patchtst42_mae
+    spec_sha256: 8388622cde5e8b4590ebd41b81c48978e9200e5d0d5c0f75e18c4876aa0929f2
+    gt_sha256: 1280d82b2e44f13be2f4c9bd4fad2f48ea585602cb518565a81331c0990737c1
+  ngboost:
+    questions:
+    - concrete_ngboost_nll
+    - concrete_ngboost_rmse
+    spec_sha256: f0a61620903dc756c88e6c69f0c7fd17ead1aeffeab5c6be3a8d712b94ba9f32
+    gt_sha256: 694dc88d363ef749b36fa48178c88d19edf991f5e13eca65c0c062a969294e8e
+  ecod:
+    questions:
+    - cardio_ecod_roc_auc
+    - breastw_ecod_roc_auc
+    - mammography_ecod_roc_auc
+    spec_sha256: b45636a5dd4474f7b739c31056ea262bf21782a9ebbd7ceeb16affb481eff919
+    gt_sha256: 7e9d5f72f2af37a52df8267c49bc4fbe1003cc0c4f0d44e69cb4d2c7cf80865e
+  svgd:
+    questions:
+    - boston_bnn_svgd_test_rmse
+    - boston_bnn_svgd_test_log_likelihood
+    spec_sha256: d7438aa2313d2601e35948e7b0848d39d703acf0036c19f6a00b146a15390433
+    gt_sha256: b957f4c07484688e61f73a5b41b74afdb4c6946fc33c6ad79ca9be6b14d2aa2f
+  mc_dropout:
+    questions:
+    - boston_mc_dropout_test_rmse
+    - boston_mc_dropout_test_ll
+    spec_sha256: 2731e491b174adaa23fbda5ef759c6b91631f4fa643b29448d880ffd5ec220cd
+    gt_sha256: adb879e605b3b903dd370caaf767bb0fc708eb260950fb04c6d7ea6cf3aafb0f
+  fairbatch:
+    questions:
+    - synthetic_fairbatch_eo_accuracy
+    - synthetic_fairbatch_eo_disparity
+    spec_sha256: 344917c21cec350d6f31b508e1ad88ec3faa9887865186e859cd7db16800431a
+    gt_sha256: 0adec551d62b42e147af69f012f16ab5eb483ba7be17ab548c124d3b404c1546
+  doc2vecc:
+    questions:
+    - imdb_doc2vecc_include_test_error
+    spec_sha256: 706b1e283039b7ed8e9a0fd1c8b8922a3a55bbe659a63386bb33aa945d0bfb37
+    gt_sha256: 3a054b62bb798dbe4d625b95d8b25e5c471cd4622eb6afffe7c9c7a5791dc17f
+  pinn_gradpath:
+    questions:
+    - helmholtz2d_m1_relative_l2_50x3
+    - helmholtz2d_m2_relative_l2_50x3
+    spec_sha256: fc7436170c9c0ec966954483f78b8c3ab007cfa38b0bebc3a91437d7a71cc8d6
+    gt_sha256: 485dc86d693ccf75af6b7aac3860f72df35c34a2ec8217812553a71983c73994
+  set_transformer:
+    questions:
+    - synthetic_2d_isab16_pma_ll0_per_data
+    spec_sha256: 59b157401a92c48db73b3caf5d01de1079244ff274c401d97a667fa7e1164936
+    gt_sha256: 2d485fd48b1333676e1428dc9e5e04ed5e1e79551e25726facf40de9fa975ab3
+  nngp:
+    questions:
+    - mnist_1k_relu_nngp_test_accuracy
+    spec_sha256: d529ce8f8119a0dc08a3b574f5f0e04735004438008e45ef9c2eda8d738f4456
+    gt_sha256: 03427b6626e70da4d2e32dfcc721105b6c811a0dc145de9daa07fe33a8e2d03b
+  am_tsp:
+    questions:
+    - tsp20_am_greedy_mean_tour_length
+    - tsp50_am_greedy_mean_tour_length
+    - tsp100_am_greedy_mean_tour_length
+    spec_sha256: 7a1ed61268ba663553206ddbe48861439dda5013b0a5e0110f1484390426203f
+    gt_sha256: 549a272aaa65297d64a7ccbf718e1932c6011c1aca92687c80978f3fe4503fd9

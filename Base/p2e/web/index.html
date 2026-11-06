@@ -1,0 +1,499 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Paper2Experiment · 运行监控</title>
+<style>
+/* Layout: control room. Top bar with two views; the live view is a run list on the left and a pipeline +
+   event feed on the right; the comparison view is a filter bar and stacked panels. Colours are tokens. */
+:root {
+  --bg: #F3F5F7; --surface: #FFFFFF; --sunk: #E9EDF1; --ink: #17212B; --muted: #5B6875; --line: #D6DDE4;
+  --accent: #1E5BB8; --accent-soft: #E2EBF8; --accent-ink: #FFFFFF;
+  --ok: #1D7A4E; --ok-soft: #DFF1E7; --bad: #B23A30; --bad-soft: #F7E3E1; --warn: #9A6400; --warn-soft: #FAEFD6;
+  --single: #6B7A89; --multi: #1E5BB8;
+  --font-body: "Noto Sans SC", "PingFang SC", "Hiragino Sans GB", -apple-system, system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --r: 8px;
+}
+@media (prefers-color-scheme: dark) { :root {
+  --bg: #0F1419; --surface: #161D24; --sunk: #1C252E; --ink: #E5EAF0; --muted: #94A2AF; --line: #2A3540;
+  --accent: #78A6F0; --accent-soft: #1A2A42; --accent-ink: #0F1419;
+  --ok: #5EC390; --ok-soft: #12301F; --bad: #EF7B70; --bad-soft: #3A1D1A; --warn: #E1A63C; --warn-soft: #362710;
+  --single: #9AA8B6; --multi: #78A6F0; color-scheme: dark } }
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { height: 100%; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 14px/1.6 var(--font-body); }
+button, select, input { font: inherit; color: inherit; }
+button:focus-visible, select:focus-visible, input:focus-visible, a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+code, .mono { font-family: var(--font-mono); font-size: .92em; }
+h1, h2, h3 { margin: 0; font-weight: 600; }
+h2 { font-size: 16px; } h3 { font-size: 14px; }
+.muted { color: var(--muted); }
+.pill { display: inline-block; font: 500 11.5px/1.7 var(--font-mono); padding: 0 8px; border-radius: 999px; white-space: nowrap; vertical-align: middle; }
+.pill.ok { background: var(--ok-soft); color: var(--ok); } .pill.bad { background: var(--bad-soft); color: var(--bad); }
+.pill.warn { background: var(--warn-soft); color: var(--warn); } .pill.info { background: var(--accent-soft); color: var(--accent); }
+.pill.dim { background: var(--sunk); color: var(--muted); }
+.dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--muted); margin-right: 6px; vertical-align: 1px; }
+.dot.running { background: var(--accent); animation: pulse 1.2s ease-in-out infinite; }
+.dot.done { background: var(--ok); } .dot.error, .dot.aborted { background: var(--bad); }
+@keyframes pulse { 0%, 100% { opacity: 1 } 50% { opacity: .3 } }
+@media (prefers-reduced-motion: reduce) { .dot.running { animation: none } }
+
+.bar { background: var(--surface); border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 5; }
+.bar .in { max-width: 1440px; margin: 0 auto; padding: 8px 20px; display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+.brand { font-weight: 600; font-size: 15px; }
+.tabs { display: inline-flex; border: 1px solid var(--line); border-radius: 999px; padding: 3px; background: var(--bg); gap: 2px; }
+.tabs button { border: 0; background: transparent; padding: 5px 14px; border-radius: 999px; cursor: pointer; color: var(--muted); }
+.tabs button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+.bar .status { margin-left: auto; font-size: 12.5px; color: var(--muted); display: flex; gap: 12px; align-items: center; }
+
+.wrap { max-width: 1440px; margin: 0 auto; padding: 16px 20px 48px; }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 14px 16px; min-width: 0; }
+.panel + .panel, .stack > * + * { margin-top: 14px; }
+.panel h2 { margin-bottom: 10px; }
+.btn { border: 1px solid var(--line); background: var(--surface); padding: 5px 12px; border-radius: 6px; cursor: pointer; }
+.btn:hover { border-color: var(--accent); color: var(--accent); }
+.btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.btn:disabled { opacity: .45; cursor: default; }
+.btn.small { padding: 2px 8px; font-size: 12px; }
+select, input[type=number] { border: 1px solid var(--line); background: var(--bg); border-radius: 6px; padding: 5px 8px; }
+.tablewrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 13px; font-variant-numeric: tabular-nums; }
+th, td { text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-weight: 500; color: var(--muted); font-size: 12px; background: var(--sunk); white-space: nowrap; }
+tr:last-child td { border-bottom: 0; }
+.empty { color: var(--muted); padding: 18px 0; text-align: center; }
+
+/* live view */
+.live { display: grid; grid-template-columns: 360px minmax(0, 1fr); gap: 14px; align-items: start; }
+.launch { display: grid; gap: 8px; }
+.launch .row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.launch select, .launch input { flex: 1 1 90px; min-width: 0; }
+.launches { display: grid; gap: 6px; font-size: 12.5px; }
+.launches div { display: flex; gap: 8px; align-items: center; justify-content: space-between; background: var(--sunk); border-radius: 6px; padding: 5px 8px; }
+.runlist { display: grid; gap: 6px; max-height: 60vh; overflow-y: auto; }
+.runitem { text-align: left; border: 1px solid var(--line); background: var(--bg); border-radius: 6px; padding: 8px 10px; cursor: pointer; display: grid; gap: 2px; }
+.runitem:hover { border-color: var(--accent); }
+.runitem[aria-pressed="true"] { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent) inset; }
+.runitem .top { display: flex; gap: 8px; align-items: center; justify-content: space-between; }
+.runitem .name { font: 500 12px var(--font-mono); overflow-wrap: anywhere; }
+.runitem .sub { font-size: 12px; color: var(--muted); display: flex; gap: 10px; flex-wrap: wrap; }
+.filters { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; font-size: 12.5px; color: var(--muted); margin-bottom: 8px; }
+
+.head { display: flex; gap: 14px; align-items: baseline; flex-wrap: wrap; }
+.head h2 { font-size: 18px; }
+.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px; margin-top: 10px; }
+.kpi { background: var(--sunk); border-radius: 6px; padding: 8px 10px; display: grid; gap: 1px; }
+.kpi b { font-size: 18px; font-weight: 600; font-variant-numeric: tabular-nums; } .kpi span { font-size: 12px; color: var(--muted); }
+.meter { height: 6px; background: var(--sunk); border-radius: 3px; overflow: hidden; margin-top: 6px; }
+.meter i { display: block; height: 100%; background: var(--accent); }
+
+.pipe { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; }
+.stage { border: 1px solid var(--line); border-radius: 6px; padding: 8px 10px; display: grid; gap: 3px; background: var(--bg); position: relative; min-width: 0; }
+.stage .n { font: 500 11px var(--font-mono); color: var(--muted); letter-spacing: .06em; }
+.stage .t { font-weight: 500; font-size: 13px; line-height: 1.35; }
+.stage .s { font-size: 12px; color: var(--muted); }
+.stage.running { border-color: var(--accent); background: var(--accent-soft); }
+.stage.done { border-color: var(--ok); }
+.stage.done .n { color: var(--ok); }
+.stage.skipped { opacity: .55; }
+.stage.llm .t::after { content: " · LLM"; font: 500 10.5px var(--font-mono); color: var(--accent); }
+
+.feed { display: grid; gap: 4px; max-height: 62vh; overflow-y: auto; font-size: 12.5px; padding-right: 4px; }
+.ev { display: grid; grid-template-columns: 62px 150px minmax(0, 1fr); gap: 10px; padding: 5px 8px; border-radius: 6px; background: var(--bg); border-left: 3px solid var(--line); min-width: 0; }
+.ev .time { font: 11.5px var(--font-mono); color: var(--muted); }
+.ev .who { font: 500 12px var(--font-mono); color: var(--muted); overflow-wrap: anywhere; }
+.ev .body { min-width: 0; overflow-wrap: anywhere; }
+.ev.response { border-left-color: var(--accent); } .ev.tool_result { border-left-color: var(--line); }
+.ev.run { border-left-color: var(--ok); } .ev.submit { border-left-color: var(--warn); }
+.ev.start, .ev.end { border-left-color: var(--muted); background: var(--sunk); }
+.ev.err { border-left-color: var(--bad); }
+.chip { display: inline-block; font: 11.5px var(--font-mono); background: var(--sunk); border-radius: 4px; padding: 0 6px; margin: 1px 4px 1px 0; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; vertical-align: bottom; }
+.ev details { margin-top: 2px; } .ev summary { cursor: pointer; color: var(--muted); font-size: 12px; }
+.ev pre { margin: 4px 0 0; white-space: pre-wrap; font: 11.5px/1.5 var(--font-mono); background: var(--sunk); padding: 6px 8px; border-radius: 4px; max-height: 240px; overflow: auto; }
+.files { display: flex; gap: 6px; flex-wrap: wrap; }
+.viewer pre { margin: 8px 0 0; white-space: pre-wrap; font: 12px/1.5 var(--font-mono); background: var(--sunk); padding: 10px; border-radius: 6px; max-height: 50vh; overflow: auto; }
+
+/* compare view */
+.cmpbar { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+.cmpgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px; margin-top: 14px; }
+.vs { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 4px 12px; align-items: center; font-size: 13px; }
+.vs .h { font: 500 11.5px var(--font-mono); color: var(--muted); letter-spacing: .06em; }
+.vs .v { font-variant-numeric: tabular-nums; text-align: right; font-weight: 500; }
+.vs .v.s { color: var(--single); } .vs .v.m { color: var(--multi); }
+.chart svg { width: 100%; height: auto; display: block; }
+.chart text { fill: var(--muted); font: 11px var(--font-mono); }
+.legend { display: flex; gap: 14px; font-size: 12.5px; color: var(--muted); flex-wrap: wrap; margin-bottom: 6px; }
+.sw { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; vertical-align: -1px; }
+.claimrow { display: grid; grid-template-columns: 230px minmax(0, 1fr); gap: 12px; align-items: center; padding: 6px 0; border-bottom: 1px solid var(--line); }
+.claimrow:last-child { border-bottom: 0; }
+.claimrow .lab { font-size: 12.5px; } .claimrow .lab b { display: block; font-family: var(--font-mono); font-weight: 500; }
+.claimrow svg { width: 100%; height: 34px; display: block; }
+
+@media (max-width: 960px) {
+  .live { grid-template-columns: minmax(0, 1fr); }
+  .runlist { max-height: 40vh; }
+  .ev { grid-template-columns: 54px minmax(0, 1fr); } .ev .who { grid-column: 2; } .ev .body { grid-column: 1 / -1; }
+  .claimrow { grid-template-columns: minmax(0, 1fr); }
+}
+</style>
+</head>
+<body>
+<div class="bar"><div class="in">
+  <span class="brand">Paper2Experiment</span>
+  <div class="tabs" role="tablist">
+    <button type="button" role="tab" data-view="live" aria-pressed="true">实时工作流</button>
+    <button type="button" role="tab" data-view="compare" aria-pressed="false">Single vs Multi 对比</button>
+  </div>
+  <div class="status"><span id="st-key"></span><span id="st-poll" class="mono"></span></div>
+</div></div>
+
+<div class="wrap">
+
+<!-- ======================= live ======================= -->
+<section id="view-live" class="live">
+  <div class="stack">
+    <div class="panel">
+      <h2>启动一次运行</h2>
+      <div class="launch">
+        <div class="row">
+          <select id="l-case" aria-label="case"></select>
+          <select id="l-wf" aria-label="workflow">
+            <option value="multi">multi-agent</option><option value="single">single-agent</option><option value="deterministic">deterministic</option>
+          </select>
+          <input id="l-rep" type="number" min="1" max="10" value="1" aria-label="重复次数" title="重复次数">
+          <button type="button" class="btn primary" id="l-go">启动</button>
+        </div>
+        <div class="muted" id="l-msg" style="font-size:12.5px"></div>
+        <div class="launches" id="launches"></div>
+      </div>
+    </div>
+    <div class="panel">
+      <h2>运行记录</h2>
+      <div class="filters">
+        <label><input type="checkbox" id="f-running"> 只看进行中</label>
+        <select id="f-case" aria-label="按 case 筛选"><option value="">全部 case</option></select>
+        <select id="f-wf" aria-label="按 workflow 筛选"><option value="">全部 workflow</option><option value="single">single</option><option value="multi">multi</option><option value="deterministic">deterministic</option></select>
+        <span id="f-count"></span>
+      </div>
+      <div class="runlist" id="runlist"></div>
+    </div>
+  </div>
+
+  <div class="stack" id="detail">
+    <div class="panel empty">左边选一次运行，或启动一次新的。进行中的运行会每 2 秒刷新。</div>
+  </div>
+</section>
+
+<!-- ======================= compare ======================= -->
+<section id="view-compare" hidden>
+  <div class="panel cmpbar">
+    <h2 style="margin:0">Single-agent 与 multi-agent</h2>
+    <label>版本 <select id="c-ver"><option value="">全部</option></select></label>
+    <label>Case <select id="c-case"><option value="">全部</option></select></label>
+    <span class="muted" id="c-n"></span>
+    <span class="muted" style="margin-left:auto;font-size:12.5px">所有运行都用当前的评估器和 case.yaml 重新打分</span>
+  </div>
+  <div class="cmpgrid" id="c-kpis"></div>
+  <div class="cmpgrid">
+    <div class="panel chart"><h2>各版本判定 full 的比例</h2>
+      <div class="legend"><span><i class="sw" style="background:var(--single)"></i>single</span><span><i class="sw" style="background:var(--multi)"></i>multi</span><span>柱上是 full 次数 / 运行次数</span></div>
+      <div id="c-chart" role="img" aria-label="各版本 single 与 multi 完全复现比例"></div>
+    </div>
+    <div class="panel"><h2>按 case 的判定（full / 运行数）</h2><div class="tablewrap"><table id="c-case-table"><thead><tr><th>Case</th><th>single</th><th>multi</th><th>deterministic</th></tr></thead><tbody></tbody></table></div></div>
+  </div>
+  <div class="panel" style="margin-top:14px"><h2>每个 claim 的测量值</h2>
+    <div class="legend"><span><i class="sw" style="background:var(--single)"></i>single 每次运行的聚合值</span><span><i class="sw" style="background:var(--multi)"></i>multi</span><span><i class="sw" style="background:var(--ok-soft);border:1px solid var(--ok)"></i>容差带</span><span>竖线 = 论文值；空心点 = 该次未通过（含证据无效）</span></div>
+    <div id="c-claims"></div>
+  </div>
+  <div class="panel" style="margin-top:14px"><h2>这些运行</h2><div class="tablewrap"><table id="c-runs"><thead><tr><th>运行</th><th>版本</th><th>case</th><th>workflow</th><th>判定</th><th>分钟</th><th>$</th><th>检出</th><th>假成功</th><th>误报</th></tr></thead><tbody></tbody></table></div></div>
+</section>
+
+</div>
+
+<script>
+(function () {
+"use strict";
+var $ = function (s, r) { return (r || document).querySelector(s); };
+var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+function esc(s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+function api(path, opts) { return fetch(path, opts).then(function (r) { return r.json(); }); }
+function fmtDur(s) { if (s == null) return "–"; s = Math.round(s); if (s < 60) return s + " s"; var m = Math.floor(s / 60); return m < 60 ? m + " 分 " + (s % 60) + " 秒" : Math.floor(m / 60) + " 时 " + (m % 60) + " 分"; }
+function fmtUsd(x) { return x == null ? "–" : "$" + (+x).toFixed(3); }
+function fmtNum(x, d) { return x == null ? "–" : (+x).toFixed(d == null ? 4 : d).replace(/\.?0+$/, ""); }
+function clock(t) { if (!t) return ""; var d = new Date(t * 1000); return d.toTimeString().slice(0, 8); }
+function fmtTol(tol, unit) { tol = tol || {}; if (tol.abs != null) return "±" + fmtNum(tol.abs) + (unit === "%" ? " pp" : unit ? " " + unit : ""); if (tol.rel != null) return "±" + fmtNum(tol.rel * 100, 2) + "%（相对）"; if (tol.factor != null) return "×" + fmtNum(tol.factor) + " 以内"; return "–"; }
+var STAGE = {
+  paper_analyst: ["Paper Analyst", "读论文 → paper_spec"], env_agent: ["Env Agent", "克隆、建环境、冒烟测试"],
+  planner: ["Planner", "每个 claim × seed 一条命令"], executor_pilot: ["Executor · 试跑", "每个 claim 先跑一个 seed"],
+  result_reviewer: ["Result Reviewer", "对照论文查设置"], executor_rest: ["Executor · 其余 seed", "失败时调用 Debugger"],
+  discrepancy_analyst: ["Discrepancy Analyst", "判断差异、诊断原因"], evaluator: ["Evaluator", "不用 LLM：判定 + 诊断打分"],
+  single_agent: ["Single agent", "一个 agent 做完全部"], deterministic: ["克隆 · 安装 · 跑 README", "不用 LLM"]
+};
+var LLM = { paper_analyst: 1, env_agent: 1, planner: 1, result_reviewer: 1, discrepancy_analyst: 1, single_agent: 1 };
+var STATE = { pending: "等待", running: "进行中", done: "完成", skipped: "跳过" };
+var RUNSTATE = { running: ["进行中", "info"], done: ["完成", "ok"], error: ["出错", "bad"], aborted: ["中断", "dim"] };
+var VERDICT = { full: "ok", partial: "warn", fail: "bad" };
+
+/* ------------------------------------------------ views */
+var view = "live";
+$$("[data-view]").forEach(function (b) { b.addEventListener("click", function () {
+  view = b.dataset.view;
+  $$("[data-view]").forEach(function (x) { x.setAttribute("aria-pressed", x === b ? "true" : "false"); });
+  $("#view-live").hidden = view !== "live"; $("#view-compare").hidden = view !== "compare";
+  if (view === "compare") loadCompare();
+  try { localStorage.setItem("p2e-view", view); } catch (e) {}
+}); });
+
+/* ------------------------------------------------ cases + launcher */
+var cases = [];
+api("/api/cases").then(function (d) {
+  cases = d.cases || [];
+  $("#l-case").innerHTML = cases.map(function (c) { return "<option>" + esc(c) + "</option>"; }).join("");
+  $("#f-case").innerHTML += cases.map(function (c) { return "<option>" + esc(c) + "</option>"; }).join("");
+  $("#st-key").innerHTML = d.api_key ? '<span class="pill ok">OPENAI_API_KEY 已设置</span>' : '<span class="pill warn">没有 OPENAI_API_KEY：只能跑 deterministic</span>';
+  renderLaunches(d.launches || []);
+});
+$("#l-go").addEventListener("click", function () {
+  var body = { case: $("#l-case").value, workflow: $("#l-wf").value, repeats: +$("#l-rep").value || 1 };
+  $("#l-go").disabled = true; $("#l-msg").textContent = "正在启动…";
+  api("/api/start", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) }).then(function (d) {
+    $("#l-go").disabled = false;
+    if (d.error) { $("#l-msg").textContent = "启动失败：" + d.error; return; }
+    $("#l-msg").textContent = "已启动 pid " + d.pid + "（" + body.case + " / " + body.workflow + " × " + body.repeats + "）。几秒后会出现在运行记录里。";
+    $("#f-running").checked = true; followNewest = true;
+    poll();
+  });
+});
+function renderLaunches(list) {
+  $("#launches").innerHTML = list.slice().reverse().map(function (l) {
+    return "<div><span><span class='dot " + (l.alive ? "running" : (l.exit_code === 0 ? "done" : "error")) + "'></span><span class='mono'>" + esc(l.case + " / " + l.workflow) + (l.repeats > 1 ? " × " + l.repeats : "") + "</span> <span class='muted'>pid " + l.pid + (l.alive ? "" : " · 退出 " + l.exit_code) + "</span></span>" +
+      (l.alive ? "<button type='button' class='btn small' data-stop='" + l.pid + "'>停止</button>" : "") + "</div>";
+  }).join("");
+  $$("[data-stop]").forEach(function (b) { b.addEventListener("click", function () {
+    if (b.dataset.confirm) { api("/api/stop", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ pid: +b.dataset.stop }) }).then(poll); }
+    else { b.dataset.confirm = "1"; b.textContent = "确认停止？"; setTimeout(function () { delete b.dataset.confirm; b.textContent = "停止"; }, 3000); }
+  }); });
+}
+
+/* ------------------------------------------------ run list */
+var runs = [], selected = null, followNewest = false, serverNow = 0;
+["#f-running", "#f-case", "#f-wf"].forEach(function (s) { $(s).addEventListener("change", renderRuns); });
+function renderRuns() {
+  var onlyRun = $("#f-running").checked, fc = $("#f-case").value, fw = $("#f-wf").value;
+  var list = runs.filter(function (r) { return (!onlyRun || r.status === "running") && (!fc || r.case === fc) && (!fw || r.workflow === fw); });
+  list.sort(function (a, b) { return (b.status === "running") - (a.status === "running") || (a.name < b.name ? 1 : -1); });
+  $("#f-count").textContent = list.length + " / " + runs.length;
+  $("#runlist").innerHTML = list.length ? list.map(function (r) {
+    var rs = RUNSTATE[r.status] || [r.status, "dim"];
+    var sub = r.status === "running" ? (r.stage ? "阶段：" + (STAGE[r.stage] || [r.stage])[0] : "启动中") + (r.started ? " · " + fmtDur(serverNow - r.started) : "")
+                                     : (r.claims ? "claim " + r.claims + " · " : "") + fmtDur(r.wall_s) + " · " + fmtUsd(r.usd);
+    return "<button type='button' class='runitem' data-run='" + esc(r.name) + "'" + (r.name === selected ? " aria-pressed='true'" : "") + ">" +
+      "<div class='top'><span><span class='dot " + r.status + "'></span><b>" + esc(r.case) + "</b> · " + esc(r.workflow) + " <span class='pill dim'>" + esc(r.version) + "</span></span>" +
+      (r.verdict ? "<span class='pill " + VERDICT[r.verdict] + "'>" + r.verdict + "</span>" : "<span class='pill " + rs[1] + "'>" + rs[0] + "</span>") + "</div>" +
+      "<div class='name'>" + esc(r.name) + "</div><div class='sub'><span>" + esc(sub) + "</span>" + (r.error ? "<span style='color:var(--bad)'>" + esc(r.error).slice(0, 80) + "</span>" : "") + "</div></button>";
+  }).join("") : "<div class='empty'>没有符合筛选的运行</div>";
+  $$(".runitem").forEach(function (b) { b.addEventListener("click", function () { followNewest = false; select(b.dataset.run); }); });
+}
+
+/* ------------------------------------------------ detail */
+var detail = null, feedFilter = "", autoScroll = true, openFile = null;
+function select(name) {
+  if (name !== selected) { detail = null; openFile = null; }
+  selected = name; renderRuns();
+  loadDetail(0);
+}
+function loadDetail(since) {
+  if (!selected) return;
+  var name = selected;
+  api("/api/runs/" + encodeURIComponent(name) + "?since=" + (since || 0)).then(function (d) {
+    if (name !== selected) return;
+    if (d.error) { $("#detail").innerHTML = "<div class='panel empty'>" + esc(d.error) + "</div>"; return; }
+    serverNow = d.now || serverNow;
+    if (since > 0 && detail) { var ev = detail.events.concat(d.events); d.events = ev; }
+    detail = d; renderDetail();
+  });
+}
+function renderDetail() {
+  var d = detail; if (!d) return;
+  var rs = RUNSTATE[d.status] || [d.status, "dim"], s = d.summary;
+  var spent = d.spent_usd || 0, budget = d.budget_usd || 5;
+  var feed = $("#feed"), atBottom = !feed || feed.scrollHeight - feed.scrollTop - feed.clientHeight < 40;
+  var head =
+    "<div class='panel'><div class='head'><h2>" + esc(d.case) + " · " + esc(d.workflow) + "</h2>" +
+    (s ? "<span class='pill " + VERDICT[s.verdict] + "'>" + s.verdict + "</span>" : "") + "<span class='pill " + rs[1] + "'>" + rs[0] + "</span>" +
+    "<span class='mono muted' style='font-size:12px'>" + esc(d.name) + "</span></div>" +
+    "<div class='kpis'><div class='kpi'><b>" + fmtDur(d.elapsed_s) + "</b><span>" + (d.status === "running" ? "已运行" : "总用时") + "</span></div>" +
+    "<div class='kpi'><b>" + fmtUsd(spent) + "</b><span>花费 / 上限 " + fmtUsd(budget) + "</span><div class='meter'><i style='width:" + Math.min(100, spent / budget * 100) + "%'></i></div></div>" +
+    "<div class='kpi'><b>" + (s ? s.llm.requests : "–") + "</b><span>LLM 请求</span></div><div class='kpi'><b>" + (s ? s.llm.tool_calls : "–") + "</b><span>工具调用</span></div>" +
+    "<div class='kpi'><b>" + d.total_events + "</b><span>trace 事件</span></div><div class='kpi'><b>" + esc(d.model || "–") + "</b><span>模型</span></div></div>" +
+    (s && s.error ? "<p style='color:var(--bad);margin:10px 0 0'>错误：" + esc(s.error) + "</p>" : "") + "</div>";
+
+  var pipe = "<div class='panel'><h2>工作流阶段</h2><div class='pipe'>" + d.stages.map(function (st, i) {
+    var lab = STAGE[st.key] || [st.key, ""], extra = [];
+    if (st.started) extra.push(st.ended ? fmtDur(st.ended - st.started) : (st.state === "running" ? fmtDur(serverNow - st.started) : ""));
+    if (st.cost_usd != null) extra.push(fmtUsd(st.cost_usd));
+    if (st.requests != null) extra.push(st.requests + " 请求 · " + st.tool_calls + " 工具");
+    if (st.runs != null) extra.push(st.runs + " 次实验");
+    if (st.debuggers && st.debuggers.length) extra.push("Debugger × " + st.debuggers.length);
+    return "<div class='stage " + st.state + (LLM[st.key] ? " llm" : "") + "'><span class='n'>" + (i + 1) + " · " + STATE[st.state] + "</span><span class='t'>" + esc(lab[0]) + "</span><span class='s'>" + esc(lab[1]) + "</span>" + (extra.length ? "<span class='s mono'>" + esc(extra.join(" · ")) + "</span>" : "") + "</div>";
+  }).join("") + "</div></div>";
+
+  var gt = d.claims_gt || {}, ids = Object.keys(gt).length ? Object.keys(gt) : Object.keys(d.measured || {});
+  var claims = "<div class='panel'><h2>Claims</h2><div class='tablewrap'><table><thead><tr><th>claim</th><th>论文值</th><th>容差</th><th>测到的值（每个 seed）</th><th>聚合</th><th>判定</th></tr></thead><tbody>" +
+    ids.map(function (id) {
+      var g = gt[id] || {}, sc = s && s.claims[id], vals = (d.measured || {})[id] || [];
+      var verdict = sc ? (g.diagnostic_only ? "<span class='pill info'>仅诊断</span> " : "") + (sc.pass ? "<span class='pill ok'>通过</span>" : "<span class='pill bad'>不通过</span>") + (sc.reason ? "<div class='muted' style='font-size:12px'>" + esc(sc.reason).slice(0, 160) + "</div>" : "")
+                       : (g.diagnostic_only ? "<span class='pill info'>仅诊断</span> " : "") + "<span class='pill dim'>" + (vals.length ? vals.length + " 个值" : "等待") + "</span>";
+      return "<tr><td class='mono'>" + esc(id) + (g.setting ? "<div class='muted' style='font-size:11.5px;font-family:var(--font-body)'>" + esc(g.setting) + "</div>" : "") + "</td><td class='mono'>" + fmtNum(g.target) + (g.unit ? " " + esc(g.unit) : "") + "</td><td class='mono' title='" + esc(g.describe || "") + "'>" + esc(fmtTol(g.tolerance, g.unit)) + "</td>" +
+        "<td class='mono'>" + (vals.length ? vals.map(function (v) { return fmtNum(v); }).join(", ") : (sc && sc.n ? sc.n + " 个值" : "–")) + "</td><td class='mono'>" + (sc ? fmtNum(sc.value) : "–") + "</td><td>" + verdict + "</td></tr>";
+    }).join("") + "</tbody></table></div>" +
+    (s && s.diagnosis && s.diagnosis.present ? "<p class='muted' style='margin:10px 0 0;font-size:12.5px'>诊断：检出 " + s.diagnosis.n_detected + "/" + s.diagnosis.n_failing + " · 假成功 " + s.diagnosis.false_success.length + " · 原因归类 " + s.diagnosis.n_attribution_correct + "/" + s.diagnosis.n_attributed + " · 严格归类 " + s.diagnosis.n_strict_correct + "/" + s.diagnosis.n_attributed + "</p>" : "") + "</div>";
+
+  var agents = {}; d.events.forEach(function (e) { agents[e.agent] = 1; });
+  var feedHtml = "<div class='panel'><div class='filters' style='justify-content:space-between'><div style='display:flex;gap:8px;align-items:center'><h2 style='margin:0'>事件流</h2><select id='feed-filter'><option value=''>全部角色</option>" + Object.keys(agents).map(function (a) { return "<option" + (a === feedFilter ? " selected" : "") + ">" + esc(a) + "</option>"; }).join("") + "</select><span>" + (d.total_events > d.events.length ? "显示最后 " + d.events.length + " / " + d.total_events + " 条" : d.events.length + " 条") + "</span></div>" +
+    "<label><input type='checkbox' id='feed-auto'" + (autoScroll ? " checked" : "") + "> 自动滚到最新</label></div><div class='feed' id='feed'>" +
+    d.events.filter(function (e) { return !feedFilter || e.agent === feedFilter; }).map(renderEvent).join("") + "</div></div>";
+
+  var files = "<div class='panel viewer'><h2>各阶段的产出</h2><div class='files'>" + (d.files || []).map(function (f) { return "<button type='button' class='btn small" + (f === openFile ? " primary" : "") + "' data-file='" + esc(f) + "'>" + esc(f) + "</button>"; }).join("") +
+    (d.files && d.files.length ? "" : "<span class='muted'>还没有</span>") + "</div><div id='file-view'></div></div>";
+
+  $("#detail").innerHTML = head + pipe + claims + feedHtml + files;
+  $("#feed-filter").addEventListener("change", function () { feedFilter = this.value; renderDetail(); });
+  $("#feed-auto").addEventListener("change", function () { autoScroll = this.checked; });
+  $$("[data-file]").forEach(function (b) { b.addEventListener("click", function () { openFile = b.dataset.file; showFile(); }); });
+  if (openFile) showFile();
+  var f2 = $("#feed"); if (f2 && autoScroll && (atBottom || since0)) f2.scrollTop = f2.scrollHeight;
+  since0 = false;
+}
+var since0 = true;
+function showFile() {
+  $$("[data-file]").forEach(function (b) { b.classList.toggle("primary", b.dataset.file === openFile); });
+  fetch("/api/runs/" + encodeURIComponent(selected) + "/file/" + openFile).then(function (r) { return r.text(); }).then(function (t) {
+    try { t = JSON.stringify(JSON.parse(t), null, 2); } catch (e) {}
+    var v = $("#file-view"); if (v) v.innerHTML = "<pre>" + esc(t) + "</pre>";
+  });
+}
+function renderEvent(e) {
+  var body = "", cls = e.event;
+  if (e.event === "response") {
+    body = (e.text ? "<div>" + esc(e.text) + "</div>" : "") + (e.tool_calls || []).map(function (c) { return "<span class='chip' title='" + esc(c.input) + "'>" + esc(c.name) + "(" + esc(c.input) + ")</span>"; }).join("");
+    if (!body) body = "<span class='muted'>（空回复）</span>";
+    body = "<span class='muted mono' style='font-size:11px'>turn " + e.turn + "</span> " + body;
+  } else if (e.event === "tool_result") {
+    if (e.is_error) cls += " err";
+    body = "<span class='chip'>" + esc(e.tool) + (e.is_error ? " ✗" : "") + "</span><details><summary>输出 " + (e.output || "").length + " 字符</summary><pre>" + esc(e.output) + "</pre></details>";
+  } else if (e.event === "run") {
+    var ok = e.exit_code === 0 && e.value != null;
+    body = "<b>" + esc(e.claim_id) + "</b> seed " + e.seed + " → <b class='mono'>" + (e.value == null ? "无值" : fmtNum(e.value)) + "</b> <span class='muted'>exit " + e.exit_code + " · " + fmtDur(e.duration_s) + (e.attempts > 1 ? " · " + e.attempts + " 次尝试" : "") + " · " + esc(e.log_path) + "</span><details><summary>命令</summary><pre>" + esc(e.command) + "</pre></details>";
+    if (!ok) cls += " err";
+  } else if (e.event === "start") {
+    body = e.agent === "runner" ? "运行开始 · " + esc(e.case) + " / " + esc(e.workflow) + " · " + esc(e.model) + " · 预算 " + fmtUsd(e.budget_usd) : "▶ 开始 · " + esc(e.model || "") + (e.effort ? " · effort " + esc(e.effort) : "");
+  } else if (e.event === "end") {
+    body = e.agent === "runner" ? "运行结束 · 判定 <b>" + esc(e.verdict || "") + "</b>" : "■ 结束 · " + fmtUsd(e.cost_usd) + (e.requests != null ? " · " + e.requests + " 请求 · " + e.tool_calls + " 工具调用" : "") + (e.wall_s != null ? " · " + fmtDur(e.wall_s) : "") + (e.run_spent_usd != null ? " · 累计 " + fmtUsd(e.run_spent_usd) : "");
+  } else if (e.event === "submit") {
+    body = "提交结构化结果 <details><summary>内容</summary><pre>" + esc(e.output) + "</pre></details>";
+  } else { body = esc(e.detail || e.event); }
+  return "<div class='ev " + cls + "'><span class='time'>" + clock(e.t) + "</span><span class='who'>" + esc(e.agent) + "</span><div class='body'>" + body + "</div></div>";
+}
+
+/* ------------------------------------------------ polling */
+var timer = null;
+function poll() {
+  api("/api/runs").then(function (d) {
+    if (d.error) return;
+    runs = d.runs || []; serverNow = d.now || Date.now() / 1000;
+    renderLaunches(d.launches || []);
+    if (followNewest) { var r = runs.filter(function (x) { return x.status === "running"; }).sort(function (a, b) { return a.name < b.name ? 1 : -1; })[0]; if (r && r.name !== selected) select(r.name); }
+    renderRuns();
+    var sel = runs.filter(function (x) { return x.name === selected; })[0];
+    if (sel && detail) {
+      if (sel.status === "running" || detail.status === "running") loadDetail(detail.total_events);
+    }
+    var running = runs.filter(function (x) { return x.status === "running"; }).length;
+    $("#st-poll").textContent = (running ? running + " 个进行中 · " : "") + "刷新 " + clock(serverNow);
+  }).catch(function () { $("#st-poll").textContent = "服务不可达"; });
+}
+function schedule() { clearInterval(timer); timer = setInterval(function () { if (view === "live") poll(); }, 2000); }
+poll(); schedule();
+
+/* ------------------------------------------------ compare */
+var cmp = null;
+["#c-ver", "#c-case"].forEach(function (s) { $(s).addEventListener("change", loadCompare); });
+function loadCompare() {
+  $("#c-n").textContent = "计算中…";
+  api("/api/compare?version=" + encodeURIComponent($("#c-ver").value) + "&case=" + encodeURIComponent($("#c-case").value)).then(function (d) {
+    if (d.error) { $("#c-n").textContent = d.error; return; }
+    cmp = d;
+    fillSelect($("#c-ver"), d.versions, d.version); fillSelect($("#c-case"), d.cases, d.case);
+    $("#c-n").textContent = d.n_runs + " 次已完成的运行";
+    renderCompare();
+  });
+}
+function fillSelect(sel, items, cur) {
+  var first = sel.options[0].outerHTML;
+  sel.innerHTML = first + items.map(function (v) { return "<option" + (v === cur ? " selected" : "") + ">" + esc(v) + "</option>"; }).join("");
+  sel.value = cur || "";
+}
+function pct(a, n) { return n ? Math.round(a / n * 100) + "%" : "–"; }
+function renderCompare() {
+  var d = cmp, S = d.by_workflow.single, M = d.by_workflow.multi;
+  function row(label, fs, fm) { return "<span class='h'>" + label + "</span><span class='v s'>" + fs + "</span><span class='v m'>" + fm + "</span>"; }
+  function card(title, rows) { return "<div class='panel'><h2>" + title + "</h2><div class='vs'><span></span><span class='v s'>single</span><span class='v m'>multi</span>" + rows + "</div></div>"; }
+  if (!S && !M) { $("#c-kpis").innerHTML = "<div class='panel empty'>这个筛选下没有 single / multi 的运行</div>"; }
+  else {
+    S = S || {}; M = M || {};
+    var f = function (a, k, fmt) { return a.n ? (fmt ? fmt(a[k]) : a[k]) : "–"; };
+    $("#c-kpis").innerHTML =
+      card("复现", row("判定 full", (S.full || 0) + "/" + (S.n || 0) + " (" + pct(S.full, S.n) + ")", (M.full || 0) + "/" + (M.n || 0) + " (" + pct(M.full, M.n) + ")") + row("partial / fail", (S.partial || 0) + " / " + (S.fail || 0), (M.partial || 0) + " / " + (M.fail || 0))) +
+      card("花费与效率（每次运行均值）", row("用时", f(S, "wall_min", function (x) { return x == null ? "–" : x.toFixed(1) + " 分"; }), f(M, "wall_min", function (x) { return x == null ? "–" : x.toFixed(1) + " 分"; })) + row("花费", f(S, "usd", fmtUsd), f(M, "usd", fmtUsd)) + row("LLM 请求", f(S, "requests", function (x) { return x == null ? "–" : x.toFixed(0); }), f(M, "requests", function (x) { return x == null ? "–" : x.toFixed(0); })) + row("工具调用", f(S, "tool_calls", function (x) { return x == null ? "–" : x.toFixed(0); }), f(M, "tool_calls", function (x) { return x == null ? "–" : x.toFixed(0); }))) +
+      card("诊断", row("检出（失败 claim 被标出）", (S.detected || 0) + "/" + (S.failing || 0), (M.detected || 0) + "/" + (M.failing || 0)) + row("假成功", S.false_success || 0, M.false_success || 0) + row("误报", S.false_alarm || 0, M.false_alarm || 0) + row("原因归类正确", (S.attribution_correct || 0) + "/" + (S.attributed || 0), (M.attribution_correct || 0) + "/" + (M.attributed || 0)) + row("严格归类（自动匹配，未人工复核）", (S.strict_correct || 0) + "/" + (S.attributed || 0), (M.strict_correct || 0) + "/" + (M.attributed || 0)));
+  }
+  // version chart
+  var V = d.by_version.filter(function (v) { return v.single.n || v.multi.n; });
+  var W = 560, H = 230, L = 40, R = 10, T = 24, B = 32, ih = H - T - B, gw = (W - L - R) / Math.max(1, V.length), bw = Math.min(30, gw / 3);
+  var y = function (p) { return T + ih * (1 - p); }, g = '<svg viewBox="0 0 ' + W + ' ' + H + '">';
+  [0, 0.5, 1].forEach(function (p) { g += '<line x1="' + L + '" x2="' + (W - R) + '" y1="' + y(p) + '" y2="' + y(p) + '" stroke="var(--line)"/><text x="' + (L - 6) + '" y="' + (y(p) + 4) + '" text-anchor="end">' + Math.round(p * 100) + '%</text>'; });
+  V.forEach(function (v, i) {
+    var cx = L + gw * i + gw / 2;
+    [["single", "var(--single)", -bw / 2 - 2], ["multi", "var(--multi)", bw / 2 + 2]].forEach(function (k) {
+      var a = v[k[0]]; if (!a.n) return;
+      var p = a.full / a.n, x = cx + k[2] - bw / 2;
+      g += '<rect x="' + x + '" y="' + y(p) + '" width="' + bw + '" height="' + Math.max(1, ih * p) + '" rx="2" fill="' + k[1] + '"/><text x="' + (x + bw / 2) + '" y="' + (y(p) - 5) + '" text-anchor="middle">' + a.full + '/' + a.n + '</text>';
+    });
+    g += '<text x="' + cx + '" y="' + (H - 10) + '" text-anchor="middle">' + esc(v.version) + '</text>';
+  });
+  $("#c-chart").innerHTML = V.length ? g + "</svg>" : "<div class='empty'>没有数据</div>";
+  // per case
+  $("#c-case-table tbody").innerHTML = Object.keys(d.by_case).map(function (c) {
+    var r = d.by_case[c]; return "<tr><td><b>" + esc(c) + "</b></td>" + ["single", "multi", "deterministic"].map(function (wf) { var a = r[wf]; return "<td class='mono'>" + (a.n ? a.full + "/" + a.n : "–") + "</td>"; }).join("") + "</tr>";
+  }).join("") || "<tr><td colspan='4' class='empty'>没有数据</td></tr>";
+  // claims dot plot
+  $("#c-claims").innerHTML = d.claims.map(function (c) {
+    var t = c.target, tol = c.tolerance || {}, lo, hi;
+    if (tol.abs != null) { lo = t - tol.abs; hi = t + tol.abs; } else if (tol.rel != null) { lo = t - Math.abs(t) * tol.rel; hi = t + Math.abs(t) * tol.rel; } else if (tol.factor != null) { lo = Math.min(t / tol.factor, t * tol.factor); hi = Math.max(t / tol.factor, t * tol.factor); } else { lo = hi = t; }
+    var all = [lo, hi, t]; ["single", "multi"].forEach(function (wf) { c.values[wf].forEach(function (v) { all.push(v.value); }); });
+    var mn = Math.min.apply(null, all), mx = Math.max.apply(null, all), pad = (mx - mn || Math.abs(t) * 0.05 || 1) * 0.12; mn -= pad; mx += pad;
+    var X = function (v) { return 6 + (v - mn) / (mx - mn) * 588; };
+    var svg = '<svg viewBox="0 0 600 34" preserveAspectRatio="none"><rect x="' + X(lo) + '" y="8" width="' + Math.max(1, X(hi) - X(lo)) + '" height="18" fill="var(--ok-soft)" stroke="var(--ok)"/><line x1="' + X(t) + '" x2="' + X(t) + '" y1="4" y2="30" stroke="var(--ink)" stroke-width="1.5"/>';
+    [["single", "var(--single)", 12], ["multi", "var(--multi)", 22]].forEach(function (k) {
+      c.values[k[0]].forEach(function (v) { svg += '<circle cx="' + X(v.value) + '" cy="' + k[2] + '" r="4.5" fill="' + (v.pass ? k[1] : "var(--surface)") + '" stroke="' + k[1] + '" stroke-width="1.5"><title>' + esc(k[0] + " · " + v.run + " · " + fmtNum(v.value) + (v.pass ? "" : " · 未通过")) + '</title></circle>'; });
+    });
+    svg += "</svg>";
+    var n = c.values.single.length + c.values.multi.length;
+    return "<div class='claimrow'><div class='lab'><b>" + esc(c.case + " · " + c.claim) + "</b>论文值 " + fmtNum(t) + (c.unit ? " " + esc(c.unit) : "") + " · 容差 " + esc(fmtTol(c.tolerance, c.unit)) + (c.diagnostic_only ? " · <span class='pill info'>仅诊断</span>" : "") + " · " + n + " 次测量</div>" + svg + "</div>";
+  }).join("") || "<div class='empty'>没有数据</div>";
+  // runs table
+  $("#c-runs tbody").innerHTML = d.runs.slice().sort(function (a, b) { return a.run < b.run ? 1 : -1; }).map(function (r) {
+    return "<tr><td class='mono'>" + esc(r.run) + "</td><td>" + esc(r.version) + "</td><td>" + esc(r.case) + "</td><td>" + esc(r.workflow) + "</td><td><span class='pill " + VERDICT[r.verdict] + "'>" + r.verdict + "</span></td><td class='mono'>" + r.wall_min.toFixed(1) + "</td><td class='mono'>" + fmtUsd(r.usd) + "</td><td class='mono'>" + r.detected + "/" + r.failing + "</td><td class='mono'>" + r.false_success + "</td><td class='mono'>" + r.false_alarm + "</td></tr>";
+  }).join("");
+}
+
+var startView = "live"; try { startView = localStorage.getItem("p2e-view") || "live"; } catch (e) {}
+if (startView === "compare") $("[data-view=compare]").click();
+})();
+</script>
+</body>
+</html>

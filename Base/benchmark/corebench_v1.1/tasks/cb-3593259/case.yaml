@@ -1,0 +1,13 @@
+# Hidden: pre-registered tolerances, computed from the 3 manual re-runs.
+capsule_id: capsule-3593259
+source: core-bench-v1.1-mainline core_test.json
+split: test
+data_sha256: d4aa5ebb984df7f293e04f2dd120722f172fddea6fcb54a0c928e09bc6ef837d
+rule: docs/benchmark-redesign.md section 3.3
+questions:
+- id: q1
+  question: fig From the violin plot of the energy comsumption of tap, report the
+    name of the framework that consumes the most energy.
+  vision: true
+  kind: string
+  scored: true

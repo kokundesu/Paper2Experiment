@@ -1,0 +1,30 @@
+RUN name=main_unknown_x0_uniform100 code=main inv_r2_db=30 seed=0 opts=[--data randinit_uniform]
+CONFIG {'inv_r2_db': 30.0, 'nu_db': 0.0, 'seed': 0, 'N_T': 200, 'T': 20, 'data': 'randinit_uniform', 'long_T': 2000, 'burn': 0, 'init_var': 100.0, 'ekf_init': 'm1x_0', 'P0': 0.0, 'q_scale': 1.0, 'r_scale': 1.0, 'h_jac': 'correct', 'tag': 'main_unknown_x0_uniform100'}
+data: x0 mean |x0| = 95.71, mean |x_t| over test set = 233.24, test shape (200, 3, 20)
+Extended Kalman Filter - MSE LOSS: tensor(32.7443) [dB]
+RESULT tag=main_unknown_x0_uniform100 inv_r2_db=30.0 seed=0 ekf_dB=32.744 mean_of_dB=28.105 median_dB=28.124 n_nonfinite=0 mean_rho=233.24 max_abs_K=3.53
+RUN name=main_unknown_x0_uniform100 code=main inv_r2_db=30 seed=1 opts=[--data randinit_uniform]
+CONFIG {'inv_r2_db': 30.0, 'nu_db': 0.0, 'seed': 1, 'N_T': 200, 'T': 20, 'data': 'randinit_uniform', 'long_T': 2000, 'burn': 0, 'init_var': 100.0, 'ekf_init': 'm1x_0', 'P0': 0.0, 'q_scale': 1.0, 'r_scale': 1.0, 'h_jac': 'correct', 'tag': 'main_unknown_x0_uniform100'}
+data: x0 mean |x0| = 96.33, mean |x_t| over test set = 222.68, test shape (200, 3, 20)
+Extended Kalman Filter - MSE LOSS: tensor(31.6408) [dB]
+RESULT tag=main_unknown_x0_uniform100 inv_r2_db=30.0 seed=1 ekf_dB=31.641 mean_of_dB=28.275 median_dB=28.574 n_nonfinite=0 mean_rho=222.68 max_abs_K=3.33
+RUN name=main_unknown_x0_uniform100 code=main inv_r2_db=30 seed=2 opts=[--data randinit_uniform]
+CONFIG {'inv_r2_db': 30.0, 'nu_db': 0.0, 'seed': 2, 'N_T': 200, 'T': 20, 'data': 'randinit_uniform', 'long_T': 2000, 'burn': 0, 'init_var': 100.0, 'ekf_init': 'm1x_0', 'P0': 0.0, 'q_scale': 1.0, 'r_scale': 1.0, 'h_jac': 'correct', 'tag': 'main_unknown_x0_uniform100'}
+data: x0 mean |x0| = 94.39, mean |x_t| over test set = 231.49, test shape (200, 3, 20)
+Extended Kalman Filter - MSE LOSS: tensor(31.3334) [dB]
+RESULT tag=main_unknown_x0_uniform100 inv_r2_db=30.0 seed=2 ekf_dB=31.333 mean_of_dB=27.940 median_dB=28.879 n_nonfinite=0 mean_rho=231.49 max_abs_K=3.51
+RUN name=main_unknown_x0_uniform100 code=main inv_r2_db=10 seed=0 opts=[--data randinit_uniform]
+CONFIG {'inv_r2_db': 10.0, 'nu_db': 0.0, 'seed': 0, 'N_T': 200, 'T': 20, 'data': 'randinit_uniform', 'long_T': 2000, 'burn': 0, 'init_var': 100.0, 'ekf_init': 'm1x_0', 'P0': 0.0, 'q_scale': 1.0, 'r_scale': 1.0, 'h_jac': 'correct', 'tag': 'main_unknown_x0_uniform100'}
+data: x0 mean |x0| = 95.71, mean |x_t| over test set = 233.66, test shape (200, 3, 20)
+Extended Kalman Filter - MSE LOSS: tensor(32.5807) [dB]
+RESULT tag=main_unknown_x0_uniform100 inv_r2_db=10.0 seed=0 ekf_dB=32.581 mean_of_dB=28.085 median_dB=28.124 n_nonfinite=0 mean_rho=233.66 max_abs_K=3.57
+RUN name=main_unknown_x0_uniform100 code=main inv_r2_db=10 seed=1 opts=[--data randinit_uniform]
+CONFIG {'inv_r2_db': 10.0, 'nu_db': 0.0, 'seed': 1, 'N_T': 200, 'T': 20, 'data': 'randinit_uniform', 'long_T': 2000, 'burn': 0, 'init_var': 100.0, 'ekf_init': 'm1x_0', 'P0': 0.0, 'q_scale': 1.0, 'r_scale': 1.0, 'h_jac': 'correct', 'tag': 'main_unknown_x0_uniform100'}
+data: x0 mean |x0| = 96.33, mean |x_t| over test set = 222.30, test shape (200, 3, 20)
+Extended Kalman Filter - MSE LOSS: tensor(31.6740) [dB]
+RESULT tag=main_unknown_x0_uniform100 inv_r2_db=10.0 seed=1 ekf_dB=31.674 mean_of_dB=28.262 median_dB=28.518 n_nonfinite=0 mean_rho=222.30 max_abs_K=3.32
+RUN name=main_unknown_x0_uniform100 code=main inv_r2_db=10 seed=2 opts=[--data randinit_uniform]
+CONFIG {'inv_r2_db': 10.0, 'nu_db': 0.0, 'seed': 2, 'N_T': 200, 'T': 20, 'data': 'randinit_uniform', 'long_T': 2000, 'burn': 0, 'init_var': 100.0, 'ekf_init': 'm1x_0', 'P0': 0.0, 'q_scale': 1.0, 'r_scale': 1.0, 'h_jac': 'correct', 'tag': 'main_unknown_x0_uniform100'}
+data: x0 mean |x0| = 94.39, mean |x_t| over test set = 231.75, test shape (200, 3, 20)
+Extended Kalman Filter - MSE LOSS: tensor(31.3962) [dB]
+RESULT tag=main_unknown_x0_uniform100 inv_r2_db=10.0 seed=2 ekf_dB=31.396 mean_of_dB=27.970 median_dB=28.900 n_nonfinite=0 mean_rho=231.75 max_abs_K=3.43

@@ -1,0 +1,37 @@
+# ReproSpec (agent-visible, no values). FROZEN: see ../FROZEN.yaml.
+id: set_transformer
+title: ''
+objective: 复现 Set Transformer（ICML 2019）在摊销聚类任务（2D、4 个高斯的混合）上 ISAB(16)+PMA 的每点对数似然（表
+  3）。
+task_prompt: ''
+language: Python
+paper:
+  url: https://arxiv.org/abs/1810.00825
+  pdf: null
+code:
+  repo_url: https://github.com/juho-lee/set_transformer
+  capsule: null
+questions:
+- id: synthetic_2d_isab16_pma_ll0_per_data
+  text: 在二维合成四高斯混合的摊销聚类任务中，ISAB(16)+PMA 直接预测混合模型参数后、未经 EM 更新时，测试集平均每点对数似然是多少？
+  answer_type: number
+  metric: LL0/data（平均每点对数似然，未经过 EM 更新）
+  direction: higher
+  unit: ''
+  locator: 正文表 3（Meta clustering results），Synthetic 数据集，ISAB (16) + PMA (ours) 行，LL0/data
+    列；补充材料表 5 的同名行列亦有列出
+  setting: Synthetic 2D mixtures of Gaussians；每个输入集合包含 100–500 个二维点，来自四个高斯分量；编码器为使用
+    16 个诱导点的 ISAB，解码器为使用四个种子向量的 PMA；测试时不进行后续 EM 更新。
+  runs: 3
+  evidence: log
+origin:
+  source: user
+  reference: ''
+  prompt: 复现 Set Transformer（ICML 2019）在摊销聚类任务（2D、4 个高斯的混合）上 ISAB(16)+PMA 的每点对数似然（表
+    3）。
+  drafted_by:
+  - sol
+  checked_by:
+  - sonnet55
+  - haiku55
+  user_confirmed: true

@@ -1,0 +1,68 @@
+# Benchmark case: hidden ground truth for the evaluator. Agents never see this file
+# (they get task.yaml instead).
+id: l2o_wmmse
+paper:
+  title: "Learning to Optimize: Training Deep Neural Networks for Interference Management"
+  authors: "Sun, Chen, Shi, Hong, Fu & Sidiropoulos"
+  venue: "IEEE Transactions on Signal Processing 66(20), 2018 (earlier version: SPAWC 2017)"
+  arxiv: "1705.09412"
+repo:
+  url: https://github.com/Haoran-S/TSP-DNN
+  commit: 674df88eadd5567818ef592d2b58603c83b0a2e8
+  note: >
+    Official code (old URL Haoran-S/SPAWC2017 redirects here). Already uses
+    tensorflow.compat.v1 since a 2021 community PR. Ships pre-trained checkpoints
+    for K=10/20/30 (DNNmodel/), a toy demo.py (K=10, 25k samples, 100 epochs) and
+    test.py (evaluates the checkpoints on only 1,000 test samples). There is no
+    script that trains the Table I models; the agent must assemble one from
+    demo.py + the paper's Sec. V.
+difficulty: medium
+expected_runtime_cpu_min: 17   # longest single run (K=30, 1e6 samples, 120 epochs) on an M4 CPU
+
+# Paper Table I ("Sum-Rate and Computational Performance for Gaussian IC"), 10,000 test samples.
+# A claim is reproduced when the mean over seeds is within tolerance:
+#   abs: |mean - value| <= abs      rel: |mean - value| / |value| <= rel
+#   factor: value / factor <= mean <= value * factor   (for error metrics / timings)
+# evidence_pattern matches the training trace only (2026-10-05): the value itself must also appear in the same
+# log, which the evaluator checks separately. Patterns that also pinned the final print line failed a correct
+# FITS run whose agent had (legitimately) patched the output format.
+claims:
+  - {id: k10_dnn_pct, metric: sum_rate_ratio, setting: gaussian_ic_K10, unit: "%", value: 98.33, tolerance: {abs: 2.0}, evidence_pattern: "epoch:\\d+"}
+  - {id: k20_dnn_pct, metric: sum_rate_ratio, setting: gaussian_ic_K20, unit: "%", value: 92.04, tolerance: {abs: 2.0}, evidence_pattern: "epoch:\\d+"}
+  - {id: k30_dnn_pct, metric: sum_rate_ratio, setting: gaussian_ic_K30, unit: "%", value: 84.29, tolerance: {abs: 2.0}, evidence_pattern: "epoch:\\d+"}
+  # 17.98 s (WMMSE, Python) / 0.047 s (DNN), total CPU time over the 10,000 K=10 test samples
+  - {id: k10_speedup_py, metric: cpu_time_speedup, setting: gaussian_ic_K10, unit: "x", value: 382.6, tolerance: {factor: 3.0}, evidence_pattern: "epoch:\\d+"}
+
+rubric:
+  min_seeds: 3
+  levels:
+    full: "all claims within tolerance"
+    partial: "at least one claim within tolerance"
+    fail: "no claim reproduced or run did not finish"
+  tolerance_justification: >
+    Seed std of the from-scratch DNN/WMMSE ratio is only 0.02-0.13 pp (fixed data, 3 seeds), but
+    the authors' own released checkpoints, evaluated with the official code on fresh 10k test sets,
+    already differ from Table I by -0.5 / +0.6 / +1.4 pp (K=10/20/30), and training length / LR
+    schedule are unspecified in the paper (300 vs 200 epochs moved K=20 by +0.3 pp). The WMMSE
+    stopping rule in the code (100 it, 1e-3) differs from the paper's (500 it, 1e-5), shifting the
+    WMMSE reference by ~0.2-0.3 %. 2.0 pp covers these setup ambiguities while still failing a
+    clearly undertrained or mis-specified network (e.g. a 1e5-sample / 10-epoch smoke run gave 84.7 %
+    at K=10; an undertrained K=30 net whose outputs all fall below 0.5 gives 0 %). The speed-up is hardware- and load-dependent (we saw
+    a 3x spread in the Python WMMSE time across runs on the same machine), hence factor 3.
+
+# Known obstacles on a modern environment (Python 3.11, TF 2.21, NumPy 2.4, Matplotlib 3.11)
+known_issues:
+  - "NumPy 2.x: perf_eval passes np.random.rand(K,1) into math.log2 -> `TypeError: only 0-dimensional arrays can be converted to Python scalars`; use np.random.rand(K)."
+  - "Matplotlib >= 3.6: `OSError: 'seaborn-deep' is not a valid package style`; use 'seaborn-v0_8-deep' (or skip plotting)."
+  - "TF1 API is already wrapped in tensorflow.compat.v1 + disable_v2_behavior() in the repo (2021 PR); works on TF 2.21 with deprecation warnings only."
+  - "No Table I training script: test.py only evaluates the shipped checkpoints, and on 1,000 test samples (paper: 10,000); demo.py trains a K=10 toy model (25k samples, 100 epochs, batch 200; README claims ~94 %), not the paper setup."
+  - "Architecture mismatch: paper Sec. V-B says 3 hidden layers x 200 neurons; code and shipped checkpoints use 200-80-80."
+  - "Paper setup: 1e6 training samples, 1e4 test samples, batch 1000, lr 0.001, RMSprop(0.9), LR decayed when validation stalls; epoch count not given (code default 300, demo 100). The code's LRdecay=1 is lr/(epoch+1), not plateau decay."
+  - "Python WMMSE data generation is slow (~0.35/1.1/2.2 ms per sample for K=10/20/30, i.e. up to ~40 min for 1e6 samples at K=30); a vectorised WMMSE (bit-identical labels) makes it 1-2 min."
+  - "Memory: 1e6 x 900 float64 inputs for K=30 is 7.2 GB and df.train makes another copy; store float32 / sample-major on a 16 GB machine."
+  - "df.train gathers minibatches from a transposed (non-contiguous) array; at K=30 this makes training ~5x slower on CPU. np.ascontiguousarray fixes it without changing results."
+  - "df.train crashes with `ZeroDivisionError: integer modulo by zero` when training_epochs < 10 (epoch % int(epochs/10))."
+  - "No seeding of TF in df.train; multi-seed runs need tf.set_random_seed in the caller."
+  - "DNN outputs must be binarised at 0.5 (test(..., binary=1)) to match Table I; early in training all outputs are < 0.5, giving a 0 % sum-rate ratio, which is a correct but alarming-looking number."
+  - "CPU-time speed-up must be measured on 10,000 samples: with test.py's 1,000 samples, fixed TF session overhead dominates the DNN time and the speed-up drops to ~50x at K=10."
+  - "Trap: evaluating the shipped checkpoints (DNNmodel/) is not training from scratch; it gives 97.8 / 92.7 / 85.6 %, close to Table I, so an agent that only runs test.py looks successful."

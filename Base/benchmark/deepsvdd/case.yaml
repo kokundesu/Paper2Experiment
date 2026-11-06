@@ -1,0 +1,38 @@
+# Benchmark case: hidden ground truth for the evaluator. Agents never see this file.
+# Held-out case for v3.0-heldout (added 2026-10-15). Written from the paper and the repository's README, file
+# listing and logging lines only: no code of this paper was run before the tolerance was fixed (pre-registered).
+id: deepsvdd
+paper:
+  title: "Deep One-Class Classification"
+  authors: "Ruff, Vandermeulen, Görnitz, Deecke, Siddiqui, Binder, Müller, Kloft"
+  venue: "ICML 2018 (PMLR 80)"
+repo:
+  url: https://github.com/lukasruff/Deep-SVDD-PyTorch
+  note: >
+    The first author's PyTorch implementation of the paper (the experiments in the paper were run with the
+    authors' earlier Theano code). src/main.py (click CLI: dataset, net, xp_path, data_path, --objective, --lr,
+    --n_epochs, --lr_milestone, --pretrain, --ae_* options, --normal_class, --seed; -1 = no seed) logs
+    "Epoch i/n  Time ..  Loss .." and "Test set AUC: xx.xx%". README's MNIST example: one-class, lr 1e-4,
+    150 epochs with milestone 50, AE pretraining 150 epochs, batch 200, weight decay 0.5e-6 / AE 0.5e-3.
+    The paper (Sec. 4.1) instead describes a two-phase schedule, lr 1e-4 then 1e-5, DCAE 250 + 100 epochs and
+    Deep SVDD 150 + 100 epochs: the official command and the paper text disagree.
+difficulty: medium
+expected_runtime_cpu_min: 30  # estimate, not measured: LeNet-type AE + encoder on ~6k MNIST images, 300+ epochs
+
+# Table 1, One-Class Deep SVDD column, MNIST: class 0 98.0 +- 0.7, class 3 91.9 +- 1.5 (AUC %, std over 10 seeds).
+# evidence_pattern: the trainer's per-epoch trace ("Epoch 3/150 ... Loss: ..."), case-insensitive.
+claims:
+  - {id: mnist0_auc, metric: test_auc, setting: "Table 1, One-Class Deep SVDD, MNIST, class 0", unit: "%", value: 98.0, tolerance: {abs: 0.7}, evidence_pattern: "(?i)\\bepoch\\b\\W{0,3}\\d+[^\\n]{0,80}\\bloss\\b"}
+  - {id: mnist3_auc, metric: test_auc, setting: "Table 1, One-Class Deep SVDD, MNIST, class 3", unit: "%", value: 91.9, tolerance: {abs: 1.5}, evidence_pattern: "(?i)\\bepoch\\b\\W{0,3}\\d+[^\\n]{0,80}\\bloss\\b"}
+
+rubric:
+  min_seeds: 3
+  aggregate: mean
+  levels:
+    full: "all verdict claims within tolerance (diagnostic_only claims excluded)"
+    partial: "at least one verdict claim within tolerance"
+    fail: "no verdict claim reproduced or run did not finish"
+  tolerance_justification: >
+    Pre-registered rule for held-out cases: when the paper reports a spread, the mean over the seed runs must lie
+    within one reported standard deviation (0.7 / 1.5 pp, over 10 seeds) of the paper value. Fixed before any run
+    of this paper.

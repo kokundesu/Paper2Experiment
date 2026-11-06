@@ -1,0 +1,66 @@
+# cmd (cwd scratch copy of manual/SGC): HYPEROPT_FMIN_SEED=3 python tuning.py --dataset citeseer --epochs 100
+0.0470s
+Validation Accuracy: 0.6960 Test Accuracy: 0.6800
+Pre-compute time: 0.0470s, train time: 0.0525s, total: 0.0996s
+  0%|          | 0/60 [00:00<?, ?trial/s, best loss=?]                                                      weight decay: 1.98e-05 accuracy: 0.7140
+  0%|          | 0/60 [00:00<?, ?trial/s, best loss=?]                                                      weight decay: 6.95e-06 accuracy: 0.6960
+  2%|▏         | 1/60 [00:00<00:05, 11.52trial/s, best loss: -0.714]                                                                    weight decay: 3.81e-09 accuracy: 0.6260
+  3%|▎         | 2/60 [00:00<00:03, 16.53trial/s, best loss: -0.714]  5%|▌         | 3/60 [00:00<00:02, 24.76trial/s, best loss: -0.714]                                                                    weight decay: 7.63e-06 accuracy: 0.7000
+  5%|▌         | 3/60 [00:00<00:02, 24.76trial/s, best loss: -0.714]                                                                    weight decay: 1.66e-08 accuracy: 0.6260
+  7%|▋         | 4/60 [00:00<00:02, 24.76trial/s, best loss: -0.714]                                                                    weight decay: 7.19e-10 accuracy: 0.6260
+  8%|▊         | 5/60 [00:00<00:02, 24.76trial/s, best loss: -0.714] 10%|█         | 6/60 [00:00<00:02, 25.48trial/s, best loss: -0.714]                                                                    weight decay: 3.45e-08 accuracy: 0.6380
+ 10%|█         | 6/60 [00:00<00:02, 25.48trial/s, best loss: -0.714]                                                                    weight decay: 1.49e-09 accuracy: 0.6260
+ 12%|█▏        | 7/60 [00:00<00:02, 25.48trial/s, best loss: -0.714]                                                                    weight decay: 1.38e-08 accuracy: 0.6280
+ 13%|█▎        | 8/60 [00:00<00:02, 25.48trial/s, best loss: -0.714] 15%|█▌        | 9/60 [00:00<00:01, 26.89trial/s, best loss: -0.714]                                                                    weight decay: 1.04e-08 accuracy: 0.6260
+ 15%|█▌        | 9/60 [00:00<00:01, 26.89trial/s, best loss: -0.714]                                                                    weight decay: 1.54e-08 accuracy: 0.6340
+ 17%|█▋        | 10/60 [00:00<00:01, 26.89trial/s, best loss: -0.714]                                                                     weight decay: 2.01e-07 accuracy: 0.6520
+ 18%|█▊        | 11/60 [00:00<00:01, 26.89trial/s, best loss: -0.714] 20%|██        | 12/60 [00:00<00:01, 26.26trial/s, best loss: -0.714]                                                                     weight decay: 8.07e-08 accuracy: 0.6420
+ 20%|██        | 12/60 [00:00<00:01, 26.26trial/s, best loss: -0.714]                                                                     weight decay: 1.05e-06 accuracy: 0.6660
+ 22%|██▏       | 13/60 [00:00<00:01, 26.26trial/s, best loss: -0.714]                                                                     weight decay: 6.67e-07 accuracy: 0.6620
+ 23%|██▎       | 14/60 [00:00<00:01, 26.26trial/s, best loss: -0.714] 25%|██▌       | 15/60 [00:00<00:01, 26.67trial/s, best loss: -0.714]                                                                     weight decay: 3.36e-07 accuracy: 0.6600
+ 25%|██▌       | 15/60 [00:00<00:01, 26.67trial/s, best loss: -0.714]                                                                     weight decay: 5.24e-08 accuracy: 0.6380
+ 27%|██▋       | 16/60 [00:00<00:01, 26.67trial/s, best loss: -0.714]                                                                     weight decay: 6.56e-06 accuracy: 0.6960
+ 28%|██▊       | 17/60 [00:00<00:01, 26.67trial/s, best loss: -0.714] 30%|███       | 18/60 [00:00<00:01, 26.62trial/s, best loss: -0.714]                                                                     weight decay: 2.57e-09 accuracy: 0.6260
+ 30%|███       | 18/60 [00:00<00:01, 26.62trial/s, best loss: -0.714]                                                                     weight decay: 2.28e-05 accuracy: 0.7200
+ 32%|███▏      | 19/60 [00:00<00:01, 26.62trial/s, best loss: -0.714]                                                                     weight decay: 7.72e-05 accuracy: 0.7320
+ 33%|███▎      | 20/60 [00:00<00:01, 26.62trial/s, best loss: -0.72] 35%|███▌      | 21/60 [00:00<00:01, 27.07trial/s, best loss: -0.732]                                                                     weight decay: 8.06e-05 accuracy: 0.7320
+ 35%|███▌      | 21/60 [00:00<00:01, 27.07trial/s, best loss: -0.732]                                                                     weight decay: 7.33e-05 accuracy: 0.7280
+ 37%|███▋      | 22/60 [00:00<00:01, 27.07trial/s, best loss: -0.732]                                                                     weight decay: 1.77e-10 accuracy: 0.6260
+ 38%|███▊      | 23/60 [00:00<00:01, 27.07trial/s, best loss: -0.732] 40%|████      | 24/60 [00:00<00:01, 27.51trial/s, best loss: -0.732]                                                                     weight decay: 9.48e-05 accuracy: 0.7300
+ 40%|████      | 24/60 [00:00<00:01, 27.51trial/s, best loss: -0.732]                                                                     weight decay: 1.54e-06 accuracy: 0.6720
+ 42%|████▏     | 25/60 [00:00<00:01, 27.51trial/s, best loss: -0.732]                                                                     weight decay: 3.58e-05 accuracy: 0.7260
+ 43%|████▎     | 26/60 [00:01<00:01, 27.51trial/s, best loss: -0.732] 45%|████▌     | 27/60 [00:01<00:01, 27.06trial/s, best loss: -0.732]                                                                     weight decay: 2.64e-06 accuracy: 0.6740
+ 45%|████▌     | 27/60 [00:01<00:01, 27.06trial/s, best loss: -0.732]                                                                     weight decay: 4.88e-05 accuracy: 0.7320
+ 47%|████▋     | 28/60 [00:01<00:01, 27.06trial/s, best loss: -0.732]                                                                     weight decay: 1.50e-05 accuracy: 0.7120
+ 48%|████▊     | 29/60 [00:01<00:01, 27.06trial/s, best loss: -0.732] 50%|█████     | 30/60 [00:01<00:01, 27.05trial/s, best loss: -0.732]                                                                     weight decay: 3.32e-06 accuracy: 0.6860
+ 50%|█████     | 30/60 [00:01<00:01, 27.05trial/s, best loss: -0.732]                                                                     weight decay: 3.85e-05 accuracy: 0.7280
+ 52%|█████▏    | 31/60 [00:01<00:01, 27.05trial/s, best loss: -0.732]                                                                     weight decay: 9.03e-06 accuracy: 0.7000
+ 53%|█████▎    | 32/60 [00:01<00:01, 27.05trial/s, best loss: -0.732] 55%|█████▌    | 33/60 [00:01<00:01, 26.78trial/s, best loss: -0.732]                                                                     weight decay: 1.41e-10 accuracy: 0.6340
+ 55%|█████▌    | 33/60 [00:01<00:01, 26.78trial/s, best loss: -0.732]                                                                     weight decay: 2.14e-07 accuracy: 0.6520
+ 57%|█████▋    | 34/60 [00:01<00:00, 26.78trial/s, best loss: -0.732]                                                                     weight decay: 3.93e-06 accuracy: 0.6880
+ 58%|█████▊    | 35/60 [00:01<00:00, 26.78trial/s, best loss: -0.732] 60%|██████    | 36/60 [00:01<00:00, 27.13trial/s, best loss: -0.732]                                                                     weight decay: 1.49e-05 accuracy: 0.7120
+ 60%|██████    | 36/60 [00:01<00:00, 27.13trial/s, best loss: -0.732]                                                                     weight decay: 4.90e-05 accuracy: 0.7320
+ 62%|██████▏   | 37/60 [00:01<00:00, 27.13trial/s, best loss: -0.732]                                                                     weight decay: 5.69e-07 accuracy: 0.6580
+ 63%|██████▎   | 38/60 [00:01<00:00, 27.13trial/s, best loss: -0.732] 65%|██████▌   | 39/60 [00:01<00:00, 26.60trial/s, best loss: -0.732]                                                                     weight decay: 5.38e-10 accuracy: 0.6260
+ 65%|██████▌   | 39/60 [00:01<00:00, 26.60trial/s, best loss: -0.732]                                                                     weight decay: 4.00e-05 accuracy: 0.7300
+ 67%|██████▋   | 40/60 [00:01<00:00, 26.60trial/s, best loss: -0.732]                                                                     weight decay: 1.68e-06 accuracy: 0.6760
+ 68%|██████▊   | 41/60 [00:01<00:00, 26.60trial/s, best loss: -0.732] 70%|███████   | 42/60 [00:01<00:00, 27.25trial/s, best loss: -0.732]                                                                     weight decay: 7.44e-06 accuracy: 0.6960
+ 70%|███████   | 42/60 [00:01<00:00, 27.25trial/s, best loss: -0.732]                                                                     weight decay: 9.83e-05 accuracy: 0.7300
+ 72%|███████▏  | 43/60 [00:01<00:00, 27.25trial/s, best loss: -0.732]                                                                     weight decay: 5.03e-09 accuracy: 0.6280
+ 73%|███████▎  | 44/60 [00:01<00:00, 27.25trial/s, best loss: -0.732] 75%|███████▌  | 45/60 [00:01<00:00, 27.27trial/s, best loss: -0.732]                                                                     weight decay: 1.77e-07 accuracy: 0.6500
+ 75%|███████▌  | 45/60 [00:01<00:00, 27.27trial/s, best loss: -0.732]                                                                     weight decay: 2.43e-05 accuracy: 0.7240
+ 77%|███████▋  | 46/60 [00:01<00:00, 27.27trial/s, best loss: -0.732]                                                                     weight decay: 4.45e-08 accuracy: 0.6380
+ 78%|███████▊  | 47/60 [00:01<00:00, 27.27trial/s, best loss: -0.732] 80%|████████  | 48/60 [00:01<00:00, 26.37trial/s, best loss: -0.732]                                                                     weight decay: 9.73e-07 accuracy: 0.6660
+ 80%|████████  | 48/60 [00:01<00:00, 26.37trial/s, best loss: -0.732]                                                                     weight decay: 2.64e-08 accuracy: 0.6340
+ 82%|████████▏ | 49/60 [00:01<00:00, 26.37trial/s, best loss: -0.732]                                                                     weight decay: 1.21e-07 accuracy: 0.6480
+ 83%|████████▎ | 50/60 [00:01<00:00, 26.37trial/s, best loss: -0.732] 85%|████████▌ | 51/60 [00:01<00:00, 26.40trial/s, best loss: -0.732]                                                                     weight decay: 4.95e-07 accuracy: 0.6520
+ 85%|████████▌ | 51/60 [00:01<00:00, 26.40trial/s, best loss: -0.732]                                                                     weight decay: 7.98e-09 accuracy: 0.6340
+ 87%|████████▋ | 52/60 [00:01<00:00, 26.40trial/s, best loss: -0.732]                                                                     weight decay: 4.66e-06 accuracy: 0.6940
+ 88%|████████▊ | 53/60 [00:02<00:00, 26.40trial/s, best loss: -0.732] 90%|█████████ | 54/60 [00:02<00:00, 25.74trial/s, best loss: -0.732]                                                                     weight decay: 1.14e-05 accuracy: 0.7020
+ 90%|█████████ | 54/60 [00:02<00:00, 25.74trial/s, best loss: -0.732]                                                                     weight decay: 1.39e-09 accuracy: 0.6240
+ 92%|█████████▏| 55/60 [00:02<00:00, 25.74trial/s, best loss: -0.732]                                                                     weight decay: 3.01e-10 accuracy: 0.6320
+ 93%|█████████▎| 56/60 [00:02<00:00, 25.74trial/s, best loss: -0.732] 95%|█████████▌| 57/60 [00:02<00:00, 26.08trial/s, best loss: -0.732]                                                                     weight decay: 5.03e-05 accuracy: 0.7320
+ 95%|█████████▌| 57/60 [00:02<00:00, 26.08trial/s, best loss: -0.732]                                                                     weight decay: 1.87e-06 accuracy: 0.6760
+ 97%|█████████▋| 58/60 [00:02<00:00, 26.08trial/s, best loss: -0.732]                                                                     weight decay: 2.08e-05 accuracy: 0.7160
+ 98%|█████████▊| 59/60 [00:02<00:00, 26.08trial/s, best loss: -0.732]100%|██████████| 60/60 [00:02<00:00, 26.43trial/s, best loss: -0.732]100%|██████████| 60/60 [00:02<00:00, 26.62trial/s, best loss: -0.732]
+Best weight decay: 7.72e-05

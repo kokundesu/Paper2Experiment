@@ -1,0 +1,39 @@
+# Hidden: tolerances from the reference re-runs (pre-registered before any workflow runs).
+id: ngboost
+rule: docs/benchmark-redesign.md section 3.3
+reference_run_dir: /Users/allenhuw/Documents/Projects/Paper2Exp/Base/runs/reference/20261017-234417_ngboost
+questions:
+  concrete_ngboost_nll:
+    status: scored
+    paper_value: 3.04
+    ref_mean: 3.0846
+    ref_s: 0.03140318455188901
+    n: 5
+    m: 3
+    h: 0.06366379410270802
+    term: noise
+    noise: 0.06366379410270802
+    precision: 0.005
+    floor: 3.0846e-05
+    h_paper: 0.07602631123499286
+    paper_gap: 0.04459999999999997
+    justification: h = max(noise 0.0637 [t(4)=2.776, s=0.0314, n=5, m=3], precision
+      0.005 [2 places], floor 3.08e-05) = 0.0637 (noise); paper gap 0.0446 vs h +
+      h_paper 0.14
+  concrete_ngboost_rmse:
+    status: paper_mismatch
+    paper_value: 5.06
+    ref_mean: 5.47828
+    ref_s: 0.0693991138271952
+    n: 5
+    m: 3
+    h: 0.1406930843687056
+    term: noise
+    noise: 0.1406930843687056
+    precision: 0.005
+    floor: 5.47828e-05
+    h_paper: 0.27280029325497435
+    paper_gap: 0.4182800000000002
+    justification: h = max(noise 0.141 [t(4)=2.776, s=0.0694, n=5, m=3], precision
+      0.005 [2 places], floor 5.48e-05) = 0.141 (noise); paper gap 0.418 vs h + h_paper
+      0.413

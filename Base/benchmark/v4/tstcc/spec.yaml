@@ -1,0 +1,45 @@
+# ReproSpec (agent-visible, no values). FROZEN: see ../FROZEN.yaml.
+id: tstcc
+title: ''
+objective: 复现 TS-TCC（IJCAI 2021）在 Epilepsy 脑电数据上线性评估的 ACC 和 MF1，表 2。
+task_prompt: ''
+language: Python
+paper:
+  url: https://arxiv.org/abs/2106.14112
+  pdf: null
+code:
+  repo_url: https://github.com/emadeldeen24/TS-TCC
+  capsule: null
+questions:
+- id: epilepsy_ts_tcc_linear_acc
+  text: 论文表 2 中 TS-TCC (ours) 在 Epilepsy 数据集上线性评估的平均分类准确率（ACC）是多少？
+  answer_type: number
+  metric: Accuracy (ACC), mean across independent runs
+  direction: higher
+  unit: '%'
+  locator: 表 2，TS-TCC (ours) 行，Epilepsy → ACC 列
+  setting: Epileptic Seizure Recognition 脑电数据集；癫痫发作与非发作二分类；TS-TCC 自监督预训练编码器冻结，在其特征上训练单层线性分类器（仓库先运行
+    self_supervised，再运行 train_linear，选择 Epilepsy 数据集）；测试集评估。
+  runs: 3
+  evidence: log
+- id: epilepsy_ts_tcc_linear_mf1
+  text: 论文表 2 中 TS-TCC (ours) 在 Epilepsy 数据集上线性评估的平均宏平均 F1（MF1）是多少？
+  answer_type: number
+  metric: Macro-averaged F1-score (MF1), mean across independent runs
+  direction: higher
+  unit: '%'
+  locator: 表 2，TS-TCC (ours) 行，Epilepsy → MF1 列
+  setting: Epileptic Seizure Recognition 脑电数据集；癫痫发作与非发作二分类；TS-TCC 自监督预训练编码器冻结，在其特征上训练单层线性分类器（仓库先运行
+    self_supervised，再运行 train_linear，选择 Epilepsy 数据集）；测试集评估。
+  runs: 3
+  evidence: log
+origin:
+  source: user
+  reference: ''
+  prompt: 复现 TS-TCC（IJCAI 2021）在 Epilepsy 脑电数据上线性评估的 ACC 和 MF1，表 2。
+  drafted_by:
+  - sol
+  checked_by:
+  - sonnet55
+  - haiku55
+  user_confirmed: true

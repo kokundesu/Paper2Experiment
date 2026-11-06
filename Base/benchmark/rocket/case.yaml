@@ -1,0 +1,39 @@
+# Benchmark case: hidden ground truth for the evaluator. Agents never see this file.
+# Held-out case for v3.0-heldout (added 2026-10-15). Written from the paper and the repository's README, file
+# listing and script argument/print lines only: no code of this paper was run before the tolerance was fixed.
+id: rocket
+paper:
+  title: "ROCKET: Exceptionally fast and accurate time series classification using random convolutional kernels"
+  authors: "Dempster, Petitjean, Webb"
+  venue: "Data Mining and Knowledge Discovery 2020"
+  arxiv: "1910.13051"
+repo:
+  url: https://github.com/angus924/rocket
+  note: >
+    Official code (NumPy + Numba, scikit-learn RidgeClassifierCV). code/reproduce_experiments_ucr.py takes dataset
+    names, an input path, an output path, --num_runs (default 10) and --num_kernels (default 10,000); it prints
+    progress and writes a results CSV. The UCR archive is not in the repo and must be downloaded. The repo ships
+    results/results_ucr.csv (and .preprint/results_ucr_bakeoff.csv) with accuracies; those files are not evidence.
+difficulty: medium  # mainly the data download and format
+expected_runtime_cpu_min: 5  # estimate, not measured: small datasets, 10,000 kernels, CPU-native method
+
+# Appendix D, Table 1, Rocket column (mean over 10 runs with different random kernels; fractions in the paper):
+#   ECG200 0.9060, FaceAll 0.9475, ArrowHead 0.8051.
+# evidence_pattern: the computation's own trace (loading / transform / fit / kernels / training), so a dump of the
+# shipped results CSVs (header "dataset,accuracy_mean,...,time_training_seconds,...") does not match.
+claims:
+  - {id: ecg200_acc,    metric: test_accuracy, setting: "Appendix D Table 1, Rocket, ECG200",    unit: "%", value: 90.60, tolerance: {abs: 1.0}, evidence_pattern: "(?i)(loading data|performing runs|\\bkernels?\\b|\\btransform\\w*|\\bfit(ting)?\\b|\\btraining\\b)"}
+  - {id: faceall_acc,   metric: test_accuracy, setting: "Appendix D Table 1, Rocket, FaceAll",   unit: "%", value: 94.75, tolerance: {abs: 1.0}, evidence_pattern: "(?i)(loading data|performing runs|\\bkernels?\\b|\\btransform\\w*|\\bfit(ting)?\\b|\\btraining\\b)"}
+  - {id: arrowhead_acc, metric: test_accuracy, setting: "Appendix D Table 1, Rocket, ArrowHead", unit: "%", value: 80.51, tolerance: {abs: 1.0}, evidence_pattern: "(?i)(loading data|performing runs|\\bkernels?\\b|\\btransform\\w*|\\bfit(ting)?\\b|\\btraining\\b)"}
+
+rubric:
+  min_seeds: 3
+  aggregate: mean
+  levels:
+    full: "all verdict claims within tolerance (diagnostic_only claims excluded)"
+    partial: "at least one verdict claim within tolerance"
+    fail: "no verdict claim reproduced or run did not finish"
+  tolerance_justification: >
+    Pre-registered rule for held-out cases: the paper gives one number per dataset (a 10-run mean, no spread), so
+    accuracy claims get +-1 percentage point on the mean over the seed runs, wider than the +-0.5 pp of single-run
+    numbers because each seed run here is a single draw of random kernels. Fixed before any run of this paper.

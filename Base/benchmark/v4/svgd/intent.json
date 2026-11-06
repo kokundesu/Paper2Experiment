@@ -1,0 +1,93 @@
+{
+ "draft": {
+  "understanding": "复现论文第 5 节 Bayesian Neural Network 实验中，SVGD（表中的 Our Method）在 Boston 数据集上的平均测试 RMSE 和平均测试对数似然；不包括 PBP 基线或运行时间。",
+  "questions": [
+   {
+    "id": "boston_bnn_svgd_test_rmse",
+    "text": "SVGD（Our Method）在 Boston 数据集的 Bayesian neural network 实验中，平均测试 RMSE 是多少？",
+    "metric": "Avg. Test RMSE",
+    "unit": "",
+    "direction": "lower",
+    "locator": "第 5 节 Bayesian Neural Network 实验表（第 8 页），Boston 行，Avg. Test RMSE 下的 Our Method 列",
+    "setting": "Boston 数据集；SVGD Bayesian neural network，单隐层、50 个 ReLU 隐藏单元、20 个粒子；随机划分 90% 训练集和 10% 测试集。",
+    "runs": 20,
+    "protocol_notes": "论文称 Boston 结果在 20 次随机试验上取平均；逆协方差采用 Gamma(1, 0.1) 先验，SVGD 使用带动量的 AdaGrad，mini-batch 大小为 100。目标是表中均值，不单独提取 ± 后的量。"
+   },
+   {
+    "id": "boston_bnn_svgd_test_log_likelihood",
+    "text": "SVGD（Our Method）在 Boston 数据集的 Bayesian neural network 实验中，平均测试对数似然是多少？",
+    "metric": "Avg. Test LL",
+    "unit": "",
+    "direction": "higher",
+    "locator": "第 5 节 Bayesian Neural Network 实验表（第 8 页），Boston 行，Avg. Test LL 下的 Our Method 列",
+    "setting": "Boston 数据集；SVGD Bayesian neural network，单隐层、50 个 ReLU 隐藏单元、20 个粒子；随机划分 90% 训练集和 10% 测试集。",
+    "runs": 20,
+    "protocol_notes": "论文称 Boston 结果在 20 次随机试验上取平均；逆协方差采用 Gamma(1, 0.1) 先验，SVGD 使用带动量的 AdaGrad，mini-batch 大小为 100。目标是表中均值，不单独提取 ± 后的量。"
+   }
+  ],
+  "open_issues": []
+ },
+ "checks": {
+  "sonnet55": {
+   "items": [
+    {
+     "question_id": "boston_bnn_svgd_test_rmse",
+     "in_scope": "yes",
+     "locator_ok": "yes",
+     "underspecified": [
+      "none"
+     ],
+     "answer_type_ok": "yes",
+     "measurable": "yes",
+     "comment": ""
+    },
+    {
+     "question_id": "boston_bnn_svgd_test_log_likelihood",
+     "in_scope": "yes",
+     "locator_ok": "yes",
+     "underspecified": [
+      "none"
+     ],
+     "answer_type_ok": "yes",
+     "measurable": "yes",
+     "comment": ""
+    }
+   ],
+   "missing_questions": []
+  },
+  "haiku55": {
+   "items": [
+    {
+     "question_id": "boston_bnn_svgd_test_rmse",
+     "in_scope": "yes",
+     "locator_ok": "yes",
+     "underspecified": [
+      "none"
+     ],
+     "answer_type_ok": "yes",
+     "measurable": "yes",
+     "comment": "Boston row, Our Method column under Avg. Test RMSE on page 8. The setting matches the paper: one hidden layer, 50 ReLU units, 20 particles, 90/10 split, 20 trials. The repo has python/bayesian_nn.py and data/boston_housing, and the Theano-based code can run on CPU. Target is the table mean."
+    },
+    {
+     "question_id": "boston_bnn_svgd_test_log_likelihood",
+     "in_scope": "yes",
+     "locator_ok": "yes",
+     "underspecified": [
+      "none"
+     ],
+     "answer_type_ok": "yes",
+     "measurable": "yes",
+     "comment": "Boston row, Our Method column under Avg. Test LL on page 8. Same setting and protocol as the RMSE item. Target is the table mean, so the ± value is not extracted."
+    }
+   ],
+   "missing_questions": []
+  }
+ },
+ "accepted": [
+  "boston_bnn_svgd_test_rmse",
+  "boston_bnn_svgd_test_log_likelihood"
+ ],
+ "queue": [],
+ "notes": [],
+ "cost_usd": 0.1063
+}

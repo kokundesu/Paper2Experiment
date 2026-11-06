@@ -1,0 +1,15 @@
+WARNING:tensorflow:From /Users/allenhuw/Documents/Projects/Paper2Experiment/envs/pinn/lib/python3.11/site-packages/tensorflow/python/compat/v2_compat.py:98: disable_resource_variables (from tensorflow.python.ops.resource_variables_toggle) is deprecated and will be removed in a future version.
+Instructions for updating:
+non-resource variables are not supported in the long term
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1790845592.404387 1600922 mlir_graph_optimization_pass.cc:437] MLIR V1 optimization pass is not enabled
+Eval 1000 Loss: 4.676e-04
+Eval 2000 Loss: 8.201e-05
+Eval 3000 Loss: 3.620e-05
+Eval 4000 Loss: 1.869e-05
+Eval 5000 Loss: 1.246e-05
+Eval 6000 Loss: 8.918e-06
+Eval 7000 Loss: 6.168e-06
+Training time: 63.2696
+Error u: 1.173117e-03
+Optimizer: nit=6602 nfev=7233 status=0 msg=CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH final_loss=5.768e-06

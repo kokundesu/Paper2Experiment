@@ -1,0 +1,49 @@
+# Hidden ground truth from the paper (GT stage). Tolerances follow after the reference re-runs.
+id: nngp
+extractors:
+- haiku55
+- luna
+values:
+  mnist_1k_relu_nngp_test_accuracy:
+    paper_value: 0.9279
+    printed: '0.9279'
+    precision: 4
+    quote: MNIST:1k NN-2-5000-3.19-0.00 0.9252 NN-2-1000-0.60-0.00 0.9254 GP-20-1.45-0.28
+      0.9279 GP-20-1.96-0.62 0.9266
+    page: 9
+    reported_spread: null
+    spread_kind: none
+    spread_over: none
+    n_runs: null
+    status: agreed
+    votes:
+      haiku55:
+        value: 0.9279
+        verified: true
+        why: ''
+        printed: '0.9279'
+        quote: MNIST:1k NN-2-5000-3.19-0.00 0.9252 NN-2-1000-0.60-0.00 0.9254 GP-20-1.45-0.28
+          0.9279 GP-20-1.96-0.62 0.9266
+        page: 9
+        spread: null
+        spread_kind: none
+        spread_over: none
+        n_runs: null
+        note: Table 1, MNIST:1k row, ReLU NNGP entry GP-20-1.45-0.28 (depth 20, sigma_w^2=1.45,
+          sigma_b^2=0.28 chosen on validation). Same value repeated in Table 2 (page
+          17). No ± spread reported.
+      luna:
+        value: 0.9279
+        verified: true
+        why: ''
+        printed: '0.9279'
+        quote: 'MNIST:1k NN-2-5000-3.19-0.00 0.9252 NN-2-1000-0.60-0.00 0.9254
+
+          GP-20-1.45-0.28 0.9279 GP-20-1.96-0.62 0.9266'
+        page: 9
+        spread: null
+        spread_kind: none
+        spread_over: none
+        n_runs: null
+        note: Table 1, MNIST:1k, Model (ReLU) GP row; reported test accuracy is 0.9279.
+          No ± spread is printed.

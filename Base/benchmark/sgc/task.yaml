@@ -1,0 +1,13 @@
+# Task given to every workflow. Contains no target values.
+id: sgc
+paper_url: https://arxiv.org/pdf/1902.07153
+paper_pdf: paper/1902.07153.pdf
+repo_url: https://github.com/Tiiiger/SGC
+objective: >
+  Reproduce the SGC row of Table 2 (test accuracy on the citation networks, public
+  split) using the official code and the paper's experimental setup.
+claims:
+  - {id: cora_acc,     metric: test_accuracy, setting: cora,     unit: "%", description: "SGC test accuracy on Cora"}
+  - {id: citeseer_acc, metric: test_accuracy, setting: citeseer, unit: "%", description: "SGC test accuracy on Citeseer"}
+  - {id: pubmed_acc,   metric: test_accuracy, setting: pubmed,   unit: "%", description: "SGC test accuracy on Pubmed"}
+seeds: 3

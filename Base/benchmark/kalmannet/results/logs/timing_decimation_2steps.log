@@ -1,0 +1,47 @@
+15:11:16 Pipeline Start
+15:11:16 Current Time = 10.04.26_15:11:16
+15:11:16 SEED: 0
+15:11:16 Using CPU
+15:11:16 1/r2 [dB]:  tensor(0.)
+15:11:16 Search 1/q2 [dB]:  tensor(8.2390)
+15:11:16 Data Gen
+15:11:16 no chopping
+15:11:16 Data Load
+15:11:16 load dataset to device: cpu
+15:11:16 testset size: torch.Size([10, 3, 3000])
+15:11:16 trainset size: torch.Size([1000, 3, 3000])
+15:11:16 cvset size: torch.Size([10, 3, 3000])
+15:11:16 Observation Noise Floor(test dataset) - MSE LOSS: tensor(0.0056) [dB]
+15:11:16 Observation Noise Floor(test dataset) - STD: tensor(0.0456) [dB]
+15:11:16 Observation Noise Floor(train dataset) - MSE LOSS: tensor(-0.0009) [dB]
+15:11:16 Observation Noise Floor(train dataset) - STD: tensor(0.0643) [dB]
+15:11:16 Start EKF test J=5
+15:11:16 Extended Kalman Filter - MSE LOSS: tensor(-6.2674) [dB]
+15:11:16 Extended Kalman Filter - STD: tensor(0.1368) [dB]
+15:11:16 Inference Time: 0.4565451145172119
+15:11:16 Start EKF test J=2
+15:11:17 Extended Kalman Filter - MSE LOSS: tensor(-6.2370) [dB]
+15:11:17 Extended Kalman Filter - STD: tensor(0.1348) [dB]
+15:11:17 Inference Time: 0.3228020668029785
+15:11:17 Number of trainable parameters for KNet: 23928
+15:11:21 0 MSE Training : tensor(nan) [dB] MSE Validation : tensor(nan) [dB]
+15:11:21 Optimal idx: 0 Optimal : 1000 [dB]
+15:11:24 1 MSE Training : tensor(nan) [dB] MSE Validation : tensor(nan) [dB]
+15:11:24 Optimal idx: 0 Optimal : 1000 [dB]
+15:11:24 Traceback (most recent call last):
+15:11:24   File "/Users/allenhuw/Documents/Projects/Paper2Experiment/benchmark/kalmannet/manual/KalmanNet_TSP/main_lor_decimation.py", line 181, in <module>
+15:11:24     [MSE_test_linear_arr, MSE_test_linear_avg, MSE_test_dB_avg, knet_out,t] = KNet_Pipeline.NNTest(sys_model,test_input,test_target,path_results)
+15:11:24                                                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+15:11:24   File "/Users/allenhuw/Documents/Projects/Paper2Experiment/benchmark/kalmannet/manual/KalmanNet_TSP/Pipelines/Pipeline_EKF.py", line 274, in NNTest
+15:11:24     self.model = torch.load(path_results + os.environ.get('RUN_TAG', '') + 'best-model.pt', map_location=self.device, weights_only=False)  # [p2e]
+15:11:24                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+15:11:24   File "/Users/allenhuw/Documents/Projects/Paper2Experiment/envs/kalmannet/lib/python3.11/site-packages/torch/serialization.py", line 1565, in load
+15:11:24     with _open_file_like(f, "rb") as opened_file:
+15:11:24          ^^^^^^^^^^^^^^^^^^^^^^^^
+15:11:24   File "/Users/allenhuw/Documents/Projects/Paper2Experiment/envs/kalmannet/lib/python3.11/site-packages/torch/serialization.py", line 795, in _open_file_like
+15:11:24     return _open_file(name_or_buffer, mode)
+15:11:24            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+15:11:24   File "/Users/allenhuw/Documents/Projects/Paper2Experiment/envs/kalmannet/lib/python3.11/site-packages/torch/serialization.py", line 776, in __init__
+15:11:24     super().__init__(open(name, mode))  # noqa: SIM115
+15:11:24                      ^^^^^^^^^^^^^^^^
+15:11:24 FileNotFoundError: [Errno 2] No such file or directory: 'KNet/timing_best-model.pt'

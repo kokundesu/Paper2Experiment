@@ -1,0 +1,39 @@
+# Benchmark case: hidden ground truth for the evaluator. Agents never see this file.
+# Held-out case for v3.0-heldout (added 2026-10-15). Written from the paper and the repository's README and file
+# listing only: no code of this paper was run before the tolerance was fixed (a priori, pre-registered).
+id: gin
+paper:
+  title: "How Powerful are Graph Neural Networks?"
+  authors: "Xu, Hu, Leskovec, Jegelka"
+  venue: "ICLR 2019"
+  arxiv: "1810.00826"
+repo:
+  url: https://github.com/weihua916/powerful-gnns
+  note: >
+    Official PyTorch code (tested with PyTorch 0.4.1 / 1.0.0); datasets ship in dataset.zip. main.py trains one
+    fold (--fold_idx) and prints per-epoch "loss training" and "accuracy train: .. test: ..". The README says the
+    defaults are not the paper's best settings. Paper protocol (Sec. 7): 5 GNN layers, 2-layer MLPs, batch norm,
+    Adam lr 0.01 halved every 50 epochs; tuned per dataset: hidden {16, 32}, batch {32, 128}, dropout {0, 0.5},
+    and the single epoch with the best validation accuracy averaged over the 10 folds; the reported number is the
+    mean (+- std) over the 10 folds at that epoch.
+difficulty: hard  # the per-dataset hyperparameters are not reported, only the grid
+expected_runtime_cpu_min: 20  # estimate, not measured: 10 folds x 350 epochs of a small model on small graphs
+
+# Table 1, SUM-MLP (GIN-0): MUTAG 89.4 +- 5.6, PTC 64.6 +- 7.0 (std over the 10 folds).
+# evidence_pattern: main.py's per-epoch training trace ("loss training: ..."), case-insensitive and tolerant of a
+# reformatted trace ("loss=...", "train loss 0.3").
+claims:
+  - {id: mutag_acc, metric: cv_accuracy, setting: "Table 1, GIN-0, MUTAG", unit: "%", value: 89.4, tolerance: {abs: 5.6}, evidence_pattern: "(?i)\\bloss\\b[^\\n]{0,20}\\d"}
+  - {id: ptc_acc,   metric: cv_accuracy, setting: "Table 1, GIN-0, PTC",   unit: "%", value: 64.6, tolerance: {abs: 7.0}, evidence_pattern: "(?i)\\bloss\\b[^\\n]{0,20}\\d"}
+
+rubric:
+  min_seeds: 3
+  aggregate: mean
+  levels:
+    full: "all verdict claims within tolerance (diagnostic_only claims excluded)"
+    partial: "at least one verdict claim within tolerance"
+    fail: "no verdict claim reproduced or run did not finish"
+  tolerance_justification: >
+    Pre-registered rule for held-out cases: when the paper reports a spread, the mean over the seed runs must lie
+    within one reported standard deviation of the paper value. Here that std is the spread over the 10 folds
+    (5.6 / 7.0 pp), so the band is wide; it was fixed before any run of this paper and is not narrowed afterwards.

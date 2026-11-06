@@ -1,0 +1,59 @@
+{
+ "draft": {
+  "understanding": "用户要复现论文《Combining Label Propagation and Simple Models Out-performs Graph Neural Networks》表 2 中，ogbn-arxiv 数据集上以 Plain Linear 为基础预测器、采用 Correct & Smooth 的 Autoscale 纠错方式所得的测试节点分类准确率；只需这一项结果。",
+  "questions": [
+   {
+    "id": "arxiv_plain_linear_cs_autoscale_test_accuracy",
+    "text": "论文表 2 中，ogbn-arxiv 上 Plain Linear 基础预测器结合 Correct & Smooth（Autoscale）的测试准确率是多少？",
+    "metric": "测试集节点分类准确率",
+    "unit": "%",
+    "direction": "higher",
+    "locator": "表 2，上半部分，Methods 为 Autoscale、Base Model 为 Plain Linear 的行，Arxiv 列",
+    "setting": "ogbn-arxiv；官方训练／验证／测试划分；Plain Linear 仅使用原始节点特征作为基础预测，不使用谱嵌入；随后执行 Autoscale 残差纠错及最终预测平滑的完整 C&S 流程；传播时仅使用训练集真实标签，不将验证集真实标签加入最终平滑。",
+    "runs": 1,
+    "protocol_notes": "论文表 2 说明最终平滑步骤仅使用训练标签；未明确说明此表中该单元格的独立运行次数或平均方式，因此按未注明处理。不要将表 4（加入验证标签）、基础预测单独结果或 FDiff-scale 行当成目标。仓库 README 的 plain 默认命令所展示的结果不应替代指定的论文表格单元格；复现时须确认纠错选项确为 Autoscale。"
+   }
+  ],
+  "open_issues": []
+ },
+ "checks": {
+  "sonnet55": {
+   "items": [
+    {
+     "question_id": "arxiv_plain_linear_cs_autoscale_test_accuracy",
+     "in_scope": "yes",
+     "locator_ok": "yes",
+     "underspecified": [
+      "none"
+     ],
+     "answer_type_ok": "yes",
+     "measurable": "yes",
+     "comment": "Table 2, Autoscale / Plain Linear / Arxiv cell. The README plain command may use a different scale option. The code must be confirmed to run autoscale."
+    }
+   ],
+   "missing_questions": []
+  },
+  "haiku55": {
+   "items": [
+    {
+     "question_id": "arxiv_plain_linear_cs_autoscale_test_accuracy",
+     "in_scope": "yes",
+     "locator_ok": "yes",
+     "underspecified": [
+      "none"
+     ],
+     "answer_type_ok": "yes",
+     "measurable": "yes",
+     "comment": "Table 2 top block, Autoscale row with Base Model Plain Linear, Arxiv column; the paper reports 71.11. The setting correctly restricts to training labels only (Table 2 setting, not Table 4). The README's 71.26 is a different run and is correctly flagged as not a substitute. Runs/seeds are left for later per the instructions."
+    }
+   ],
+   "missing_questions": []
+  }
+ },
+ "accepted": [
+  "arxiv_plain_linear_cs_autoscale_test_accuracy"
+ ],
+ "queue": [],
+ "notes": [],
+ "cost_usd": 0.0791
+}

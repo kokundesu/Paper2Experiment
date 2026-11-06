@@ -1,0 +1,83 @@
+experiment,dataset,seed,epochs,tuned,extra,weight_decay,val_acc,test_acc,train_time_s,wall_s,log
+cora_acc,cora,42,100,1,"",1.3026973714043257e-05,0.7940,0.8100,0.0278,4.51,results/logs/cora_acc_s42.log
+cora_acc,cora,0,100,1,"",1.3026973714043257e-05,0.7940,0.8100,0.0287,4.64,results/logs/cora_acc_s0.log
+cora_acc,cora,1,100,1,"",1.3026973714043257e-05,0.7940,0.8110,0.0287,4.89,results/logs/cora_acc_s1.log
+cora_acc,cora,2,100,1,"",1.3026973714043257e-05,0.7940,0.8100,0.0283,4.23,results/logs/cora_acc_s2.log
+cora_acc,cora,3,100,1,"",1.3026973714043257e-05,0.7960,0.8100,0.0252,4.38,results/logs/cora_acc_s3.log
+cora_acc,cora,4,100,1,"",1.3026973714043257e-05,0.7940,0.8110,0.0257,4.38,results/logs/cora_acc_s4.log
+cora_acc,cora,5,100,1,"",1.3026973714043257e-05,0.7940,0.8100,0.0274,4.4,results/logs/cora_acc_s5.log
+cora_acc,cora,6,100,1,"",1.3026973714043257e-05,0.7960,0.8100,0.0272,4.33,results/logs/cora_acc_s6.log
+cora_acc,cora,7,100,1,"",1.3026973714043257e-05,0.7960,0.8100,0.0279,4.63,results/logs/cora_acc_s7.log
+cora_acc,cora,8,100,1,"",1.3026973714043257e-05,0.7940,0.8100,0.0261,4.75,results/logs/cora_acc_s8.log
+citeseer_acc,citeseer,42,150,1,"",2.3545587233182368e-05,0.7280,0.7190,0.0413,4.57,results/logs/citeseer_acc_s42.log
+citeseer_acc,citeseer,0,150,1,"",2.3545587233182368e-05,0.7280,0.7180,0.0416,4.41,results/logs/citeseer_acc_s0.log
+citeseer_acc,citeseer,1,150,1,"",2.3545587233182368e-05,0.7280,0.7170,0.0415,4.51,results/logs/citeseer_acc_s1.log
+citeseer_acc,citeseer,2,150,1,"",2.3545587233182368e-05,0.7280,0.7190,0.0405,5.1,results/logs/citeseer_acc_s2.log
+citeseer_acc,citeseer,3,150,1,"",2.3545587233182368e-05,0.7280,0.7190,0.0432,4.85,results/logs/citeseer_acc_s3.log
+citeseer_acc,citeseer,4,150,1,"",2.3545587233182368e-05,0.7280,0.7190,0.0416,4.55,results/logs/citeseer_acc_s4.log
+citeseer_acc,citeseer,5,150,1,"",2.3545587233182368e-05,0.7280,0.7190,0.0412,4.43,results/logs/citeseer_acc_s5.log
+citeseer_acc,citeseer,6,150,1,"",2.3545587233182368e-05,0.7280,0.7180,0.0413,4.43,results/logs/citeseer_acc_s6.log
+citeseer_acc,citeseer,7,150,1,"",2.3545587233182368e-05,0.7280,0.7180,0.0411,4.41,results/logs/citeseer_acc_s7.log
+citeseer_acc,citeseer,8,150,1,"",2.3545587233182368e-05,0.7280,0.7180,0.0433,4.48,results/logs/citeseer_acc_s8.log
+pubmed_acc,pubmed,42,100,1,"",7.403929623323868e-05,0.8180,0.7890,0.0226,4.4,results/logs/pubmed_acc_s42.log
+pubmed_acc,pubmed,0,100,1,"",7.403929623323868e-05,0.8180,0.7890,0.0223,4.38,results/logs/pubmed_acc_s0.log
+pubmed_acc,pubmed,1,100,1,"",7.403929623323868e-05,0.8180,0.7890,0.0220,4.41,results/logs/pubmed_acc_s1.log
+pubmed_acc,pubmed,2,100,1,"",7.403929623323868e-05,0.8180,0.7890,0.0223,4.36,results/logs/pubmed_acc_s2.log
+pubmed_acc,pubmed,3,100,1,"",7.403929623323868e-05,0.8180,0.7900,0.0230,4.5,results/logs/pubmed_acc_s3.log
+pubmed_acc,pubmed,4,100,1,"",7.403929623323868e-05,0.8180,0.7900,0.0218,4.52,results/logs/pubmed_acc_s4.log
+pubmed_acc,pubmed,5,100,1,"",7.403929623323868e-05,0.8180,0.7890,0.0224,4.59,results/logs/pubmed_acc_s5.log
+pubmed_acc,pubmed,6,100,1,"",7.403929623323868e-05,0.8180,0.7900,0.0225,4.42,results/logs/pubmed_acc_s6.log
+pubmed_acc,pubmed,7,100,1,"",7.403929623323868e-05,0.8180,0.7900,0.0227,4.37,results/logs/pubmed_acc_s7.log
+pubmed_acc,pubmed,8,100,1,"",7.403929623323868e-05,0.8180,0.7900,0.0224,4.35,results/logs/pubmed_acc_s8.log
+diag_citeseer_ep100,citeseer,42,100,1,"",2.3545587233182368e-05,0.7220,0.7120,0.0542,6.2,results/logs/diag_citeseer_ep100_s42.log
+diag_citeseer_ep100,citeseer,0,100,1,"",2.3545587233182368e-05,0.7220,0.7120,0.0368,5.45,results/logs/diag_citeseer_ep100_s0.log
+diag_citeseer_ep100,citeseer,1,100,1,"",2.3545587233182368e-05,0.7220,0.7120,0.0337,5.76,results/logs/diag_citeseer_ep100_s1.log
+diag_citeseer_ep100,citeseer,2,100,1,"",2.3545587233182368e-05,0.7220,0.7120,0.0301,4.96,results/logs/diag_citeseer_ep100_s2.log
+diag_citeseer_ep100,citeseer,3,100,1,"",2.3545587233182368e-05,0.7220,0.7120,0.0324,4.79,results/logs/diag_citeseer_ep100_s3.log
+diag_citeseer_ep100,citeseer,4,100,1,"",2.3545587233182368e-05,0.7220,0.7120,0.0312,4.47,results/logs/diag_citeseer_ep100_s4.log
+diag_citeseer_ep100,citeseer,5,100,1,"",2.3545587233182368e-05,0.7220,0.7120,0.0383,5.18,results/logs/diag_citeseer_ep100_s5.log
+diag_citeseer_ep100,citeseer,6,100,1,"",2.3545587233182368e-05,0.7220,0.7120,0.0471,6.01,results/logs/diag_citeseer_ep100_s6.log
+diag_citeseer_ep100,citeseer,7,100,1,"",2.3545587233182368e-05,0.7220,0.7120,0.0486,6.04,results/logs/diag_citeseer_ep100_s7.log
+diag_citeseer_ep100,citeseer,8,100,1,"",2.3545587233182368e-05,0.7220,0.7120,0.0459,6.37,results/logs/diag_citeseer_ep100_s8.log
+diag_cora_ep150,cora,42,150,1,"",1.3026973714043257e-05,0.7900,0.8140,0.0600,5.83,results/logs/diag_cora_ep150_s42.log
+diag_cora_ep150,cora,0,150,1,"",1.3026973714043257e-05,0.7900,0.8140,0.0940,6.02,results/logs/diag_cora_ep150_s0.log
+diag_cora_ep150,cora,1,150,1,"",1.3026973714043257e-05,0.7900,0.8140,0.0336,5.3,results/logs/diag_cora_ep150_s1.log
+diag_pubmed_ep150,pubmed,42,150,1,"",7.403929623323868e-05,0.8140,0.7890,0.0353,5.13,results/logs/diag_pubmed_ep150_s42.log
+diag_pubmed_ep150,pubmed,0,150,1,"",7.403929623323868e-05,0.8140,0.7890,0.0344,5.75,results/logs/diag_pubmed_ep150_s0.log
+diag_pubmed_ep150,pubmed,1,150,1,"",7.403929623323868e-05,0.8140,0.7890,0.0425,6.21,results/logs/diag_pubmed_ep150_s1.log
+diag_cora_untuned,cora,42,100,0,"",5e-06(default),0.7920,0.8070,0.0416,5.77,results/logs/diag_cora_untuned_s42.log
+diag_cora_untuned,cora,0,100,0,"",5e-06(default),0.7920,0.8060,0.0414,5.87,results/logs/diag_cora_untuned_s0.log
+diag_cora_untuned,cora,1,100,0,"",5e-06(default),0.7920,0.8050,0.0380,5.74,results/logs/diag_cora_untuned_s1.log
+diag_citeseer_untuned,citeseer,42,150,0,"",5e-06(default),0.7000,0.6950,0.1224,5.81,results/logs/diag_citeseer_untuned_s42.log
+diag_citeseer_untuned,citeseer,0,150,0,"",5e-06(default),0.7000,0.6950,0.0493,5.77,results/logs/diag_citeseer_untuned_s0.log
+diag_citeseer_untuned,citeseer,1,150,0,"",5e-06(default),0.7000,0.6950,0.0980,6.13,results/logs/diag_citeseer_untuned_s1.log
+diag_pubmed_untuned,pubmed,42,100,0,"",5e-06(default),0.7720,0.7770,0.0348,6.36,results/logs/diag_pubmed_untuned_s42.log
+diag_pubmed_untuned,pubmed,0,100,0,"",5e-06(default),0.7740,0.7790,0.0342,6.48,results/logs/diag_pubmed_untuned_s0.log
+diag_pubmed_untuned,pubmed,1,100,0,"",5e-06(default),0.7740,0.7790,0.0346,6.53,results/logs/diag_pubmed_untuned_s1.log
+diag_cora_K1,cora,42,100,1,"--degree 1",1.3026973714043257e-05,0.7540,0.7660,0.0421,6.26,results/logs/diag_cora_K1_s42.log
+diag_cora_K1,cora,0,100,1,"--degree 1",1.3026973714043257e-05,0.7520,0.7660,0.0448,6.34,results/logs/diag_cora_K1_s0.log
+diag_citeseer_K1,citeseer,42,150,1,"--degree 1",2.3545587233182368e-05,0.6960,0.6830,0.0491,6.23,results/logs/diag_citeseer_K1_s42.log
+diag_citeseer_K1,citeseer,0,150,1,"--degree 1",2.3545587233182368e-05,0.6960,0.6830,0.0623,5.98,results/logs/diag_citeseer_K1_s0.log
+diag_pubmed_K1,pubmed,42,100,1,"--degree 1",7.403929623323868e-05,0.7660,0.7750,0.0350,6.23,results/logs/diag_pubmed_K1_s42.log
+diag_pubmed_K1,pubmed,0,100,1,"--degree 1",7.403929623323868e-05,0.7680,0.7750,0.0293,5.97,results/logs/diag_pubmed_K1_s0.log
+diag_cora_K3,cora,42,100,1,"--degree 3",1.3026973714043257e-05,0.7940,0.8190,0.0413,5.87,results/logs/diag_cora_K3_s42.log
+diag_cora_K3,cora,0,100,1,"--degree 3",1.3026973714043257e-05,0.7940,0.8190,0.0452,6.12,results/logs/diag_cora_K3_s0.log
+diag_citeseer_K3,citeseer,42,150,1,"--degree 3",2.3545587233182368e-05,0.7320,0.7140,0.1533,6.55,results/logs/diag_citeseer_K3_s42.log
+diag_citeseer_K3,citeseer,0,150,1,"--degree 3",2.3545587233182368e-05,0.7320,0.7140,0.0530,5.94,results/logs/diag_citeseer_K3_s0.log
+diag_pubmed_K3,pubmed,42,100,1,"--degree 3",7.403929623323868e-05,0.8040,0.7900,0.0354,6.43,results/logs/diag_pubmed_K3_s42.log
+diag_pubmed_K3,pubmed,0,100,1,"--degree 3",7.403929623323868e-05,0.8040,0.7900,0.0282,6.18,results/logs/diag_pubmed_K3_s0.log
+diag_cora_ep100_retuned_h1,cora,42,100,0,"--weight_decay 1.65e-05",1.65e-05,0.7960,0.8100,0.0674,7.43,results/logs/diag_cora_ep100_retuned_h1_s42.log
+diag_cora_ep100_retuned_h2,cora,42,100,0,"--weight_decay 1.33e-05",1.33e-05,0.7940,0.8100,0.0541,6.74,results/logs/diag_cora_ep100_retuned_h2_s42.log
+diag_cora_ep100_retuned_h3,cora,42,100,0,"--weight_decay 1.22e-05",1.22e-05,0.7980,0.8090,0.0468,6.65,results/logs/diag_cora_ep100_retuned_h3_s42.log
+diag_citeseer_ep150_retuned_h1,citeseer,42,150,0,"--weight_decay 3.66e-05",3.66e-05,0.7340,0.7190,0.0716,6.7,results/logs/diag_citeseer_ep150_retuned_h1_s42.log
+diag_citeseer_ep150_retuned_h2,citeseer,42,150,0,"--weight_decay 2.80e-05",2.80e-05,0.7360,0.7200,0.0942,6.69,results/logs/diag_citeseer_ep150_retuned_h2_s42.log
+diag_citeseer_ep150_retuned_h3,citeseer,42,150,0,"--weight_decay 3.17e-05",3.17e-05,0.7380,0.7190,0.0667,6.15,results/logs/diag_citeseer_ep150_retuned_h3_s42.log
+diag_citeseer_ep100_retuned_h1,citeseer,42,100,0,"--weight_decay 7.83e-05",7.83e-05,0.7320,0.7230,0.0422,5.49,results/logs/diag_citeseer_ep100_retuned_h1_s42.log
+diag_citeseer_ep100_retuned_h2,citeseer,42,100,0,"--weight_decay 5.67e-05",5.67e-05,0.7320,0.7200,0.0503,6.14,results/logs/diag_citeseer_ep100_retuned_h2_s42.log
+diag_citeseer_ep100_retuned_h3,citeseer,42,100,0,"--weight_decay 7.72e-05",7.72e-05,0.7320,0.7230,0.0475,6.23,results/logs/diag_citeseer_ep100_retuned_h3_s42.log
+diag_pubmed_ep100_retuned_h1,pubmed,42,100,0,"--weight_decay 6.67e-05",6.67e-05,0.8160,0.7890,0.0323,6.18,results/logs/diag_pubmed_ep100_retuned_h1_s42.log
+diag_pubmed_ep100_retuned_h2,pubmed,42,100,0,"--weight_decay 7.67e-05",7.67e-05,0.8180,0.7890,0.0481,6.16,results/logs/diag_pubmed_ep100_retuned_h2_s42.log
+diag_pubmed_ep100_retuned_h3,pubmed,42,100,0,"--weight_decay 7.72e-05",7.72e-05,0.8180,0.7890,0.0374,6.14,results/logs/diag_pubmed_ep100_retuned_h3_s42.log
+diag_citeseer_ep100_retuned_h4,citeseer,42,100,0,"--weight_decay 5.66e-05",5.66e-05,0.7320,0.7200,0.0558,8.02,results/logs/diag_citeseer_ep100_retuned_h4_s42.log
+diag_citeseer_ep100_retuned_h5,citeseer,42,100,0,"--weight_decay 5.69e-05",5.69e-05,0.7320,0.7200,0.0598,6.53,results/logs/diag_citeseer_ep100_retuned_h5_s42.log
+diag_citeseer_ep100_retuned_h6,citeseer,42,100,0,"--weight_decay 5.36e-05",5.36e-05,0.7320,0.7210,0.0600,6.79,results/logs/diag_citeseer_ep100_retuned_h6_s42.log

@@ -1,0 +1,6 @@
+# Upstream clone (re-create with: git clone --depth 1 https://github.com/maziarraissi/PINNs repos/PINNs)
+repos/
+# Paper PDF (re-download: curl -L -o paper/1711.10561.pdf https://arxiv.org/pdf/1711.10561)
+paper/*.pdf
+__pycache__/
+# manual/ (patched copy + patch) and results/ are kept

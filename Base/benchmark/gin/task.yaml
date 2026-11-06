@@ -1,0 +1,15 @@
+# Task given to every workflow. Contains no target values.
+id: gin
+paper_url: https://arxiv.org/pdf/1810.00826
+paper_pdf: paper/1810.00826.pdf
+repo_url: https://github.com/weihua916/powerful-gnns
+objective: >
+  Reproduce the GIN-0 ("SUM-MLP (GIN-0)") row of Table 1 (graph classification
+  accuracy under the paper's 10-fold cross-validation protocol) for MUTAG and PTC,
+  using the official code and the paper's experimental setup. One seed run is one
+  complete 10-fold cross-validation; its value is the accuracy the paper's protocol
+  reports for that cross-validation.
+claims:
+  - {id: mutag_acc, metric: cv_accuracy, setting: "Table 1, GIN-0, MUTAG", unit: "%", description: "GIN-0 10-fold cross-validation accuracy on MUTAG"}
+  - {id: ptc_acc,   metric: cv_accuracy, setting: "Table 1, GIN-0, PTC",   unit: "%", description: "GIN-0 10-fold cross-validation accuracy on PTC"}
+seeds: 3

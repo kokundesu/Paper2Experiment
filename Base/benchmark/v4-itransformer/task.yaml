@@ -1,0 +1,25 @@
+# v4 task as agents see it (from the frozen ReproSpec). No target values.
+id: v4-itransformer
+paper_pdf: paper/2310.06625.pdf
+paper_url: https://arxiv.org/pdf/2310.06625
+repo_url: https://github.com/thuml/iTransformer
+objective: 复现 iTransformer（ICLR 2024）在 Exchange 数据集上输入长度 96、预测长度 96 的 MSE 和 MAE（附录的完整结果表，表
+  10）。
+claims:
+- id: exchange_96_96_mse
+  metric: MSE
+  setting: 附录 F.4 表 10（Full results of the long-term forecasting task），Exchange 数据集分组、预测长度
+    96 行、iTransformer (Ours) 的 MSE 列
+  unit: ''
+  description: '附录表 10 中，iTransformer 在 Exchange 数据集、输入长度 96、预测长度 96 的多变量长期预测测试 MSE
+    是多少？ Setting: Exchange；iTransformer 原模型；多变量长期预测；输入长度 96，预测长度 96；按 TimesNet 的时序训练/验证/测试划分协议。对应仓库
+    scripts/multivariate_forecasting/Exchange/iTransformer.sh，而非 Avg 行。'
+- id: exchange_96_96_mae
+  metric: MAE
+  setting: 附录 F.4 表 10（Full results of the long-term forecasting task），Exchange 数据集分组、预测长度
+    96 行、iTransformer (Ours) 的 MAE 列
+  unit: ''
+  description: '附录表 10 中，iTransformer 在 Exchange 数据集、输入长度 96、预测长度 96 的多变量长期预测测试 MAE
+    是多少？ Setting: Exchange；iTransformer 原模型；多变量长期预测；输入长度 96，预测长度 96；按 TimesNet 的时序训练/验证/测试划分协议。对应仓库
+    scripts/multivariate_forecasting/Exchange/iTransformer.sh，而非 Avg 行。'
+seeds: 3

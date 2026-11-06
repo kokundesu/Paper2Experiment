@@ -1,0 +1,43 @@
+# CORE-Bench v1.1 task as a ReproSpec: what agents see. No answers.
+id: cb-1683542
+title: 'Measuring the effects of exercise in neuromuscular disorders: a systematic
+  review and meta-analyses'
+objective: 'Test the computational reproducibility of a scientific capsule (CORE-Bench,
+  Hard level): run its code and answer the questions from the output.'
+task_prompt: 'Export the following R default packages: datasets,utils,grDevices,graphics,stats,methods.
+  Then run ''main.R''.'
+language: R
+paper: null
+code:
+  repo_url: null
+  capsule: capsule-1683542
+questions:
+- id: q1
+  text: fig From Figure 2, report the Observed SMD for Bankole et al. 2016. Ignore
+    the confidence interval.
+  answer_type: any
+  metric: ''
+  direction: ''
+  unit: ''
+  locator: program output
+  setting: ''
+  runs: 1
+  evidence: either
+- id: q2
+  text: fig From Figure 12, report the Observed SMD for Jeppesen et al. 2006. Ignore
+    the confidence interval.
+  answer_type: any
+  metric: ''
+  direction: ''
+  unit: ''
+  locator: program output
+  setting: ''
+  runs: 1
+  evidence: either
+origin:
+  source: corebench
+  reference: core-bench (original) core_train.json sha256:3df47f1b3fa1cb60045018eb1a0f1ad4ecf6a53f72318c845a879ce0313b0730
+  prompt: ''
+  drafted_by: []
+  checked_by: []
+  user_confirmed: false

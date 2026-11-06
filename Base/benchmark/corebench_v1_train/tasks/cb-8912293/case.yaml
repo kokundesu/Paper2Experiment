@@ -1,0 +1,24 @@
+# Hidden: pre-registered tolerances, computed from the 3 manual re-runs.
+capsule_id: capsule-8912293
+source: core-bench (original) core_train.json
+split: dev
+data_sha256: 3df47f1b3fa1cb60045018eb1a0f1ad4ecf6a53f72318c845a879ce0313b0730
+rule: docs/benchmark-redesign.md section 3.3
+questions:
+- id: q1
+  question: fig Report the location of experiment with the higher proportion of 131
+    pre−registered experiments in AEA and EGAP registries for the mobilization intervention
+    class (ignore the n value).
+  vision: true
+  kind: string
+  scored: true
+- id: q2
+  question: fig From Figure A5, report the y-axis label.
+  vision: true
+  kind: string
+  scored: true
+- id: q3
+  question: fig From Figure A2, report the x-axis label of the first plot.
+  vision: true
+  kind: string
+  scored: true

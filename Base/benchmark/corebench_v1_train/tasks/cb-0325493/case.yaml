@@ -1,0 +1,45 @@
+# Hidden: pre-registered tolerances, computed from the 3 manual re-runs.
+capsule_id: capsule-0325493
+source: core-bench (original) core_train.json
+split: dev
+data_sha256: 3df47f1b3fa1cb60045018eb1a0f1ad4ecf6a53f72318c845a879ce0313b0730
+rule: docs/benchmark-redesign.md section 3.3
+questions:
+- id: q1
+  question: For the within-variance improvements, report the improvement for the FS_TotalGrayVol
+    outcome with the Day variable.
+  vision: false
+  kind: numeric
+  scored: true
+  tolerance:
+    mean: 1.8
+    s: 0.0
+    n: 3
+    m: 1
+    noise: 0.0
+    precision: 0.05
+    floor: 1.8e-05
+    h: 0.05
+    term: precision
+- id: q2
+  question: For the within-variance improvements, report the improvement for the FS_CortexVol
+    outcome with the Day variable.
+  vision: false
+  kind: numeric
+  scored: true
+  tolerance:
+    mean: 1.75
+    s: 0.0
+    n: 3
+    m: 1
+    noise: 0.0
+    precision: 0.005
+    floor: 1.7500000000000002e-05
+    h: 0.005
+    term: precision
+- id: q3
+  question: fig Report the name of the model, LASSO or Random Forest, which has the
+    higher out-of-sample R^2 in % for FS-GM.
+  vision: true
+  kind: string
+  scored: true

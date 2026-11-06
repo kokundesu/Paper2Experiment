@@ -1,0 +1,97 @@
+# Hidden: pre-registered tolerances, computed from the 3 manual re-runs.
+capsule_id: capsule-9166182
+source: core-bench (original) core_train.json
+split: dev
+data_sha256: 3df47f1b3fa1cb60045018eb1a0f1ad4ecf6a53f72318c845a879ce0313b0730
+rule: docs/benchmark-redesign.md section 3.3
+questions:
+- id: q1
+  question: For experiment 1, report the adversary errors without SEAM.
+  vision: false
+  kind: numeric
+  scored: true
+  tolerance:
+    mean: 58.0
+    s: 0.0
+    n: 3
+    m: 1
+    noise: 0.0
+    precision: 0.05
+    floor: 0.00058
+    h: 0.05
+    term: precision
+- id: q2
+  question: For experiment 1, report the adversary errors with SEAM.
+  vision: false
+  kind: numeric
+  scored: true
+  tolerance:
+    mean: 17.0
+    s: 0.0
+    n: 3
+    m: 1
+    noise: 0.0
+    precision: 0.05
+    floor: 0.00017
+    h: 0.05
+    term: precision
+- id: q3
+  question: For experiment 2, report the adversary errors without SEAM.
+  vision: false
+  kind: numeric
+  scored: true
+  tolerance:
+    mean: 27.0
+    s: 0.0
+    n: 3
+    m: 1
+    noise: 0.0
+    precision: 0.05
+    floor: 0.00027
+    h: 0.05
+    term: precision
+- id: q4
+  question: For experiment 2, report the adversary errors with SEAM.
+  vision: false
+  kind: numeric
+  scored: true
+  tolerance:
+    mean: 21.0
+    s: 0.0
+    n: 3
+    m: 1
+    noise: 0.0
+    precision: 0.05
+    floor: 0.00021
+    h: 0.05
+    term: precision
+- id: q5
+  question: For experiment 3, report the adversary errors without SEAM.
+  vision: false
+  kind: numeric
+  scored: true
+  tolerance:
+    mean: 47.0
+    s: 0.0
+    n: 3
+    m: 1
+    noise: 0.0
+    precision: 0.05
+    floor: 0.00047000000000000004
+    h: 0.05
+    term: precision
+- id: q6
+  question: For experiment 3, report the adversary errors with SEAM.
+  vision: false
+  kind: numeric
+  scored: true
+  tolerance:
+    mean: 19.0
+    s: 0.0
+    n: 3
+    m: 1
+    noise: 0.0
+    precision: 0.05
+    floor: 0.00019
+    h: 0.05
+    term: precision

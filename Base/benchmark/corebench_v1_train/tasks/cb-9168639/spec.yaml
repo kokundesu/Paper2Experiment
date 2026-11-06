@@ -1,0 +1,41 @@
+# CORE-Bench v1.1 task as a ReproSpec: what agents see. No answers.
+id: cb-9168639
+title: Research Ethics Committees as an intervention point to promote a priori sample
+  size calculations
+objective: 'Test the computational reproducibility of a scientific capsule (CORE-Bench,
+  Hard level): run its code and answer the questions from the output.'
+task_prompt: Run the analysis.Rmd file using Rscript and output the results in the
+  'results' directory.
+language: R
+paper: null
+code:
+  repo_url: null
+  capsule: capsule-9168639
+questions:
+- id: q1
+  text: fig Report Institutions Sampled for US in Table 1.
+  answer_type: any
+  metric: ''
+  direction: ''
+  unit: ''
+  locator: program output
+  setting: ''
+  runs: 1
+  evidence: either
+- id: q2
+  text: fig Report Institutions Sampled for UK in Table 1.
+  answer_type: any
+  metric: ''
+  direction: ''
+  unit: ''
+  locator: program output
+  setting: ''
+  runs: 1
+  evidence: either
+origin:
+  source: corebench
+  reference: core-bench (original) core_train.json sha256:3df47f1b3fa1cb60045018eb1a0f1ad4ecf6a53f72318c845a879ce0313b0730
+  prompt: ''
+  drafted_by: []
+  checked_by: []
+  user_confirmed: false

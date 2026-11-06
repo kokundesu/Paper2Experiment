@@ -1,0 +1,41 @@
+# Benchmark case: hidden ground truth for the evaluator. Agents never see this file
+# (they get task.yaml instead).
+id: gcn
+paper:
+  title: "Semi-Supervised Classification with Graph Convolutional Networks"
+  authors: "Kipf & Welling"
+  venue: "ICLR 2017"
+  arxiv: "1609.02907"
+repo:
+  url: https://github.com/tkipf/gcn
+  note: "Official TF1 code. tkipf/pygcn is a PyTorch re-implementation whose README says it is not meant to reproduce the paper (different split)."
+difficulty: easy
+expected_runtime_cpu_min: 2
+
+# Paper Table 2, GCN row: test accuracy (%) on the Planetoid public split.
+# A claim is reproduced when the mean over seeds is within tolerance:
+#   abs: |mean - value| <= abs      rel: |mean - value| / |value| <= rel
+#   factor: value / factor <= mean <= value * factor   (for error metrics)
+# evidence_pattern matches the training trace only (2026-10-05): the value itself must also appear in the same
+# log, which the evaluator checks separately. Patterns that also pinned the final print line failed a correct
+# FITS run whose agent had (legitimately) patched the output format.
+claims:
+  - {id: cora_acc,     metric: test_accuracy, setting: cora,     unit: "%", value: 81.5, tolerance: {abs: 1.5}, evidence_pattern: "Epoch: \\d+ train_loss="}
+  - {id: citeseer_acc, metric: test_accuracy, setting: citeseer, unit: "%", value: 70.3, tolerance: {abs: 1.5}, evidence_pattern: "Epoch: \\d+ train_loss="}
+  - {id: pubmed_acc,   metric: test_accuracy, setting: pubmed,   unit: "%", value: 79.0, tolerance: {abs: 1.5}, evidence_pattern: "Epoch: \\d+ train_loss="}
+
+rubric:
+  min_seeds: 3
+  levels:
+    full: "all claims within tolerance"
+    partial: "at least one claim within tolerance"
+    fail: "no claim reproduced or run did not finish"
+  tolerance_justification: "Seed std is 0.25-0.82 pp over 10 seeds; 1.5 pp is about 2 std of the noisiest dataset."
+
+# Known obstacles on a modern environment (Python 3.11, TF 2.21, SciPy 1.17)
+known_issues:
+  - "Package not installed: `from gcn.utils import *` needs the repo root on PYTHONPATH (or `pip install -e .`)."
+  - "SciPy >= 1.8 removed scipy.sparse.linalg.eigen.arpack; import eigsh from scipy.sparse.linalg."
+  - "TF1 API (tf.app.flags, placeholders, sessions): use `import tensorflow.compat.v1 as tf; tf.disable_v2_behavior()`."
+  - "Seed hard-coded to 123 in train.py; multi-seed runs need a small patch."
+  - "Trap: tkipf/pygcn uses a different split and reports ~83% on Cora; not comparable."

@@ -1,0 +1,47 @@
+# ReproSpec (agent-visible, no values). FROZEN: see ../FROZEN.yaml.
+id: mc_dropout
+title: ''
+objective: 复现 Dropout as a Bayesian Approximation（ICML 2016）在 Boston Housing 上 MC
+  dropout 的 RMSE 和测试对数似然（表 1）。
+task_prompt: ''
+language: Python
+paper:
+  url: https://arxiv.org/abs/1506.02142
+  pdf: null
+code:
+  repo_url: https://github.com/yaringal/DropoutUncertaintyExps
+  capsule: null
+questions:
+- id: boston_mc_dropout_test_rmse
+  text: 论文表 1 中 Boston Housing 的 Dropout（MC dropout）平均测试 RMSE 是多少？
+  answer_type: number
+  metric: average test RMSE
+  direction: lower
+  unit: ''
+  locator: 表 1，Boston Housing 行，Avg. Test RMSE and Std. Errors 下的 Dropout 列（取均值，不取标准误）
+  setting: Boston Housing 回归；论文表 1 的单隐层、50 个隐藏单元的 Dropout 网络；测试时对随机前向传播结果取平均作为 MC
+    dropout 预测；论文原始验证集调参方案 一次运行 = 论文的完整协议：仓库里 20 个固定划分上的平均。
+  runs: 3
+  evidence: log
+- id: boston_mc_dropout_test_ll
+  text: 论文表 1 中 Boston Housing 的 Dropout（MC dropout）平均测试预测对数似然是多少？
+  answer_type: number
+  metric: average test predictive log-likelihood (LL)
+  direction: higher
+  unit: ''
+  locator: 表 1，Boston Housing 行，Avg. Test LL and Std. Errors 下的 Dropout 列（取均值，不取标准误）
+  setting: Boston Housing 回归；论文表 1 的单隐层、50 个隐藏单元的 Dropout 网络；采用随机前向传播的预测分布估计测试对数似然；论文原始验证集调参方案
+    一次运行 = 论文的完整协议：仓库里 20 个固定划分上的平均。
+  runs: 3
+  evidence: log
+origin:
+  source: user
+  reference: ''
+  prompt: 复现 Dropout as a Bayesian Approximation（ICML 2016）在 Boston Housing 上 MC dropout
+    的 RMSE 和测试对数似然（表 1）。
+  drafted_by:
+  - sol
+  checked_by:
+  - sonnet55
+  - haiku55
+  user_confirmed: true

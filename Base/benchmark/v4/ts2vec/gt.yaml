@@ -1,0 +1,189 @@
+# Hidden ground truth from the paper (GT stage). Tolerances follow after the reference re-runs.
+id: ts2vec
+extractors:
+- haiku55
+- luna
+values:
+  ecg200_accuracy_b8:
+    paper_value: 0.92
+    printed: '0.920'
+    precision: 3
+    quote: ECG200 0.890 0.920 0.880 0.940 0.830 0.880 0.830 0.770
+    page: 16
+    reported_spread: null
+    spread_kind: none
+    spread_over: none
+    n_runs: null
+    status: agreed
+    votes:
+      haiku55:
+        value: 0.92
+        verified: true
+        why: ''
+        printed: '0.920'
+        quote: ECG200 0.890 0.920 0.880 0.940 0.830 0.880 0.830 0.770
+        page: 16
+        spread: null
+        spread_kind: none
+        spread_over: none
+        n_runs: null
+        note: Table 9 row ECG200; columns are TS2Vec B=4, B=8, B=16, then T-Loss,
+          TNC, TS-TCC, TST, DTW. B=8 is the second value, 0.920. Table 11 also lists
+          0.920.
+      luna:
+        value: 0.92
+        verified: true
+        why: ''
+        printed: '0.920'
+        quote: ECG200 0.890 0.920 0.880 0.940 0.830 0.880 0.830 0.770
+        page: 16
+        spread: null
+        spread_kind: none
+        spread_over: none
+        n_runs: null
+        note: Table 9 TS2Vec B=8 column.
+  gunpoint_accuracy_b8:
+    paper_value: 0.98
+    printed: '0.980'
+    precision: 3
+    quote: GunPoint 0.980 0.980 0.987 0.980 0.967 0.993 0.827 0.907
+    page: 16
+    reported_spread: null
+    spread_kind: none
+    spread_over: none
+    n_runs: null
+    status: agreed
+    votes:
+      haiku55:
+        value: 0.98
+        verified: true
+        why: ''
+        printed: '0.980'
+        quote: GunPoint 0.980 0.980 0.987 0.980 0.967 0.993 0.827 0.907
+        page: 16
+        spread: null
+        spread_kind: none
+        spread_over: none
+        n_runs: null
+        note: Table 9 row GunPoint; B=8 is the second value, 0.980.
+      luna:
+        value: 0.98
+        verified: true
+        why: ''
+        printed: '0.980'
+        quote: GunPoint 0.980 0.980 0.987 0.980 0.967 0.993 0.827 0.907
+        page: 16
+        spread: null
+        spread_kind: none
+        spread_over: none
+        n_runs: null
+        note: Table 9 TS2Vec B=8 column.
+  italypowerdemand_accuracy_b8:
+    paper_value: 0.925
+    printed: '0.925'
+    precision: 3
+    quote: ItalyPowerDemand 0.961 0.925 0.960 0.954 0.928 0.955 0.845 0.950
+    page: 16
+    reported_spread: null
+    spread_kind: none
+    spread_over: none
+    n_runs: null
+    status: agreed
+    votes:
+      haiku55:
+        value: 0.925
+        verified: true
+        why: ''
+        printed: '0.925'
+        quote: ItalyPowerDemand 0.961 0.925 0.960 0.954 0.928 0.955 0.845 0.950
+        page: 16
+        spread: null
+        spread_kind: none
+        spread_over: none
+        n_runs: null
+        note: Table 9 row ItalyPowerDemand; B=8 is the second value, 0.925. Table
+          11 also lists 0.925.
+      luna:
+        value: 0.925
+        verified: true
+        why: ''
+        printed: '0.925'
+        quote: ItalyPowerDemand 0.961 0.925 0.960 0.954 0.928 0.955 0.845 0.950
+        page: 16
+        spread: null
+        spread_kind: none
+        spread_over: none
+        n_runs: null
+        note: Table 9 TS2Vec B=8 column.
+  twoleadecg_accuracy_b8:
+    paper_value: 0.986
+    printed: '0.986'
+    precision: 3
+    quote: TwoLeadECG 0.982 0.986 0.987 0.999 0.993 0.976 0.871 0.905
+    page: 17
+    reported_spread: null
+    spread_kind: none
+    spread_over: none
+    n_runs: null
+    status: agreed
+    votes:
+      haiku55:
+        value: 0.986
+        verified: true
+        why: ''
+        printed: '0.986'
+        quote: TwoLeadECG 0.982 0.986 0.987 0.999 0.993 0.976 0.871 0.905
+        page: 17
+        spread: null
+        spread_kind: none
+        spread_over: none
+        n_runs: null
+        note: Table 9 row TwoLeadECG; B=8 is the second value, 0.986.
+      luna:
+        value: 0.986
+        verified: true
+        why: ''
+        printed: '0.986'
+        quote: TwoLeadECG 0.982 0.986 0.987 0.999 0.993 0.976 0.871 0.905
+        page: 17
+        spread: null
+        spread_kind: none
+        spread_over: none
+        n_runs: null
+        note: Table 9 TS2Vec B=8 column.
+  chinatown_accuracy_b8:
+    paper_value: 0.965
+    printed: '0.965'
+    precision: 3
+    quote: Chinatown 0.968 0.965 0.959 0.951 0.977 0.983 0.936 0.957
+    page: 17
+    reported_spread: null
+    spread_kind: none
+    spread_over: none
+    n_runs: null
+    status: agreed
+    votes:
+      haiku55:
+        value: 0.965
+        verified: true
+        why: ''
+        printed: '0.965'
+        quote: Chinatown 0.968 0.965 0.959 0.951 0.977 0.983 0.936 0.957
+        page: 17
+        spread: null
+        spread_kind: none
+        spread_over: none
+        n_runs: null
+        note: Table 9 row Chinatown; B=8 is the second value, 0.965.
+      luna:
+        value: 0.965
+        verified: true
+        why: ''
+        printed: '0.965'
+        quote: Chinatown 0.968 0.965 0.959 0.951 0.977 0.983 0.936 0.957
+        page: 17
+        spread: null
+        spread_kind: none
+        spread_over: none
+        n_runs: null
+        note: Table 9 TS2Vec B=8 column.

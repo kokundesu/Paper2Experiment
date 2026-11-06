@@ -1,0 +1,89 @@
+# Hidden ground truth from the paper (GT stage). Tolerances follow after the reference re-runs.
+id: tstcc
+extractors:
+- haiku55
+- luna
+values:
+  epilepsy_ts_tcc_linear_acc:
+    paper_value: 97.23
+    printed: '97.23'
+    precision: 2
+    quote: TS-TCC (ours) 90.37±0.34 90.38 ±0.39 83.00±0.71 73.57 ±0.74 97.23±0.10
+      95.54 ±0.08
+    page: 5
+    reported_spread: 0.1
+    spread_kind: std
+    spread_over: seeds
+    n_runs: 5
+    status: agreed
+    votes:
+      haiku55:
+        value: 97.23
+        verified: true
+        why: ''
+        printed: '97.23'
+        quote: TS-TCC (ours) 90.37±0.34 90.38 ±0.39 83.00±0.71 73.57 ±0.74 97.23±0.10
+          95.54 ±0.08
+        page: 5
+        spread: 0.1
+        spread_kind: std
+        spread_over: seeds
+        n_runs: 5
+        note: Table 2, TS-TCC (ours) row, Epilepsy ACC column.论文表注说明为5个种子的均值±标准差（Experiments
+          were repeated for 5 times with 5 different seeds）。
+      luna:
+        value: 97.23
+        verified: true
+        why: ''
+        printed: '97.23'
+        quote: TS-TCC (ours) 90.37±0.34 90.38 ±0.39 83.00±0.71 73.57 ±0.74 97.23±0.10
+          95.54 ±0.08
+        page: 5
+        spread: 0.1
+        spread_kind: std
+        spread_over: runs
+        n_runs: 5
+        note: Table 2 gives the mean and standard deviation; §4.2 states that experiments
+          were repeated 5 times with 5 different seeds. The table prints no percent
+          sign.
+  epilepsy_ts_tcc_linear_mf1:
+    paper_value: 95.54
+    printed: '95.54'
+    precision: 2
+    quote: TS-TCC (ours) 90.37±0.34 90.38 ±0.39 83.00±0.71 73.57 ±0.74 97.23±0.10
+      95.54 ±0.08
+    page: 5
+    reported_spread: 0.08
+    spread_kind: std
+    spread_over: seeds
+    n_runs: 5
+    status: agreed
+    votes:
+      haiku55:
+        value: 95.54
+        verified: true
+        why: ''
+        printed: '95.54'
+        quote: TS-TCC (ours) 90.37±0.34 90.38 ±0.39 83.00±0.71 73.57 ±0.74 97.23±0.10
+          95.54 ±0.08
+        page: 5
+        spread: 0.08
+        spread_kind: std
+        spread_over: seeds
+        n_runs: 5
+        note: Table 2, TS-TCC (ours) row, Epilepsy MF1 column. 5 seeds 的均值±标准差。
+      luna:
+        value: 95.54
+        verified: true
+        why: ''
+        printed: '95.54'
+        quote: TS-TCC (ours) 90.37±0.34 90.38 ±0.39 83.00±0.71 73.57 ±0.74 97.23±0.10
+          95.54 ±0.08
+        page: 5
+        spread: 0.08
+        spread_kind: std
+        spread_over: runs
+        n_runs: 5
+        note: Table 2 gives the mean and standard deviation; §4.2 states that experiments
+          were repeated 5 times with 5 different seeds. The table prints no percent
+          sign.

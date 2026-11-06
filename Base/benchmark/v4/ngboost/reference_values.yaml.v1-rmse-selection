@@ -1,0 +1,83 @@
+# Reference re-runs of the official code (hidden).
+id: ngboost
+recipe_status: draft
+commit: 6aadc1fc49311606c9abc808c2a1f100880120c5
+run_dir: /Users/allenhuw/Documents/Projects/Paper2Exp/Base/runs/reference/20261017-100756_ngboost
+n: 5
+setup_logs:
+- cmd_001_setup.log
+- cmd_002_setup.log
+- cmd_003_setup.log
+- cmd_004_setup.log
+runs:
+- i: 0
+  seed: 0
+  threads: default
+  exit: 0
+  wall_s: 674.8
+  log: cmd_005_ref_0.log
+  values:
+    concrete_ngboost_nll: 3.4671
+    concrete_ngboost_rmse: 4.6329
+- i: 1
+  seed: 1
+  threads: '1'
+  exit: 0
+  wall_s: 657.9
+  log: cmd_006_ref_1.log
+  values:
+    concrete_ngboost_nll: 3.4287
+    concrete_ngboost_rmse: 4.6072
+- i: 2
+  seed: 2
+  threads: default
+  exit: 0
+  wall_s: 295.5
+  log: cmd_007_ref_2.log
+  values:
+    concrete_ngboost_nll: 4.1043
+    concrete_ngboost_rmse: 4.6641
+- i: 3
+  seed: 3
+  threads: '1'
+  exit: 0
+  wall_s: 269.2
+  log: cmd_008_ref_3.log
+  values:
+    concrete_ngboost_nll: 3.4252
+    concrete_ngboost_rmse: 4.4774
+- i: 4
+  seed: 4
+  threads: default
+  exit: 0
+  wall_s: 256.2
+  log: cmd_009_ref_4.log
+  values:
+    concrete_ngboost_nll: 3.314
+    concrete_ngboost_rmse: 4.5556
+values:
+  concrete_ngboost_nll:
+  - 3.4671
+  - 3.4287
+  - 4.1043
+  - 3.4252
+  - 3.314
+  concrete_ngboost_rmse:
+  - 4.6329
+  - 4.6072
+  - 4.6641
+  - 4.4774
+  - 4.5556
+printed_places:
+  concrete_ngboost_nll: 4
+  concrete_ngboost_rmse: 4
+manifest:
+  cmd_001_setup.log: c466a297f879d7e595833ff3eb1980d863d695dcb47b9487aa72b3de1dba86f3
+  cmd_002_setup.log: 6287f6759a37475704ebb7715ff88faf29fc470a1af35655b7fc1f04602b0078
+  cmd_003_setup.log: d0481be9063e0e267351d7bc4d1c8ca3582a2be8e52e71fa7dda9085fbaabb20
+  cmd_004_setup.log: acc2e7d9204ab04ccffea7a602cb1b673337e7d6ef0e5202843637b0dfae12f2
+  cmd_005_ref_0.log: dd03d2fc16c88fbbe6c7d443bcf5acae9f052e4c6c911464aa7efebccc9885e6
+  cmd_006_ref_1.log: 4846a8f46e275cb31b270c984e2274b190a4a3d19ec0746c94d6e620d36c1c61
+  cmd_007_ref_2.log: 3018c4b6f643eb5dac34d0a1b8c3788be0258a97efd5859127624c825b08e3ed
+  cmd_008_ref_3.log: 1d00cc6ae6a66051ac16a3cb734c229da060a0ac6597994dc49aa23a581575b0
+  cmd_009_ref_4.log: c8b262ebe2d2433d6d9e7886cee4a71de18f060b218976d70e6985736693ad26

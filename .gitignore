@@ -1,0 +1,15 @@
+envs/
+__pycache__/
+.DS_Store
+.venv/
+.env
+
+# per-version run outputs and local notes
+Base/runs/*
+!Base/runs/reports/
+.DS_Store
+Base/benchmark/corebench_v1.1/capsules/
+Base/benchmark/corebench_v1_train/capsules/
+.pytest_cache/
+*.tar.gz
+Base/benchmark/v4/*/paper/

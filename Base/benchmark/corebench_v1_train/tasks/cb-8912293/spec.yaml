@@ -1,0 +1,52 @@
+# CORE-Bench v1.1 task as a ReproSpec: what agents see. No answers.
+id: cb-8912293
+title: 'Making a Difference: The Consequences of Electoral Experiments'
+objective: 'Test the computational reproducibility of a scientific capsule (CORE-Bench,
+  Hard level): run its code and answer the questions from the output.'
+task_prompt: Run '01_data_processing.R', '02_info_exps.R', '03_colorado_sim.R', '04_pap_analysis.R',
+  and '05_existing_applications.R' using Rscript.
+language: R
+paper: null
+code:
+  repo_url: null
+  capsule: capsule-8912293
+questions:
+- id: q1
+  text: fig Report the location of experiment with the higher proportion of 131 pre−registered
+    experiments in AEA and EGAP registries for the mobilization intervention class
+    (ignore the n value).
+  answer_type: any
+  metric: ''
+  direction: ''
+  unit: ''
+  locator: program output
+  setting: ''
+  runs: 1
+  evidence: either
+- id: q2
+  text: fig From Figure A5, report the y-axis label.
+  answer_type: any
+  metric: ''
+  direction: ''
+  unit: ''
+  locator: program output
+  setting: ''
+  runs: 1
+  evidence: either
+- id: q3
+  text: fig From Figure A2, report the x-axis label of the first plot.
+  answer_type: any
+  metric: ''
+  direction: ''
+  unit: ''
+  locator: program output
+  setting: ''
+  runs: 1
+  evidence: either
+origin:
+  source: corebench
+  reference: core-bench (original) core_train.json sha256:3df47f1b3fa1cb60045018eb1a0f1ad4ecf6a53f72318c845a879ce0313b0730
+  prompt: ''
+  drafted_by: []
+  checked_by: []
+  user_confirmed: false

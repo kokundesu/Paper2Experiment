@@ -1,0 +1,22 @@
+# Hidden: pre-registered tolerances, computed from the 3 manual re-runs.
+capsule_id: capsule-3249574
+source: core-bench (original) core_train.json
+split: dev
+data_sha256: 3df47f1b3fa1cb60045018eb1a0f1ad4ecf6a53f72318c845a879ce0313b0730
+rule: docs/benchmark-redesign.md section 3.3
+questions:
+- id: q1
+  question: Report the F1-score after epoch 200.
+  vision: false
+  kind: numeric
+  scored: false
+  tolerance:
+    mean: 0.96543
+    s: 0.023398771335264575
+    n: 3
+    m: 1
+    noise: 0.11626092331201963
+    precision: 5.0e-06
+    floor: 9.654300000000002e-06
+    h: 0.11626092331201963
+    term: noise

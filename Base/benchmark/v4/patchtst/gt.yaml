@@ -1,0 +1,102 @@
+# Hidden ground truth from the paper (GT stage). Tolerances follow after the reference re-runs.
+id: patchtst
+extractors:
+- haiku55
+- luna
+values:
+  ili_24_patchtst42_mse:
+    paper_value: 1.522
+    printed: '1.522'
+    precision: 3
+    quote: 'ILI
+
+      24 1.319 0.754 1.522 0.814 2.215 1.081 2.624 1.095 2.906 1.182 4.657 1.449 1.420
+      2.012 4.480 1.444'
+    page: 7
+    reported_spread: null
+    spread_kind: none
+    spread_over: none
+    n_runs: null
+    status: agreed
+    votes:
+      haiku55:
+        value: 1.522
+        verified: true
+        why: ''
+        printed: '1.522'
+        quote: 'ILI
+
+          24 1.319 0.754 1.522 0.814 2.215 1.081 2.624 1.095 2.906 1.182 4.657 1.449
+          1.420 2.012 4.480 1.444'
+        page: 7
+        spread: null
+        spread_kind: none
+        spread_over: none
+        n_runs: null
+        note: 'Table 3 ILI row for horizon 24; PatchTST/42 MSE column is the 2nd pair
+          (1.522 | 0.814). No ± spread printed in Table 3. Consistent with Table 9
+          (L=104, PatchTST/42, ILI 24: 1.522 / 0.814). Table 14 (seed variance) does
+          not include ILI.'
+      luna:
+        value: 1.522
+        verified: true
+        why: ''
+        printed: '1.522'
+        quote: 'ILI
+
+          24 1.319 0.754 1.522 0.814 2.215 1.081 2.624 1.095 2.906 1.182 4.657 1.449
+          1.420 2.012 4.480 1.444'
+        page: 7
+        spread: null
+        spread_kind: none
+        spread_over: none
+        n_runs: null
+        note: Table 3 headers identify the PatchTST/42 MSE entry as 1.522; no spread
+          is reported.
+  ili_24_patchtst42_mae:
+    paper_value: 0.814
+    printed: '0.814'
+    precision: 3
+    quote: 'ILI
+
+      24 1.319 0.754 1.522 0.814 2.215 1.081 2.624 1.095 2.906 1.182 4.657 1.449 1.420
+      2.012 4.480 1.444'
+    page: 7
+    reported_spread: null
+    spread_kind: none
+    spread_over: none
+    n_runs: null
+    status: agreed
+    votes:
+      haiku55:
+        value: 0.814
+        verified: true
+        why: ''
+        printed: '0.814'
+        quote: 'ILI
+
+          24 1.319 0.754 1.522 0.814 2.215 1.081 2.624 1.095 2.906 1.182 4.657 1.449
+          1.420 2.012 4.480 1.444'
+        page: 7
+        spread: null
+        spread_kind: none
+        spread_over: none
+        n_runs: null
+        note: Table 3 ILI row for horizon 24; PatchTST/42 MAE column (1.522 | 0.814).
+          No ± spread printed. Same value appears in Table 9 at L=104.
+      luna:
+        value: 0.814
+        verified: true
+        why: ''
+        printed: '0.814'
+        quote: 'ILI
+
+          24 1.319 0.754 1.522 0.814 2.215 1.081 2.624 1.095 2.906 1.182 4.657 1.449
+          1.420 2.012 4.480 1.444'
+        page: 7
+        spread: null
+        spread_kind: none
+        spread_over: none
+        n_runs: null
+        note: Table 3 headers identify the PatchTST/42 MAE entry as 0.814; no spread
+          is reported.

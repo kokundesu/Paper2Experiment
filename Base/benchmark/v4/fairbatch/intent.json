@@ -1,0 +1,93 @@
+{
+ "draft": {
+  "understanding": "用户希望复现论文表 1 中 FairBatch 在合成数据集上训练逻辑回归、以 equal opportunity 为公平性目标时的测试集 accuracy 和 EO disparity；仅针对 FairBatch 行，而非无公平约束的 LR 基线或其他数据集。",
+  "questions": [
+   {
+    "id": "synthetic_fairbatch_eo_accuracy",
+    "text": "论文表 1 中，合成数据集上采用 FairBatch、逻辑回归模型并以 equal opportunity 为公平性目标时，测试集 accuracy 的跨次实验平均值是多少？",
+    "metric": "Test accuracy",
+    "unit": "",
+    "direction": "higher",
+    "locator": "Table 1, FairBatch row, Synthetic group, Acc. column",
+    "setting": "Synthetic dataset; logistic regression trained with FairBatch for equal opportunity; separate test set",
+    "runs": 10,
+    "protocol_notes": "论文说明所有实验以不同随机种子重复 10 次；表格以中心值和 ± 项呈现。合成数据采用训练/测试划分，EO 公平性目标，评估在独立测试集上进行；此问题针对中心值，不要求 ± 项。"
+   },
+   {
+    "id": "synthetic_fairbatch_eo_disparity",
+    "text": "论文表 1 中，合成数据集上采用 FairBatch、逻辑回归模型并以 equal opportunity 为公平性目标时，测试集 EO disparity 的跨次实验平均值是多少？",
+    "metric": "EO disparity = max over sensitive groups z of |Pr(predicted positive | z, true positive) − Pr(predicted positive | true positive)|",
+    "unit": "",
+    "direction": "lower",
+    "locator": "Table 1, FairBatch row, Synthetic group, EO Disp. column",
+    "setting": "Synthetic dataset; logistic regression trained with FairBatch for equal opportunity; separate test set",
+    "runs": 10,
+    "protocol_notes": "论文说明所有实验以不同随机种子重复 10 次；表格以中心值和 ± 项呈现。按论文第 4 节的 EO disparity 定义计算测试集公平性；此问题针对中心值，不要求 ± 项。"
+   }
+  ],
+  "open_issues": []
+ },
+ "checks": {
+  "sonnet55": {
+   "items": [
+    {
+     "question_id": "synthetic_fairbatch_eo_accuracy",
+     "in_scope": "yes",
+     "locator_ok": "yes",
+     "underspecified": [
+      "none"
+     ],
+     "answer_type_ok": "yes",
+     "measurable": "yes",
+     "comment": ""
+    },
+    {
+     "question_id": "synthetic_fairbatch_eo_disparity",
+     "in_scope": "yes",
+     "locator_ok": "yes",
+     "underspecified": [
+      "none"
+     ],
+     "answer_type_ok": "yes",
+     "measurable": "yes",
+     "comment": ""
+    }
+   ],
+   "missing_questions": []
+  },
+  "haiku55": {
+   "items": [
+    {
+     "question_id": "synthetic_fairbatch_eo_accuracy",
+     "in_scope": "yes",
+     "locator_ok": "yes",
+     "underspecified": [
+      "none"
+     ],
+     "answer_type_ok": "yes",
+     "measurable": "yes",
+     "comment": "Table 1, FairBatch row, Synthetic Acc. column is the requested accuracy under LR with EO. The synthetic data files are provided as .npy with a train/test split, so the setting is concrete."
+    },
+    {
+     "question_id": "synthetic_fairbatch_eo_disparity",
+     "in_scope": "yes",
+     "locator_ok": "yes",
+     "underspecified": [
+      "none"
+     ],
+     "answer_type_ok": "yes",
+     "measurable": "yes",
+     "comment": "Table 1, FairBatch row, Synthetic EO Disp. column. The EO disparity definition in the draft matches Section 4 of the paper. The draft's metric line uses max over z of |Pr(ŷ=1|z,y=1) − Pr(ŷ=1|y=1)|, which is the paper's definition."
+    }
+   ],
+   "missing_questions": []
+  }
+ },
+ "accepted": [
+  "synthetic_fairbatch_eo_accuracy",
+  "synthetic_fairbatch_eo_disparity"
+ ],
+ "queue": [],
+ "notes": [],
+ "cost_usd": 0.1637
+}

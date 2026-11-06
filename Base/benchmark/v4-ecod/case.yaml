@@ -1,0 +1,59 @@
+# Hidden: targets are the reference re-runs' means, tolerances their h.
+id: v4-ecod
+rubric:
+  min_seeds: 3
+  aggregate: mean
+claims:
+- id: cardio_ecod_roc_auc
+  metric: ROC-AUC
+  setting: 表 4，Cardio (mat) 行，ECOD 列（括号外的 ROC 分数）
+  unit: ''
+  value: 0.9355496000000001
+  tolerance:
+    abs: 0.0038060366129726276
+  target: reference
+  paper_value: 0.897
+  evidence_pattern: (?i:\becod\b|roc[-_ ]?auc|\bsplit\b|iteration)|(?i:\b(?:seeds?|splits?|trials?|folds?|iter(?:ation)?s?|epochs?|steps?|runs?)\b\W{0,3}\d+)
+  ref_spread: 0.0018773884254463867
+  run_definition: 论文的完整协议：10 个随机 60/40 划分上的平均。
+  diagnostic_only: false
+- id: breastw_ecod_roc_auc
+  metric: ROC-AUC
+  setting: 表 4，Breastw (mat) 行，ECOD 列（括号外的 ROC 分数）
+  unit: ''
+  value: 0.99154
+  tolerance:
+    abs: 0.0011287194607620514
+  target: reference
+  paper_value: 0.994
+  evidence_pattern: (?i:\becod\b|roc[-_ ]?auc|\bsplit\b|iteration)|(?i:\b(?:seeds?|splits?|trials?|folds?|iter(?:ation)?s?|epochs?|steps?|runs?)\b\W{0,3}\d+)
+  ref_spread: 0.0005567589244906726
+  run_definition: 论文的完整协议：10 个随机 60/40 划分上的平均。
+  diagnostic_only: false
+- id: mammography_ecod_roc_auc
+  metric: ROC-AUC
+  setting: 表 4，Mammography (mat) 行，ECOD 列（括号外的 ROC 分数）
+  unit: ''
+  value: 0.9085822
+  tolerance:
+    abs: 0.006526069566173337
+  target: reference
+  paper_value: 0.894
+  evidence_pattern: (?i:\becod\b|roc[-_ ]?auc|\bsplit\b|iteration)|(?i:\b(?:seeds?|splits?|trials?|folds?|iter(?:ation)?s?|epochs?|steps?|runs?)\b\W{0,3}\d+)
+  ref_spread: 0.003219088178351126
+  run_definition: 论文的完整协议：10 个随机 60/40 划分上的平均。
+  diagnostic_only: false
+discrepancies:
+- claim_id: cardio_ecod_roc_auc
+  category: unknown
+  confidence: unresolved
+  summary: the official code itself misses the paper here (reference 0.9355 vs paper
+    0.897); scored against the reference, the diagnosis should report the gap
+- claim_id: mammography_ecod_roc_auc
+  category: unknown
+  confidence: unresolved
+  summary: the official code itself misses the paper here (reference 0.9086 vs paper
+    0.894); scored against the reference, the diagnosis should report the gap
+source:
+  spec: benchmark/v4/ecod
+  split: dev

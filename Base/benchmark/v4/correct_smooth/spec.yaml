@@ -1,0 +1,36 @@
+# ReproSpec (agent-visible, no values). FROZEN: see ../FROZEN.yaml.
+id: correct_smooth
+title: ''
+objective: 复现 Correct & Smooth（ICLR 2021）在 ogbn-arxiv 上 Plain Linear + C&S（Autoscale）的测试准确率，表
+  2。
+task_prompt: ''
+language: Python
+paper:
+  url: https://arxiv.org/abs/2010.13993
+  pdf: null
+code:
+  repo_url: https://github.com/CUAI/CorrectAndSmooth
+  capsule: null
+questions:
+- id: arxiv_plain_linear_cs_autoscale_test_accuracy
+  text: 论文表 2 中，ogbn-arxiv 上 Plain Linear 基础预测器结合 Correct & Smooth（Autoscale）的测试准确率是多少？
+  answer_type: number
+  metric: 测试集节点分类准确率
+  direction: higher
+  unit: '%'
+  locator: 表 2，上半部分，Methods 为 Autoscale、Base Model 为 Plain Linear 的行，Arxiv 列
+  setting: ogbn-arxiv；官方训练／验证／测试划分；Plain Linear 仅使用原始节点特征作为基础预测，不使用谱嵌入；随后执行 Autoscale
+    残差纠错及最终预测平滑的完整 C&S 流程；传播时仅使用训练集真实标签，不将验证集真实标签加入最终平滑。
+  runs: 3
+  evidence: log
+origin:
+  source: user
+  reference: ''
+  prompt: 复现 Correct & Smooth（ICLR 2021）在 ogbn-arxiv 上 Plain Linear + C&S（Autoscale）的测试准确率，表
+    2。
+  drafted_by:
+  - sol
+  checked_by:
+  - sonnet55
+  - haiku55
+  user_confirmed: true

@@ -1,0 +1,13 @@
+# Task given to every workflow. Contains no target values.
+id: gcn
+paper_url: https://arxiv.org/pdf/1609.02907
+paper_pdf: paper/1609.02907.pdf
+repo_url: https://github.com/tkipf/gcn
+objective: >
+  Reproduce the GCN row of Table 2 (classification accuracy on the citation
+  datasets) using the official code and the paper's experimental setup.
+claims:
+  - {id: cora_acc,     metric: test_accuracy, setting: cora,     unit: "%", description: "GCN test accuracy on Cora"}
+  - {id: citeseer_acc, metric: test_accuracy, setting: citeseer, unit: "%", description: "GCN test accuracy on Citeseer"}
+  - {id: pubmed_acc,   metric: test_accuracy, setting: pubmed,   unit: "%", description: "GCN test accuracy on Pubmed"}
+seeds: 3

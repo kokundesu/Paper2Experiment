@@ -1,0 +1,119 @@
+# Hidden ground truth from the paper (GT stage). Tolerances follow after the reference re-runs.
+id: am_tsp
+extractors:
+- haiku55
+- luna
+values:
+  tsp20_am_greedy_mean_tour_length:
+    paper_value: 3.85
+    printed: '3.85'
+    precision: 2
+    quote: AM (greedy) 3.85 0 .34% (0s) 5.80 1 .76% (2s) 8.12 4 .53% (6s)
+    page: 7
+    reported_spread: null
+    spread_kind: none
+    spread_over: none
+    n_runs: null
+    status: agreed
+    votes:
+      haiku55:
+        value: 3.85
+        verified: true
+        why: ''
+        printed: '3.85'
+        quote: AM (greedy) 3.85 0 .34% (0s) 5.80 1 .76% (2s) 8.12 4 .53% (6s)
+        page: 7
+        spread: null
+        spread_kind: none
+        spread_over: none
+        n_runs: null
+        note: Table 1 (TSP, AM (greedy), n=20). Obj. = 3.85; gap 0.34% relative to
+          Concorde/Gurobi optimum 3.84. No ± spread printed in Table 1. This is the
+          paper's reported value, not a rerun of the pretrained model.
+      luna:
+        value: 3.85
+        verified: true
+        why: ''
+        printed: '3.85'
+        quote: AM (greedy) 3.85 0 .34% (0s) 5.80 1 .76% (2s) 8.12 4 .53% (6s)
+        page: 7
+        spread: null
+        spread_kind: none
+        spread_over: none
+        n_runs: null
+        note: 表 1 中 n = 20 的 Obj. 值；未报告 ± spread 或平均的运行次数。
+  tsp50_am_greedy_mean_tour_length:
+    paper_value: 5.8
+    printed: '5.80'
+    precision: 2
+    quote: AM (greedy) 3.85 0 .34% (0s) 5.80 1 .76% (2s) 8.12 4 .53% (6s)
+    page: 7
+    reported_spread: null
+    spread_kind: none
+    spread_over: none
+    n_runs: null
+    status: agreed
+    votes:
+      haiku55:
+        value: 5.8
+        verified: true
+        why: ''
+        printed: '5.80'
+        quote: AM (greedy) 3.85 0 .34% (0s) 5.80 1 .76% (2s) 8.12 4 .53% (6s)
+        page: 7
+        spread: null
+        spread_kind: none
+        spread_over: none
+        n_runs: null
+        note: Table 1 (TSP, AM (greedy), n=50). Obj. = 5.80; gap 1.76%. Table 2 (p.16)
+          also lists 5.80 for seed 1234, which is a single run, no spread.
+      luna:
+        value: 5.8
+        verified: true
+        why: ''
+        printed: '5.80'
+        quote: AM (greedy) 3.85 0 .34% (0s) 5.80 1 .76% (2s) 8.12 4 .53% (6s)
+        page: 7
+        spread: null
+        spread_kind: none
+        spread_over: none
+        n_runs: null
+        note: 表 1 中 n = 50 的 Obj. 值；未报告 ± spread 或平均的运行次数。
+  tsp100_am_greedy_mean_tour_length:
+    paper_value: 8.12
+    printed: '8.12'
+    precision: 2
+    quote: AM (greedy) 3.85 0 .34% (0s) 5.80 1 .76% (2s) 8.12 4 .53% (6s)
+    page: 7
+    reported_spread: null
+    spread_kind: none
+    spread_over: none
+    n_runs: null
+    status: agreed
+    votes:
+      haiku55:
+        value: 8.12
+        verified: true
+        why: ''
+        printed: '8.12'
+        quote: AM (greedy) 3.85 0 .34% (0s) 5.80 1 .76% (2s) 8.12 4 .53% (6s)
+        page: 7
+        spread: null
+        spread_kind: none
+        spread_over: none
+        n_runs: null
+        note: Table 1 (TSP, AM (greedy), n=100). Obj. = 8.12; gap 4.53%. Table 2 (p.16)
+          gives 8.12 for seed 1234 and 8.10 for seed 1235, but Table 1 reports 8.12.
+          No ± spread.
+      luna:
+        value: 8.12
+        verified: true
+        why: ''
+        printed: '8.12'
+        quote: AM (greedy) 3.85 0 .34% (0s) 5.80 1 .76% (2s) 8.12 4 .53% (6s)
+        page: 7
+        spread: null
+        spread_kind: none
+        spread_over: none
+        n_runs: null
+        note: 表 1 中 n = 100 的 Obj. 值；未报告 ± spread 或平均的运行次数。

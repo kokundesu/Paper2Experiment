@@ -1,0 +1,38 @@
+# Task given to every workflow. Contains no target values.
+id: pinn_burgers
+paper_url: https://arxiv.org/pdf/1711.10561
+paper_pdf: paper/1711.10561.pdf
+repo_url: https://github.com/maziarraissi/PINNs
+objective: >
+  Reproduce the continuous-time inference (data-driven solution) result for the
+  Burgers' equation in Section 2.1 ("Example (Burgers' Equation)", continuous time models): the relative
+  L2 error reported in the text / Figure 1, plus two cells of Tables 1 and 2,
+  using the official code and the paper's experimental setup
+  (L-BFGS training, Latin hypercube collocation points, tanh MLP).
+claims:
+  - id: burgers_main_l2
+    metric: relative_l2_error
+    setting: "N_u=100, N_f=10000, 9-layer net (8 hidden x 20 neurons)"
+    unit: "dimensionless (||u_pred - u_exact||_2 / ||u_exact||_2)"
+    description: >
+      Relative L2 error of predicted u(t,x) vs the exact solution over the full
+      256 x 100 (x, t) grid of burgers_shock.mat, N_u=100 initial/boundary
+      points, N_f=10000 collocation points, 8 hidden layers x 20 neurons
+      (the setting of Figure 1 and of the error quoted in the text).
+  - id: burgers_nu200_l2
+    metric: relative_l2_error
+    setting: "Table 1 cell N_u=200, N_f=10000, 9-layer net (8 hidden x 20 neurons)"
+    unit: "dimensionless"
+    description: >
+      Relative L2 error of predicted u(t,x) vs the exact solution on the full
+      grid, with N_u=200 initial/boundary points, N_f=10000 collocation points,
+      8 hidden layers x 20 neurons (Table 1, row N_u=200, column N_f=10000).
+  - id: burgers_l4n20_l2
+    metric: relative_l2_error
+    setting: "Table 2 cell 4 hidden layers x 20 neurons, N_u=100, N_f=10000"
+    unit: "dimensionless"
+    description: >
+      Relative L2 error of predicted u(t,x) vs the exact solution on the full
+      grid, with 4 hidden layers x 20 neurons, N_u=100, N_f=10000
+      (Table 2, row Layers=4, column Neurons=20).
+seeds: 3

@@ -1,0 +1,44 @@
+# Benchmark case: hidden ground truth for the evaluator. Agents never see this file.
+# Held-out case for v3.0-heldout (added 2026-10-15). Written from the paper and the repository's README, file
+# listing and train.py's argument/print lines only: no code of this paper was run before the tolerance was fixed.
+id: hnn
+paper:
+  title: "Hamiltonian Neural Networks"
+  authors: "Greydanus, Dzamba, Yosinski"
+  venue: "NeurIPS 2019"
+  arxiv: "1906.01563"
+repo:
+  url: https://github.com/greydanus/hamiltonian-nn
+  note: >
+    Official PyTorch code, no pinned versions. experiment-<task>/train.py (defaults: 200 hidden, tanh, lr 1e-3,
+    2000 steps, --seed, --baseline for the plain NN) prints "step N, train_loss .., test_loss .." with --verbose and
+    "Final train loss .. +/- ..  Final test loss .. +/- .." (spread over examples), then saves <name>.tar. The
+    energy MSE is computed only in the analyze-<task>.ipynb notebooks (integrate a trained model from a test
+    point and compare total energy). No trained models are shipped. Paper: 3 layers, 200 hidden, tanh, Adam
+    lr 1e-3, full-batch, 2000 steps, weight decay 1e-4 on the first three tasks; trained on a desktop CPU.
+difficulty: medium  # the energy metric lives in notebooks, not in the training scripts
+expected_runtime_cpu_min: 5  # estimate, not measured: 2000 full-batch steps of a small MLP
+
+# Table 1 (all values x 10^3 in the paper), HNN column:
+#   Task 1 ideal mass-spring: test loss 36 +- 2, energy .38 +- .1   -> 0.036 +- 0.002, 0.00038 +- 0.0001
+#   Task 2 ideal pendulum:    energy 25 +- 5                        -> 0.025 +- 0.005
+# The paper does not say what the +- spans (train.py's "+/-" is the spread over test examples).
+# evidence_pattern (all claims): a training trace ("step N, train_loss .."), case-insensitive and tolerant of a
+# rewritten loop ("epoch 3 loss=.."). The energy MSE is computed outside train.py, so its value counts only from a log
+# that also shows the training it evaluates, as every agent is told (metric and training progress in one log).
+claims:
+  - {id: spring_hnn_test_loss,  metric: test_loss,  setting: "Table 1, Task 1, HNN, test loss", unit: "", value: 0.036,   tolerance: {abs: 0.002}, evidence_pattern: "(?i)\\b(step|epoch|iter\\w*)\\b\\W{0,3}\\d+[^\\n]{0,60}loss"}
+  - {id: spring_hnn_energy_mse, metric: energy_mse, setting: "Table 1, Task 1, HNN, energy",    unit: "", value: 0.00038, tolerance: {abs: 0.0001}, evidence_pattern: "(?i)\\b(step|epoch|iter\\w*)\\b\\W{0,3}\\d+[^\\n]{0,60}loss"}
+  - {id: pend_hnn_energy_mse,   metric: energy_mse, setting: "Table 1, Task 2, HNN, energy",    unit: "", value: 0.025,   tolerance: {abs: 0.005}, evidence_pattern: "(?i)\\b(step|epoch|iter\\w*)\\b\\W{0,3}\\d+[^\\n]{0,60}loss"}
+
+rubric:
+  min_seeds: 3
+  aggregate: mean
+  levels:
+    full: "all verdict claims within tolerance (diagnostic_only claims excluded)"
+    partial: "at least one verdict claim within tolerance"
+    fail: "no verdict claim reproduced or run did not finish"
+  tolerance_justification: >
+    Pre-registered rule for held-out cases: when the paper reports a spread, the mean over the seed runs must lie
+    within one reported +- of the paper value (here 2e-3, 1e-4 and 5e-3 after undoing the table's x10^3 scaling).
+    Fixed before any run of this paper.

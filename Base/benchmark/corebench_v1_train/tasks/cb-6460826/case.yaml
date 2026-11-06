@@ -1,0 +1,97 @@
+# Hidden: pre-registered tolerances, computed from the 3 manual re-runs.
+capsule_id: capsule-6460826
+source: core-bench (original) core_train.json
+split: dev
+data_sha256: 3df47f1b3fa1cb60045018eb1a0f1ad4ecf6a53f72318c845a879ce0313b0730
+rule: docs/benchmark-redesign.md section 3.3
+questions:
+- id: q1
+  question: Report the CN prediction accuracy for the Iris dataset.
+  vision: false
+  kind: numeric
+  scored: true
+  tolerance:
+    mean: 100.0
+    s: 0.0
+    n: 3
+    m: 1
+    noise: 0.0
+    precision: 0.05
+    floor: 0.001
+    h: 0.05
+    term: precision
+- id: q2
+  question: Report the AA prediction acccuracy for the Iris dataset.
+  vision: false
+  kind: numeric
+  scored: true
+  tolerance:
+    mean: 100.0
+    s: 0.0
+    n: 3
+    m: 1
+    noise: 0.0
+    precision: 0.05
+    floor: 0.001
+    h: 0.05
+    term: precision
+- id: q3
+  question: Report the CN prediction acccuracy for the Zoo dataset.
+  vision: false
+  kind: numeric
+  scored: true
+  tolerance:
+    mean: 100.0
+    s: 0.0
+    n: 3
+    m: 1
+    noise: 0.0
+    precision: 0.05
+    floor: 0.001
+    h: 0.05
+    term: precision
+- id: q4
+  question: Report the AA prediction acccuracy for the Zoo dataset.
+  vision: false
+  kind: numeric
+  scored: true
+  tolerance:
+    mean: 100.0
+    s: 0.0
+    n: 3
+    m: 1
+    noise: 0.0
+    precision: 0.05
+    floor: 0.001
+    h: 0.05
+    term: precision
+- id: q5
+  question: Report the CN prediction acccuracy for the Wine dataset.
+  vision: false
+  kind: numeric
+  scored: true
+  tolerance:
+    mean: 97.21999999999998
+    s: 0.0
+    n: 3
+    m: 1
+    noise: 0.0
+    precision: 0.005
+    floor: 0.0009721999999999999
+    h: 0.005
+    term: precision
+- id: q6
+  question: Report the AA prediction acccuracy for the Wine dataset.
+  vision: false
+  kind: numeric
+  scored: true
+  tolerance:
+    mean: 97.21999999999998
+    s: 0.0
+    n: 3
+    m: 1
+    noise: 0.0
+    precision: 0.005
+    floor: 0.0009721999999999999
+    h: 0.005
+    term: precision

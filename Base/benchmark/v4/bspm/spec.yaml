@@ -1,0 +1,45 @@
+# ReproSpec (agent-visible, no values). FROZEN: see ../FROZEN.yaml.
+id: bspm
+title: ''
+objective: 我想复现 BSPM（SIGIR 2023）在 Gowalla 数据集上 BSPM-EM 的结果，就是表 4 里的 Recall@20 和 NDCG@20。
+task_prompt: ''
+language: Python
+paper:
+  url: https://arxiv.org/abs/2211.09324
+  pdf: null
+code:
+  repo_url: https://github.com/jeongwhanchoi/BSPM
+  capsule: null
+questions:
+- id: gowalla_bspm_em_recall20
+  text: 论文表 4 中 BSPM-EM 在 Gowalla 上的 Recall@20 是多少？
+  answer_type: number
+  metric: Recall@20
+  direction: higher
+  unit: ''
+  locator: 表 4（Overall performance comparison），BSPM-EM 行、Gowalla 栏下的 Recall 子列
+  setting: Gowalla 数据集；BSPM-EM（early merge），top-20 推荐评估；对应仓库 README 的 Gowalla 命令，final_sharpening=True，sharpening
+    使用 RK4、K_s=1、T_s=2.5、idl_beta=0.2、factor_dim=448；按论文使用相同训练/测试划分，候选为用户未交互物品，不使用残差连接。
+  runs: 3
+  evidence: log
+- id: gowalla_bspm_em_ndcg20
+  text: 论文表 4 中 BSPM-EM 在 Gowalla 上的 NDCG@20 是多少？
+  answer_type: number
+  metric: NDCG@20
+  direction: higher
+  unit: ''
+  locator: 表 4（Overall performance comparison），BSPM-EM 行、Gowalla 栏下的 NDCG 子列
+  setting: Gowalla 数据集；BSPM-EM（early merge），top-20 推荐评估；对应仓库 README 的 Gowalla 命令，final_sharpening=True，sharpening
+    使用 RK4、K_s=1、T_s=2.5、idl_beta=0.2、factor_dim=448；按论文使用相同训练/测试划分，候选为用户未交互物品，不使用残差连接。
+  runs: 3
+  evidence: log
+origin:
+  source: user
+  reference: ''
+  prompt: 我想复现 BSPM（SIGIR 2023）在 Gowalla 数据集上 BSPM-EM 的结果，就是表 4 里的 Recall@20 和 NDCG@20。
+  drafted_by:
+  - sol
+  checked_by:
+  - sonnet55
+  - haiku55
+  user_confirmed: true

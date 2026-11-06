@@ -1,0 +1,36 @@
+# Hidden: pre-registered tolerances, computed from the 3 manual re-runs.
+capsule_id: capsule-8412128
+source: agent-evals/core-bench-v1.1-mainline core_test.json
+core_test_sha256: d4aa5ebb984df7f293e04f2dd120722f172fddea6fcb54a0c928e09bc6ef837d
+rule: docs/benchmark-redesign.md section 3.3
+questions:
+- id: q1
+  question: What is the mean of the snf_effectiveness_index?
+  vision: false
+  kind: numeric
+  scored: true
+  tolerance:
+    mean: 0.5791337825021187
+    s: 0.0
+    n: 3
+    m: 1
+    noise: 0.0
+    precision: 5.0e-17
+    floor: 5.791337825021187e-06
+    h: 5.791337825021187e-06
+    term: floor
+- id: q2
+  question: What is the median of the dignity_score?
+  vision: false
+  kind: numeric
+  scored: true
+  tolerance:
+    mean: 0.5888590852515395
+    s: 0.0
+    n: 3
+    m: 1
+    noise: 0.0
+    precision: 5.0e-17
+    floor: 5.888590852515396e-06
+    h: 5.888590852515396e-06
+    term: floor

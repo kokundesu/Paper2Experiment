@@ -1,0 +1,17 @@
+# Task given to every workflow. Contains no target values.
+id: dlinear
+paper_url: https://arxiv.org/pdf/2205.13504
+paper_pdf: paper/2205.13504.pdf
+repo_url: https://github.com/cure-lab/LTSF-Linear
+objective: >
+  Reproduce five DLinear cells of Table 2 (multivariate long-term forecasting
+  errors, MSE) on the ETT datasets, using the official code and the paper's
+  experimental setup for LTSF-Linear (look-back window, data splits,
+  normalisation and per-dataset hyperparameters as used by the authors).
+claims:
+  - {id: etth1_96_mse,  metric: test_mse, setting: "Table 2, DLinear, ETTh1, multivariate, horizon T=96",  unit: "", description: "DLinear multivariate test MSE on ETTh1, forecasting horizon 96"}
+  - {id: etth1_336_mse, metric: test_mse, setting: "Table 2, DLinear, ETTh1, multivariate, horizon T=336", unit: "", description: "DLinear multivariate test MSE on ETTh1, forecasting horizon 336"}
+  - {id: etth2_96_mse,  metric: test_mse, setting: "Table 2, DLinear, ETTh2, multivariate, horizon T=96",  unit: "", description: "DLinear multivariate test MSE on ETTh2, forecasting horizon 96"}
+  - {id: ettm1_96_mse,  metric: test_mse, setting: "Table 2, DLinear, ETTm1, multivariate, horizon T=96",  unit: "", description: "DLinear multivariate test MSE on ETTm1, forecasting horizon 96"}
+  - {id: etth1_720_mse, metric: test_mse, setting: "Table 2, DLinear, ETTh1, multivariate, horizon T=720", unit: "", description: "DLinear multivariate test MSE on ETTh1, forecasting horizon 720"}
+seeds: 3

@@ -1,0 +1,93 @@
+{
+ "draft": {
+  "understanding": "用户希望复现 NeurIPS 2024 论文 CycleNet 表 7 中，Weather 数据集上采用 CycleNet/MLP、输入（回看）长度 96、预测长度 96 的多变量长期预测测试集 MSE 和 MAE；目标是表中的跨随机种子均值，而非其他模型、其他预测长度或跨预测长度的 Avg 行。",
+  "questions": [
+   {
+    "id": "weather_96_96_mlp_mse",
+    "text": "CycleNet/MLP 在 Weather 数据集上，以 96 步历史输入预测未来 96 步时，表 7 报告的测试集 MSE 跨运行均值是多少？",
+    "metric": "MSE",
+    "unit": "",
+    "direction": "lower",
+    "locator": "附录 C.2，表 7，Weather 区块，预测长度 96 行，CycleNet/MLP 的 MSE 列（取 ± 前的均值）",
+    "setting": "Weather 多变量长期时间序列预测；CycleNet/MLP（RCF 加双层 MLP）；look-back L=96，forecast horizon H=96；默认周期长度 W=144，默认使用无可学习仿射参数的 RevIN。",
+    "runs": 5,
+    "protocol_notes": "表 7 标明 CycleNet 的均值和标准差来自五个不同随机种子的独立运行（2024、2025、2026、2027、2028）。Weather 按训练/验证/测试 7:1:2 切分；使用验证集选模型；报告的是指定预测长度的测试指标，不是 Avg 行。"
+   },
+   {
+    "id": "weather_96_96_mlp_mae",
+    "text": "CycleNet/MLP 在 Weather 数据集上，以 96 步历史输入预测未来 96 步时，表 7 报告的测试集 MAE 跨运行均值是多少？",
+    "metric": "MAE",
+    "unit": "",
+    "direction": "lower",
+    "locator": "附录 C.2，表 7，Weather 区块，预测长度 96 行，CycleNet/MLP 的 MAE 列（取 ± 前的均值）",
+    "setting": "Weather 多变量长期时间序列预测；CycleNet/MLP（RCF 加双层 MLP）；look-back L=96，forecast horizon H=96；默认周期长度 W=144，默认使用无可学习仿射参数的 RevIN。",
+    "runs": 5,
+    "protocol_notes": "表 7 标明 CycleNet 的均值和标准差来自五个不同随机种子的独立运行（2024、2025、2026、2027、2028）。Weather 按训练/验证/测试 7:1:2 切分；使用验证集选模型；报告的是指定预测长度的测试指标，不是 Avg 行。"
+   }
+  ],
+  "open_issues": []
+ },
+ "checks": {
+  "sonnet55": {
+   "items": [
+    {
+     "question_id": "weather_96_96_mlp_mse",
+     "in_scope": "yes",
+     "locator_ok": "yes",
+     "underspecified": [
+      "none"
+     ],
+     "answer_type_ok": "yes",
+     "measurable": "yes",
+     "comment": ""
+    },
+    {
+     "question_id": "weather_96_96_mlp_mae",
+     "in_scope": "yes",
+     "locator_ok": "yes",
+     "underspecified": [
+      "none"
+     ],
+     "answer_type_ok": "yes",
+     "measurable": "yes",
+     "comment": ""
+    }
+   ],
+   "missing_questions": []
+  },
+  "haiku55": {
+   "items": [
+    {
+     "question_id": "weather_96_96_mlp_mse",
+     "in_scope": "yes",
+     "locator_ok": "yes",
+     "underspecified": [
+      "none"
+     ],
+     "answer_type_ok": "yes",
+     "measurable": "yes",
+     "comment": "Table 7 (Appendix C.2), Weather block, horizon 96 row, CycleNet/MLP MSE column, with mean before ±. Five seeds 2024-2028 are stated. Setting (L=96, W=144, RevIN without affine) matches the paper. Weather uses the 7:1:2 split. Runs on CPU are feasible for this small MLP."
+    },
+    {
+     "question_id": "weather_96_96_mlp_mae",
+     "in_scope": "yes",
+     "locator_ok": "yes",
+     "underspecified": [
+      "none"
+     ],
+     "answer_type_ok": "yes",
+     "measurable": "yes",
+     "comment": "Table 7 (Appendix C.2), Weather block, horizon 96 row, CycleNet/MLP MAE column, with mean before ±. Same setting and seeds as the MSE item. The table is the correct source, not the horizon-averaged Table 2."
+    }
+   ],
+   "missing_questions": []
+  }
+ },
+ "accepted": [
+  "weather_96_96_mlp_mse",
+  "weather_96_96_mlp_mae"
+ ],
+ "queue": [],
+ "notes": [],
+ "cost_usd": 0.2739
+}

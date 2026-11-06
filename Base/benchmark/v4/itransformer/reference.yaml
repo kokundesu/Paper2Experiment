@@ -1,0 +1,65 @@
+# Reference recipe (hidden; written by the benchmark builder).
+id: itransformer
+status: validated
+repo: https://github.com/thuml/iTransformer
+commit: c2426e68ca13f74aaec08045c5c724d8ad328124
+files:
+  patches/seed.py: '# run.py fixes its seed (fix_seed = <n>). Read it from P2E_SEED,
+    defaulting to the script''s own value, so reference
+
+    # runs can use other seeds; nothing else changes.
+
+    import pathlib, re, sys
+
+    p = pathlib.Path(sys.argv[1])
+
+    s = p.read_text()
+
+    m = re.search(r"fix_seed = (\d+)", s)
+
+    assert m and s.count(m.group(0)) == 1
+
+    s = s.replace(m.group(0), f''fix_seed = int(__import__("os").environ.get("P2E_SEED",
+    "{m.group(1)}"))'')
+
+    p.write_text(s)
+
+    print("patched", p, "default seed", m.group(1))
+
+    '
+setup:
+- git clone -q https://github.com/thuml/iTransformer repo && git -C repo checkout
+  -q c2426e68ca13f74aaec08045c5c724d8ad328124
+- uv venv -q --python 3.10 .venv
+- uv pip install -q -p .venv -r repo/requirements.txt scipy==1.11.4 gdown==5.2.0
+- .venv/bin/gdown -q 1l51QsKvQPcqILT3DwfjCgx8Dsg2rpjot -O datasets.zip && echo '01d7016eaa3eb571b77542612219d116dfc6a9f5399586dea1f98261fc4d80c4  datasets.zip'
+  | shasum -a 256 -c
+- unzip -q datasets.zip 'iTransformer_datasets/exchange_rate/exchange_rate.csv' &&
+  mkdir -p repo/dataset/exchange_rate && cp iTransformer_datasets/exchange_rate/exchange_rate.csv
+  repo/dataset/exchange_rate/
+- .venv/bin/python patches/seed.py repo/run.py
+command: cd repo && P2E_SEED={seed} ../.venv/bin/python -u run.py --is_training 1
+  --root_path ./dataset/exchange_rate/ --data_path exchange_rate.csv --model_id Exchange_96_96
+  --model iTransformer --data custom --features M --seq_len 96 --pred_len 96 --e_layers
+  2 --enc_in 8 --dec_in 8 --c_out 8 --des Exp --d_model 128 --d_ff 128 --itr 1 --num_workers
+  0
+timeout_s: 1800
+seeded: true
+metrics:
+  exchange_96_96_mse:
+    regex: mse:([0-9.]+), mae
+    scale: 1.0
+  exchange_96_96_mae:
+    regex: mae:([0-9.]+)
+    scale: 1.0
+entry: '`scripts/multivariate_forecasting/Exchange/iTransformer.sh`'
+notes:
+- 'difficulty: 易; estimated time per run: 1–3 分钟'
+- 'risk: 数据要从 Google Drive 的数据包里取'
+- 'questions: exchange_96_96_mse, exchange_96_96_mae'
+- first block of scripts/multivariate_forecasting/Exchange/iTransformer.sh, plus --num_workers
+  0 (macOS DataLoader workers; results unchanged)
+- 'patch: run.py''s fix_seed (2023) from P2E_SEED'
+- 'data: the README''s Google Drive bundle (sha256 checked)'
+- 'builder check, seed 2023 (1.6 min): MSE 0.0865, MAE 0.2062'
+evidence_pattern: (?i)epoch:\s*\d+,\s*steps:\s*\d+\s*\|\s*train loss

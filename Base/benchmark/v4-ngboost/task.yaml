@@ -1,0 +1,24 @@
+# v4 task as agents see it (from the frozen ReproSpec). No target values.
+id: v4-ngboost
+paper_pdf: paper/1910.03225.pdf
+paper_url: https://arxiv.org/pdf/1910.03225
+repo_url: https://github.com/stanfordmlgroup/ngboost
+objective: 复现 NGBoost（ICML 2020）在 Concrete 数据集上的 NLL（表 1）和 RMSE（表 3）。
+claims:
+- id: concrete_ngboost_nll
+  metric: 测试集平均负对数似然（NLL）
+  setting: 表 1，Concrete 行，NGBoost 列（取 ± 前的汇总指标）
+  unit: ''
+  description: '论文表 1 中，NGBoost 在 Concrete 数据集上的测试集平均负对数似然（NLL）是多少？ Setting: UCI Concrete
+    回归数据集；完整 NGBoost，Normal 预测分布、最大深度为 3 的决策树基学习器、对数评分规则及自然梯度；随机留出 10% 测试集，从其余 90%
+    中留出 20% 验证集选取 boosting 阶段数，再以全部 90% 重训；学习率 0.01，训练使用全部样本而非小批量。 一次运行 = 论文的完整协议：20
+    个随机 90/10 划分上的平均。'
+- id: concrete_ngboost_rmse
+  metric: 测试集均方根误差（RMSE）
+  setting: 表 3，Concrete 行，NGBoost 列（取 ± 前的汇总指标）
+  unit: ''
+  description: '论文表 3 中，NGBoost 在 Concrete 数据集上的测试集均方根误差（RMSE）是多少？ Setting: UCI Concrete
+    回归数据集；与表 1 相同的完整 NGBoost Normal 分布回归模型，以预测分布的期望作为点预测；随机留出 10% 测试集，从其余 90% 中留出
+    20% 验证集按对数似然选取 boosting 阶段数，再以全部 90% 重训；决策树最大深度 3、对数评分规则、学习率 0.01。 一次运行 = 论文的完整协议：20
+    个随机 90/10 划分上的平均。'
+seeds: 3

@@ -1,0 +1,42 @@
+# CORE-Bench v1.1 task as a ReproSpec: what agents see. No answers.
+id: cb-0201673
+title: Codex Wall v4.0 — Encrypted Holo-Causality & Predictive Governance (Reproducible
+  Capsule)
+objective: 'Test the computational reproducibility of a scientific capsule (CORE-Bench,
+  Hard level): run its code and answer the questions from the output.'
+task_prompt: Run 'run_all.sh'.
+language: Python
+paper: null
+code:
+  repo_url: null
+  capsule: capsule-0201673
+questions:
+- id: q1
+  text: What is the mean_gdp_gain_pct?
+  answer_type: any
+  unit: ''
+  locator: program output
+  setting: ''
+  runs: 1
+  evidence: either
+- id: q2
+  text: What is the p95?
+  answer_type: any
+  unit: ''
+  locator: program output
+  setting: ''
+  runs: 1
+  evidence: either
+- id: q3
+  text: What is the p50?
+  answer_type: any
+  unit: ''
+  locator: program output
+  setting: ''
+  runs: 1
+  evidence: either
+origin:
+  source: corebench
+  reference: core-bench-v1.1-mainline sha256:d4aa5ebb984df7f293e04f2dd120722f172fddea6fcb54a0c928e09bc6ef837d
+  drafted_by: []
+  user_confirmed: false

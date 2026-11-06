@@ -1,0 +1,33 @@
+experiment                         dataset   n   mean   std   min   max   dev wall_s  pass rate of 3-seed means @ 0.3 / 0.5 / 1.0
+cora_acc                           cora     10  81.02  0.04  81.0  81.1 +0.02   4.51  1.00 / 1.00 / 1.00
+citeseer_acc                       citeseer 10  71.84  0.07  71.7  71.9 -0.06   4.57  1.00 / 1.00 / 1.00
+pubmed_acc                         pubmed   10  78.95  0.05  78.9  79.0 +0.05   4.43  1.00 / 1.00 / 1.00
+diag_citeseer_ep100                citeseer 10  71.20  0.00  71.2  71.2 -0.70   5.52  0.00 / 0.00 / 1.00
+diag_cora_ep150                    cora      3  81.40  0.00  81.4  81.4 +0.40   5.72  0.00 / 1.00 / 1.00
+diag_pubmed_ep150                  pubmed    3  78.90  0.00  78.9  78.9 +0.00   5.70  1.00 / 1.00 / 1.00
+diag_cora_untuned                  cora      3  80.60  0.10  80.5  80.7 -0.40   5.79  0.00 / 1.00 / 1.00
+diag_citeseer_untuned              citeseer  3  69.50  0.00  69.5  69.5 -2.40   5.90  0.00 / 0.00 / 0.00
+diag_pubmed_untuned                pubmed    3  77.83  0.12  77.7  77.9 -1.07   6.46  0.00 / 0.00 / 0.00
+diag_cora_K1                       cora      2  76.60  0.00  76.6  76.6 -4.40   6.30  0.00 / 0.00 / 0.00
+diag_citeseer_K1                   citeseer  2  68.30  0.00  68.3  68.3 -3.60   6.11  0.00 / 0.00 / 0.00
+diag_pubmed_K1                     pubmed    2  77.50  0.00  77.5  77.5 -1.40   6.10  0.00 / 0.00 / 0.00
+diag_cora_K3                       cora      2  81.90  0.00  81.9  81.9 +0.90   6.00  0.00 / 0.00 / 1.00
+diag_citeseer_K3                   citeseer  2  71.40  0.00  71.4  71.4 -0.50   6.25  0.00 / 1.00 / 1.00
+diag_pubmed_K3                     pubmed    2  79.00  0.00  79.0  79.0 +0.10   6.30  1.00 / 1.00 / 1.00
+diag_cora_ep100_retuned_h1         cora      1  81.00  0.00  81.0  81.0 +0.00   7.43  1.00 / 1.00 / 1.00
+diag_cora_ep100_retuned_h2         cora      1  81.00  0.00  81.0  81.0 +0.00   6.74  1.00 / 1.00 / 1.00
+diag_cora_ep100_retuned_h3         cora      1  80.90  0.00  80.9  80.9 -0.10   6.65  1.00 / 1.00 / 1.00
+diag_citeseer_ep150_retuned_h1     citeseer  1  71.90  0.00  71.9  71.9 -0.00   6.70  1.00 / 1.00 / 1.00
+diag_citeseer_ep150_retuned_h2     citeseer  1  72.00  0.00  72.0  72.0 +0.10   6.69  1.00 / 1.00 / 1.00
+diag_citeseer_ep150_retuned_h3     citeseer  1  71.90  0.00  71.9  71.9 -0.00   6.15  1.00 / 1.00 / 1.00
+diag_citeseer_ep100_retuned_h1     citeseer  1  72.30  0.00  72.3  72.3 +0.40   5.49  0.00 / 1.00 / 1.00
+diag_citeseer_ep100_retuned_h2     citeseer  1  72.00  0.00  72.0  72.0 +0.10   6.14  1.00 / 1.00 / 1.00
+diag_citeseer_ep100_retuned_h3     citeseer  1  72.30  0.00  72.3  72.3 +0.40   6.23  0.00 / 1.00 / 1.00
+diag_pubmed_ep100_retuned_h1       pubmed    1  78.90  0.00  78.9  78.9 +0.00   6.18  1.00 / 1.00 / 1.00
+diag_pubmed_ep100_retuned_h2       pubmed    1  78.90  0.00  78.9  78.9 +0.00   6.16  1.00 / 1.00 / 1.00
+diag_pubmed_ep100_retuned_h3       pubmed    1  78.90  0.00  78.9  78.9 +0.00   6.14  1.00 / 1.00 / 1.00
+diag_citeseer_ep100_retuned_h4     citeseer  1  72.00  0.00  72.0  72.0 +0.10   8.02  1.00 / 1.00 / 1.00
+diag_citeseer_ep100_retuned_h5     citeseer  1  72.00  0.00  72.0  72.0 +0.10   6.53  1.00 / 1.00 / 1.00
+diag_citeseer_ep100_retuned_h6     citeseer  1  72.10  0.00  72.1  72.1 +0.20   6.79  1.00 / 1.00 / 1.00
+
+82 runs, total wall 451 s

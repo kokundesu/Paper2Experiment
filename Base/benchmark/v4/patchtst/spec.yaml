@@ -1,0 +1,47 @@
+# ReproSpec (agent-visible, no values). FROZEN: see ../FROZEN.yaml.
+id: patchtst
+title: ''
+objective: 复现 PatchTST（ICLR 2023）在 ILI 数据集预测长度 24 的 MSE 和 MAE，表 3 里 PatchTST/42 那一行。
+task_prompt: ''
+language: Python
+paper:
+  url: https://arxiv.org/abs/2211.14730
+  pdf: null
+code:
+  repo_url: https://github.com/yuqinie98/PatchTST
+  capsule: null
+questions:
+- id: ili_24_patchtst42_mse
+  text: 论文表 3 中 ILI 数据集、预测长度 24、监督训练 PatchTST/42 的多变量预测 MSE 是多少？
+  answer_type: number
+  metric: MSE
+  direction: lower
+  unit: ''
+  locator: 表 3，ILI 数据集的预测长度 24 行，PatchTST/42 下的 MSE 列
+  setting: ILI 每周多变量时间序列；监督训练 PatchTST/42；预测未来 24 个时间步；按论文附录表 9 和图 3 所示，ILI 使用历史输入长度
+    104，尽管 /42 在正文中以通常的历史长度 336 定义；补丁长度 16、步幅 8；仓库 PatchTST_supervised/scripts/PatchTST/illness.sh
+    对应的实验。
+  runs: 3
+  evidence: log
+- id: ili_24_patchtst42_mae
+  text: 论文表 3 中 ILI 数据集、预测长度 24、监督训练 PatchTST/42 的多变量预测 MAE 是多少？
+  answer_type: number
+  metric: MAE
+  direction: lower
+  unit: ''
+  locator: 表 3，ILI 数据集的预测长度 24 行，PatchTST/42 下的 MAE 列
+  setting: ILI 每周多变量时间序列；监督训练 PatchTST/42；预测未来 24 个时间步；按论文附录表 9 和图 3 所示，ILI 使用历史输入长度
+    104，尽管 /42 在正文中以通常的历史长度 336 定义；补丁长度 16、步幅 8；仓库 PatchTST_supervised/scripts/PatchTST/illness.sh
+    对应的实验。
+  runs: 3
+  evidence: log
+origin:
+  source: user
+  reference: ''
+  prompt: 复现 PatchTST（ICLR 2023）在 ILI 数据集预测长度 24 的 MSE 和 MAE，表 3 里 PatchTST/42 那一行。
+  drafted_by:
+  - sol
+  checked_by:
+  - sonnet55
+  - haiku55
+  user_confirmed: true

@@ -1,0 +1,44 @@
+# v4 held-out dataset: what a user would type, one entry per paper (from dataset-candidates.md, 2026-10-16).
+# No reported values here: the intent stage turns each prompt into a ReproSpec, and the GT stage extracts the values
+# from the paper with providers that never see this list's source.
+papers:
+  - {id: bspm, arxiv: "2211.09324", repo: "https://github.com/jeongwhanchoi/BSPM",
+     prompt: "我想复现 BSPM（SIGIR 2023）在 Gowalla 数据集上 BSPM-EM 的结果，就是表 4 里的 Recall@20 和 NDCG@20。"}
+  - {id: ials, arxiv: "2110.14037", repo: "https://github.com/google-research/google-research/tree/master/ials",
+     prompt: "复现 Revisiting the Performance of iALS（RecSys 2022）中 ML-1M 上、按 NCF 留一法协议评估的 iALS 的 HR@10 和 NDCG@10（表 5）。"}
+  - {id: gprgnn, arxiv: "2006.07988", repo: "https://github.com/jianhao2016/GPRGNN",
+     prompt: "复现 GPR-GNN（ICLR 2021）在 Chameleon 数据集（60/20/20 划分）上的节点分类准确率，表 2 里 GPRGNN 那一行。"}
+  - {id: correct_smooth, arxiv: "2010.13993", repo: "https://github.com/CUAI/CorrectAndSmooth",
+     prompt: "复现 Correct & Smooth（ICLR 2021）在 ogbn-arxiv 上 Plain Linear + C&S（Autoscale）的测试准确率，表 2。"}
+  - {id: appnp, arxiv: "1810.05997", repo: "https://github.com/gasteigerjo/ppnp",
+     prompt: "复现 APPNP（Predict then Propagate，ICLR 2019）在 MS Academic 数据集上的准确率，表 2，用作者的 PyTorch 版本。"}
+  - {id: itransformer, arxiv: "2310.06625", repo: "https://github.com/thuml/iTransformer",
+     prompt: "复现 iTransformer（ICLR 2024）在 Exchange 数据集上输入长度 96、预测长度 96 的 MSE 和 MAE（附录的完整结果表，表 10）。"}
+  - {id: tstcc, arxiv: "2106.14112", repo: "https://github.com/emadeldeen24/TS-TCC",
+     prompt: "复现 TS-TCC（IJCAI 2021）在 Epilepsy 脑电数据上线性评估的 ACC 和 MF1，表 2。"}
+  - {id: ts2vec, arxiv: "2106.10466", repo: "https://github.com/zhihanyue/ts2vec",
+     prompt: "复现 TS2Vec（AAAI 2022）在 UCR 的 ECG200、GunPoint、ItalyPowerDemand、TwoLeadECG、Chinatown 五个数据集上的分类准确率（附录表 9，B=8 那一列）。"}
+  - {id: cyclenet, arxiv: "2409.18479", repo: "https://github.com/ACAT-SCUT/CycleNet",
+     prompt: "复现 CycleNet（NeurIPS 2024）在 Weather 数据集上输入 96、预测 96 的 MLP 版本的 MSE 和 MAE（表 7）。"}
+  - {id: patchtst, arxiv: "2211.14730", repo: "https://github.com/yuqinie98/PatchTST",
+     prompt: "复现 PatchTST（ICLR 2023）在 ILI 数据集预测长度 24 的 MSE 和 MAE，表 3 里 PatchTST/42 那一行。"}
+  - {id: ngboost, arxiv: "1910.03225", repo: "https://github.com/stanfordmlgroup/ngboost",
+     prompt: "复现 NGBoost（ICML 2020）在 Concrete 数据集上的 NLL（表 1）和 RMSE（表 3）。"}
+  - {id: ecod, arxiv: "2201.00382", repo: "https://github.com/yzhao062/pyod",
+     prompt: "复现 ECOD（TKDE 2022）在 ODDS 的 Cardio、Breastw、Mammography 三个数据集上的 ROC-AUC（表 4）。"}
+  - {id: svgd, arxiv: "1608.04471", repo: "https://github.com/dilinwang820/Stein-Variational-Gradient-Descent",
+     prompt: "复现 Stein Variational Gradient Descent（NeurIPS 2016）在 Boston 数据集上 Bayesian 神经网络的 RMSE 和测试对数似然（第 5 节 BNN 实验的表）。"}
+  - {id: mc_dropout, arxiv: "1506.02142", repo: "https://github.com/yaringal/DropoutUncertaintyExps",
+     prompt: "复现 Dropout as a Bayesian Approximation（ICML 2016）在 Boston Housing 上 MC dropout 的 RMSE 和测试对数似然（表 1）。"}
+  - {id: fairbatch, arxiv: "2012.01696", repo: "https://github.com/yuji-roh/fairbatch",
+     prompt: "复现 FairBatch（ICLR 2021）在合成数据上用逻辑回归、equal opportunity 公平性下的 accuracy 和 EO disparity（表 1）。"}
+  - {id: doc2vecc, arxiv: "1707.02377", repo: "https://github.com/mchen24/iclr2017",
+     prompt: "复现 Doc2VecC（ICLR 2017）在 IMDB 情感分类上的错误率（表 1）。"}
+  - {id: pinn_gradpath, arxiv: "2001.04536", repo: "https://github.com/PredictiveIntelligenceLab/GradientPathologiesPINNs",
+     prompt: "复现 Understanding and Mitigating Gradient Pathologies in PINNs 里 2D Helmholtz 方程的结果：M1 和 M2 两个模型的相对 L2 误差（表 2）。"}
+  - {id: set_transformer, arxiv: "1810.00825", repo: "https://github.com/juho-lee/set_transformer",
+     prompt: "复现 Set Transformer（ICML 2019）在摊销聚类任务（2D、4 个高斯的混合）上 ISAB(16)+PMA 的每点对数似然（表 3）。"}
+  - {id: nngp, arxiv: "1711.00165", repo: "https://github.com/brain-research/nngp",
+     prompt: "复现 Deep Neural Networks as Gaussian Processes（ICLR 2018）在 MNIST、1000 个训练样本时 NNGP 的测试准确率（表 1）。"}
+  - {id: am_tsp, arxiv: "1803.08475", repo: "https://github.com/wouterkool/attention-learn-to-route",
+     prompt: "复现 Attention, Learn to Solve Routing Problems!（ICLR 2019）在 TSP20、TSP50、TSP100 上 AM 贪心解码的平均路径长度（表 1），用仓库自带的预训练模型，只做推理。"}

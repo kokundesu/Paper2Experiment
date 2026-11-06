@@ -1,0 +1,13 @@
+# Task given to every workflow. Contains no target values.
+id: deepsvdd
+paper_url: http://proceedings.mlr.press/v80/ruff18a/ruff18a.pdf
+paper_pdf: paper/ruff18a.pdf
+repo_url: https://github.com/lukasruff/Deep-SVDD-PyTorch
+objective: >
+  Reproduce the One-Class Deep SVDD results on MNIST from Table 1 (average AUC of
+  the one-class anomaly detection setup) for normal class 0 and normal class 3,
+  using the authors' code and the paper's experimental setup.
+claims:
+  - {id: mnist0_auc, metric: test_auc, setting: "Table 1, One-Class Deep SVDD, MNIST, normal class 0", unit: "%", description: "Test AUC with digit 0 as the normal class"}
+  - {id: mnist3_auc, metric: test_auc, setting: "Table 1, One-Class Deep SVDD, MNIST, normal class 3", unit: "%", description: "Test AUC with digit 3 as the normal class"}
+seeds: 3

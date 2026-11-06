@@ -1,0 +1,34 @@
+# ReproSpec (agent-visible, no values). FROZEN: see ../FROZEN.yaml.
+id: doc2vecc
+title: ''
+objective: 复现 Doc2VecC（ICLR 2017）在 IMDB 情感分类上的错误率（表 1）。
+task_prompt: ''
+language: Python
+paper:
+  url: https://arxiv.org/abs/1707.02377
+  pdf: null
+code:
+  repo_url: https://github.com/mchen24/iclr2017
+  capsule: null
+questions:
+- id: imdb_doc2vecc_include_test_error
+  text: Doc2VecC 在 IMDB 情感分类测试集上，表 1 的“include test”协议下，线性 SVM 的分类错误率是多少？
+  answer_type: number
+  metric: 分类错误率
+  direction: lower
+  unit: '%'
+  locator: 表 1，Doc2VecC 行，Error rate % (include test) 列
+  setting: IMDB 预定义训练／测试划分；Doc2VecC 文档表示在训练集、无标签集和测试集全部文本上学习，再以有标签训练集的表示训练线性 SVM，在测试集上评估；按
+    README 中 go.sh 的默认复现流程理解。
+  runs: 3
+  evidence: log
+origin:
+  source: user
+  reference: ''
+  prompt: 复现 Doc2VecC（ICLR 2017）在 IMDB 情感分类上的错误率（表 1）。
+  drafted_by:
+  - sol
+  checked_by:
+  - sonnet55
+  - haiku55
+  user_confirmed: true

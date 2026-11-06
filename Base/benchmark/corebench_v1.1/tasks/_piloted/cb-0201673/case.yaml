@@ -1,0 +1,51 @@
+# Hidden: pre-registered tolerances, computed from the 3 manual re-runs.
+capsule_id: capsule-0201673
+source: agent-evals/core-bench-v1.1-mainline core_test.json
+core_test_sha256: d4aa5ebb984df7f293e04f2dd120722f172fddea6fcb54a0c928e09bc6ef837d
+rule: docs/benchmark-redesign.md section 3.3
+questions:
+- id: q1
+  question: What is the mean_gdp_gain_pct?
+  vision: false
+  kind: numeric
+  scored: true
+  tolerance:
+    mean: 0.9999005880537902
+    s: 0.0
+    n: 3
+    m: 1
+    noise: 0.0
+    precision: 5.0e-17
+    floor: 9.999005880537904e-06
+    h: 9.999005880537904e-06
+    term: floor
+- id: q2
+  question: What is the p95?
+  vision: false
+  kind: numeric
+  scored: true
+  tolerance:
+    mean: 1.1643528158326386
+    s: 0.0
+    n: 3
+    m: 1
+    noise: 0.0
+    precision: 5.0e-17
+    floor: 1.1643528158326387e-05
+    h: 1.1643528158326387e-05
+    term: floor
+- id: q3
+  question: What is the p50?
+  vision: false
+  kind: numeric
+  scored: true
+  tolerance:
+    mean: 0.9999966483532146
+    s: 0.0
+    n: 3
+    m: 1
+    noise: 0.0
+    precision: 5.0e-17
+    floor: 9.999966483532147e-06
+    h: 9.999966483532147e-06
+    term: floor

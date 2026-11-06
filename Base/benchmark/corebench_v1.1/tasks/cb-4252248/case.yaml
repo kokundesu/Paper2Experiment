@@ -1,0 +1,24 @@
+# Hidden: pre-registered tolerances, computed from the 3 manual re-runs.
+capsule_id: capsule-4252248
+source: core-bench-v1.1-mainline core_test.json
+split: test
+data_sha256: d4aa5ebb984df7f293e04f2dd120722f172fddea6fcb54a0c928e09bc6ef837d
+rule: docs/benchmark-redesign.md section 3.3
+questions:
+- id: q1
+  question: fig Report the overall AUC from the PR curve generated with the CTRPv2
+    sensitivity dataset, tested against ATC annotations and drug-target information
+    from CHEMBL.
+  vision: true
+  kind: numeric
+  scored: true
+  tolerance:
+    mean: 0.4929241
+    s: 0.0
+    n: 3
+    m: 1
+    noise: 0.0
+    precision: 5.0e-08
+    floor: 4.929241e-06
+    h: 4.929241e-06
+    term: floor

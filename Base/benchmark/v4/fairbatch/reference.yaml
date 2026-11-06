@@ -1,0 +1,94 @@
+# Reference recipe (hidden; written by the benchmark builder).
+id: fairbatch
+status: validated
+repo: https://github.com/yuji-roh/fairbatch
+commit: 4f652764be12ce18d237d563d291b63fa1ddf67f
+files:
+  fairbatch_run.py: '"""Runs the equal-opportunity section of the official FairBatch_Synthetic.ipynb
+    for one seed: the notebook''s own code
+
+    cells (imports, data, training function, section 1), with `seeds = [0..9]` replaced
+    by `seeds = [<seed>]`."""
+
+    import json
+
+    import os
+
+    import sys
+
+
+    sys.path.insert(0, os.getcwd())  # the notebook imports models.py and FairBatchSampler.py
+    from its folder
+
+    seed = int(sys.argv[sys.argv.index("--seed") + 1])
+
+    nb = json.load(open("FairBatch_Synthetic.ipynb"))
+
+    code = ["".join(c["source"]) for c in nb["cells"] if c["cell_type"] == "code"]
+
+    # code cells: 0 imports, 1 data, 2 data counts, 3 run_epoch, 4 section 1 (equal
+    opportunity), 5 its averages, ...
+
+    section = code[4]
+
+    assert "target_fairness = ''eqopp''" in section and "seeds = [0,1,2,3,4,5,6,7,8,9]"
+    in section
+
+    section = section.replace("seeds = [0,1,2,3,4,5,6,7,8,9]", f"seeds = [{seed}]")
+
+    exec(compile("\n".join([code[0], code[1], code[2], code[3], section]), "FairBatch_Synthetic.ipynb",
+    "exec"))
+
+    '
+  patches/bce_target.py: '# Old PyTorch accepted a BCE target of shape [N] for an
+    input of shape [N, 1] (same number of elements, compared
+
+    # element-wise, with a deprecation warning); current PyTorch raises. Reshape the
+    target to the input: same values.
+
+    import pathlib, sys
+
+    p = pathlib.Path(sys.argv[1])
+
+    s = p.read_text()
+
+    old = "criterion ((F.tanh(logit)+1)/2, (self.y_data+1)/2)"
+
+    assert s.count(old) == 2, s.count(old)
+
+    s = s.replace(old, "criterion ((F.tanh(logit)+1)/2, ((self.y_data+1)/2).view_as(logit))")
+
+    p.write_text(s)
+
+    print("patched", p)
+
+    '
+setup:
+- git clone -q https://github.com/yuji-roh/fairbatch repo && git -C repo checkout
+  -q 4f652764be12ce18d237d563d291b63fa1ddf67f
+- uv venv -q --python 3.11 .venv
+- uv pip install -q -p .venv numpy==2.4.6 torch==2.14.1
+- .venv/bin/python patches/bce_target.py repo/FairBatchSampler.py
+- cp fairbatch_run.py repo/
+command: cd repo && ../.venv/bin/python fairbatch_run.py --seed {seed}
+timeout_s: 900
+seeded: true
+metrics:
+  synthetic_fairbatch_eo_accuracy:
+    regex: 'Test accuracy: ([0-9.]+), EO disparity'
+    scale: 1.0
+  synthetic_fairbatch_eo_disparity:
+    regex: 'EO disparity: ([0-9.]+)'
+    scale: 1.0
+entry: '`FairBatch_Synthetic.ipynb`（equal opportunity 部分）'
+notes:
+- 'difficulty: 易; estimated time per run: 2 分钟以内'
+- 'risk: notebook 自带运行结果，**交给 agent 前要清掉输出**；只发布了合成数据的代码'
+- 'questions: synthetic_fairbatch_eo_accuracy, synthetic_fairbatch_eo_disparity'
+- driver executes the notebook's own code cells (imports, data, run_epoch, section
+  1 equal opportunity) with the seed list replaced by one seed; the notebook averages
+  seeds 0-9, so one run = one seed
+- 'patch: BCE target reshaped to the input (old torch did this with a warning; torch
+  1.13 and 2.14 raise)'
+- 'builder check, seed 0: 0.855 / 0.0121'
+evidence_pattern: '< Seed: \d+ >'

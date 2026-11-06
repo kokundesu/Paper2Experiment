@@ -1,0 +1,127 @@
+# Hidden ground truth from the paper (GT stage). Tolerances follow after the reference re-runs.
+id: ecod
+extractors:
+- haiku55
+- luna
+values:
+  cardio_ecod_roc_auc:
+    paper_value: 0.897
+    printed: '0.897'
+    precision: 3
+    quote: Cardio (mat) 0.569 (12) 0.81 (9) 0.835 (8) 0.923 (3) 0.724 (10) 0.856 (7)
+      0.574 (11) 0.88 (6) 0.935 (2) 0.95 (1) 0.9 (4) 0.897 (5)
+    page: 9
+    reported_spread: null
+    spread_kind: none
+    spread_over: none
+    n_runs: 10
+    status: agreed_partial
+    votes:
+      haiku55:
+        value: 0.897
+        verified: true
+        why: ''
+        printed: '0.897'
+        quote: Cardio (mat) 0.569 (12) 0.81 (9) 0.835 (8) 0.923 (3) 0.724 (10) 0.856
+          (7) 0.574 (11) 0.88 (6) 0.935 (2) 0.95 (1) 0.9 (4) 0.897 (5)
+        page: 9
+        spread: null
+        spread_kind: none
+        spread_over: none
+        n_runs: 10
+        note: Table 4 (ROC, average of 10 independent trials), ECOD column is the
+          last column; 0.897 is the score, (5) is the rank. Same value appears in
+          Table 2 for ECOD.
+      luna:
+        value: 0.897
+        verified: false
+        why: quote not found in the paper text
+        printed: null
+        quote: Cardio (mat) ... ECOD 0.897 (5)
+        page: 9
+        spread: null
+        spread_kind: none
+        spread_over: none
+        n_runs: 10
+        note: Table 4 reports an average of 10 independent trials; no ± spread is
+          printed.
+  breastw_ecod_roc_auc:
+    paper_value: 0.994
+    printed: '0.994'
+    precision: 3
+    quote: Breastw (mat) 0.396 (12) 0.965 (6) 0.983 (4) 0.987 (2) 0.976 (5) 0.987
+      (2) 0.47 (11) 0.933 (9) 0.961 (7) 0.959 (8) 0.929 (10) 0.994 (1)
+    page: 9
+    reported_spread: null
+    spread_kind: none
+    spread_over: none
+    n_runs: 10
+    status: agreed_partial
+    votes:
+      haiku55:
+        value: 0.994
+        verified: true
+        why: ''
+        printed: '0.994'
+        quote: Breastw (mat) 0.396 (12) 0.965 (6) 0.983 (4) 0.987 (2) 0.976 (5) 0.987
+          (2) 0.47 (11) 0.933 (9) 0.961 (7) 0.959 (8) 0.929 (10) 0.994 (1)
+        page: 9
+        spread: null
+        spread_kind: none
+        spread_over: none
+        n_runs: 10
+        note: Table 4 ECOD column, rank 1. Note Table 2 (ECOD-variant table) lists
+          0.993 for Breastw, a small discrepancy; the question asks for Table 4, so
+          0.994 is used.
+      luna:
+        value: 0.994
+        verified: false
+        why: quote not found in the paper text
+        printed: null
+        quote: Breastw (mat) ... ECOD 0.994 (1)
+        page: 9
+        spread: null
+        spread_kind: none
+        spread_over: none
+        n_runs: 10
+        note: Table 4 reports an average of 10 independent trials; no ± spread is
+          printed.
+  mammography_ecod_roc_auc:
+    paper_value: 0.894
+    printed: '0.894'
+    precision: 3
+    quote: Mammography (mat) 0.549 (12) 0.821 (10) 0.834 (9) 0.86 (5) 0.841 (8) 0.881
+      (3) 0.729 (11) 0.855 (6) 0.872 (4) 0.882 (2) 0.851 (7) 0.894 (1)
+    page: 9
+    reported_spread: null
+    spread_kind: none
+    spread_over: none
+    n_runs: 10
+    status: agreed_partial
+    votes:
+      haiku55:
+        value: 0.894
+        verified: true
+        why: ''
+        printed: '0.894'
+        quote: Mammography (mat) 0.549 (12) 0.821 (10) 0.834 (9) 0.86 (5) 0.841 (8)
+          0.881 (3) 0.729 (11) 0.855 (6) 0.872 (4) 0.882 (2) 0.851 (7) 0.894 (1)
+        page: 9
+        spread: null
+        spread_kind: none
+        spread_over: none
+        n_runs: 10
+        note: Table 4 ECOD column, rank 1. Same value as Table 2.
+      luna:
+        value: 0.894
+        verified: false
+        why: quote not found in the paper text
+        printed: null
+        quote: Mammography (mat) ... ECOD 0.894 (1)
+        page: 9
+        spread: null
+        spread_kind: none
+        spread_over: none
+        n_runs: 10
+        note: Table 4 reports an average of 10 independent trials; no ± spread is
+          printed.

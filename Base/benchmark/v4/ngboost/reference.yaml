@@ -1,0 +1,57 @@
+# Reference recipe (hidden; written by the benchmark builder).
+id: ngboost
+status: validated
+repo: https://github.com/stanfordmlgroup/ngboost
+commit: 6aadc1fc49311606c9abc808c2a1f100880120c5
+files:
+  patches/regression_exp.py: "# regression_exp.py on master: (1) the imports of Normal/NormalFixedVar\
+    \ and MLE/CRPS that its eval() calls need were\n# dropped in a clean-up commit;\
+    \ restore the lines the earlier version had. (2) It fixes its split seed with\n\
+    # np.random.seed(1); read it from P2E_SEED (default 1 = the script's own splits)\
+    \ so reference runs can use other\n# split sets. Nothing else changes.\nimport\
+    \ pathlib, sys\np = pathlib.Path(sys.argv[1])\ns = p.read_text()\nassert s.count(\"\
+    np.random.seed(1)\") == 2 and \"from ngboost.distns import\" not in s\ns = s.replace(\"\
+    np.random.seed(1)\", 'np.random.seed(int(os.environ.get(\"P2E_SEED\", \"1\")))')\n\
+    s = s.replace(\"from ngboost import NGBRegressor\\n\", \"from ngboost import NGBRegressor\\\
+    n\"\n              \"from ngboost.distns import Normal, NormalFixedVar\\nfrom\
+    \ ngboost.scores import MLE, CRPS\\n\", 1)\n# (3) The frozen spec (and the paper,\
+    \ Sec. 4) pick the number of boosting stages by validation NLL; the script picks\n\
+    # it by validation RMSE. Use NLL, as the spec says. Changed 2026-10-17 after dev\
+    \ round 1: the first reference used\n# the script's RMSE selection and contradicted\
+    \ the spec.\nold = \"best_itr = np.argmin(val_rmse) + 1\"\nassert s.count(old)\
+    \ == 1\ns = s.replace(old, \"best_itr = np.argmin(val_nll) + 1\")\ns = \"import\
+    \ os\\n\" + s\np.write_text(s)\nprint(\"patched\", p)\n"
+setup:
+- git clone -q https://github.com/stanfordmlgroup/ngboost repo && git -C repo checkout
+  -q 6aadc1fc49311606c9abc808c2a1f100880120c5
+- uv venv -q --python 3.11 .venv
+- uv pip install -q -p .venv -e repo numpy==2.4.6 scipy==1.17.1 scikit-learn==1.6.1
+  pandas==2.3.3 xlrd==2.0.2 lifelines==0.30.3 tqdm==4.70.1
+- .venv/bin/python patches/regression_exp.py repo/examples/experiments/regression_exp.py
+command: cd repo && P2E_SEED={seed} ../.venv/bin/python examples/experiments/regression_exp.py
+  --dataset concrete --natural
+timeout_s: 2400
+seeded: true
+metrics:
+  concrete_ngboost_rmse:
+    regex: NGB=([0-9.]+) \+/-
+    scale: 1.0
+  concrete_ngboost_nll:
+    regex: NLL NGB=([0-9.]+) \+/
+    scale: 1.0
+entry: '`examples/experiments/regression_exp.py --dataset concrete --natural ...`'
+evidence_pattern: \[\d+/\d+\] BestIter=\d+
+notes:
+- 'difficulty: 易; estimated time per run: 5–10 分钟'
+- 'risk: `--natural` 默认关闭，忘了开就不对'
+- 'questions: concrete_ngboost_nll, concrete_ngboost_rmse'
+- official script with its defaults (Normal, MLE, tree depth 3, lr 0.01, 2000 stages)
+  and --natural; one run = its 20 random 90/10 splits; P2E_SEED sets the split seed
+  (1 = the script's own)
+- 'patch: restore the Normal/MLE imports a clean-up commit removed; split seed from
+  P2E_SEED'
+- '2026-10-17 rebuilt: the first reference (script''s RMSE-based stage selection:
+  RMSE 4.587, NLL 3.548) contradicted the frozen spec, which says stages are chosen
+  by validation log-likelihood (paper Sec. 4). Dev round 1 agents that followed the
+  spec got RMSE about 5.01. The recipe now selects by validation NLL. Builder check
+  added: compare every setting the spec states with the recipe before running references.'

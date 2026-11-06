@@ -1,0 +1,217 @@
+diff --git a/Pipelines/Pipeline_EKF.py b/Pipelines/Pipeline_EKF.py
+index d995bdb..236b212 100644
+--- a/Pipelines/Pipeline_EKF.py
++++ b/Pipelines/Pipeline_EKF.py
+@@ -7,6 +7,7 @@ import torch
+ import torch.nn as nn
+ import random
+ import time
++import os
+ from Plot import Plot_extended
+ 
+ 
+@@ -128,7 +129,7 @@ class Pipeline_EKF:
+             if (self.args.CompositionLoss):
+                 y_hat = torch.zeros([self.N_B, SysModel.n, SysModel.T])
+                 for t in range(SysModel.T):
+-                    y_hat[:,:,t] = torch.squeeze(SysModel.h(torch.unsqueeze(x_out_training_batch[:,:,t])))
++                    y_hat[:,:,t] = torch.squeeze(SysModel.h(torch.unsqueeze(x_out_training_batch[:,:,t],2)))  # [p2e] upstream omitted dim=2 (TypeError)
+ 
+                 if(MaskOnState):### FIXME: composition loss, y_hat may have different mask with x
+                     if self.args.randomLength:
+@@ -246,7 +247,7 @@ class Pipeline_EKF:
+                     self.MSE_cv_dB_opt = self.MSE_cv_dB_epoch[ti]
+                     self.MSE_cv_idx_opt = ti
+                     
+-                    torch.save(self.model, path_results + 'best-model.pt')
++                    torch.save(self.model, path_results + os.environ.get('RUN_TAG', '') + 'best-model.pt')  # [p2e] RUN_TAG avoids clashes between concurrent runs
+ 
+             ########################
+             ### Training Summary ###
+@@ -268,9 +269,9 @@ class Pipeline_EKF:
+         test_lengthMask=None):
+         # Load model
+         if load_model:
+-            self.model = torch.load(load_model_path, map_location=self.device) 
++            self.model = torch.load(load_model_path, map_location=self.device, weights_only=False)  # [p2e] torch>=2.6 defaults to weights_only=True
+         else:
+-            self.model = torch.load(path_results+'best-model.pt', map_location=self.device) 
++            self.model = torch.load(path_results + os.environ.get('RUN_TAG', '') + 'best-model.pt', map_location=self.device, weights_only=False)  # [p2e]
+ 
+         self.N_T = test_input.shape[0]
+         SysModel.T_test = test_input.size()[-1]
+diff --git a/Simulations/Lorenz_Atractor/parameters.py b/Simulations/Lorenz_Atractor/parameters.py
+index 2f0e88d..8469db2 100644
+--- a/Simulations/Lorenz_Atractor/parameters.py
++++ b/Simulations/Lorenz_Atractor/parameters.py
+@@ -148,8 +148,16 @@ def h(x, jacobian=False):
+     else:
+         return y
+ 
+-def h_nonlinear(x):
+-    return toSpherical(x)
++def h_nonlinear(x, jacobian=False):
++    # [p2e] the batched EKF calls getJacobian(x, h) -> h(x, jacobian=True); upstream h_nonlinear
++    # did not accept the flag (TypeError). Per-sample Jacobian via autograd on the batch sum
++    # (samples are independent, so d sum_b y_b / d x_b = dy_b/dx_b).
++    y = toSpherical(x)
++    if jacobian:
++        J = autograd.functional.jacobian(lambda z: toSpherical(z).sum(0), x)  # [n,1,B,m,1]
++        J = J.squeeze(-1).squeeze(1).permute(1, 0, 2)  # [B,n,m]
++        return y, J
++    return y
+ 
+ def hRotate(x, jacobian=False):
+     H = H_Rotate.to(x.device).reshape((1, n, n)).repeat(x.shape[0], 1, 1)# [batch_size, n, n] rotated matrix
+diff --git a/Simulations/config.py b/Simulations/config.py
+index 00c5f60..51c5ee9 100644
+--- a/Simulations/config.py
++++ b/Simulations/config.py
+@@ -60,4 +60,13 @@ def general_settings():
+                         help='output dimension multiplier for KNet')
+ 
+     args = parser.parse_args()
++    # [p2e] reproducible multi-seed runs: the original code never sets a seed
++    # (data generation, random.sample batching and weight init are all unseeded).
++    import os, random, torch, numpy as np
++    if os.environ.get('SEED') is not None:
++        seed = int(os.environ['SEED'])
++        random.seed(seed); np.random.seed(seed); torch.manual_seed(seed)
++        print("SEED:", seed)
++    if os.environ.get('OMP_NUM_THREADS'):
++        torch.set_num_threads(int(os.environ['OMP_NUM_THREADS']))
+     return args
+diff --git a/main_linear_CA.py b/main_linear_CA.py
+index 5927d39..446a579 100644
+--- a/main_linear_CA.py
++++ b/main_linear_CA.py
+@@ -47,7 +47,7 @@ args.T_test = 100
+ KnownRandInit_train = True # if true: use known random init for training, else: model is agnostic to random init
+ KnownRandInit_cv = True
+ KnownRandInit_test = True
+-args.use_cuda = True # use GPU or not
++args.use_cuda = False # use GPU or not  [p2e: CPU only]
+ args.n_steps = 4000
+ args.n_batch = 10
+ args.lr = 1e-4
+diff --git a/main_linear_canonical.py b/main_linear_canonical.py
+index ff654e6..1ec2d7c 100644
+--- a/main_linear_canonical.py
++++ b/main_linear_canonical.py
+@@ -1,3 +1,4 @@
++import os
+ import torch
+ import torch.nn as nn
+ from datetime import datetime
+@@ -49,8 +50,8 @@ else:
+    # deterministic initial condition
+    m2_0 = 0 * torch.eye(m) 
+ # sequence length
+-args.T = 100
+-args.T_test = 100
++args.T = int(os.environ.get('T', 100))  # [p2e] env override (Table I uses T=20)
++args.T_test = int(os.environ.get('T_TEST', args.T))
+ args.randomLength = False
+ if args.randomLength:# you can modify T_max and T_min 
+    args.T_max = 1000
+@@ -63,16 +64,16 @@ else:
+    cv_lengthMask = None
+    test_lengthMask = None
+ # noise
+-r2 = torch.tensor([1])
+-vdB = -20 # ratio v=q2/r2
++r2 = torch.tensor([10**(-float(os.environ.get('INV_R2_DB', 0))/10)])  # [p2e] env override; repo default 1/r2 = 0 dB
++vdB = float(os.environ.get('NU_DB', -20)) # ratio v=q2/r2  [p2e] env override; repo default -20 dB
+ v = 10**(vdB/10)
+ q2 = torch.mul(v,r2)
+ print("1/r2 [dB]: ", 10 * torch.log10(1/r2[0]))
+ print("1/q2 [dB]: ", 10 * torch.log10(1/q2[0]))
+ 
+ ### training parameters ##################################################
+-args.use_cuda = True # use GPU or not
+-args.n_steps = 4000
++args.use_cuda = False # use GPU or not  [p2e: CPU only]
++args.n_steps = int(os.environ.get('N_STEPS', 4000))  # [p2e] env override (timing runs only)
+ args.n_batch = 30
+ args.lr = 1e-4
+ args.wd = 1e-3
+@@ -99,7 +100,7 @@ print("Observation Matrix:",H)
+ ### Data Loader (Generate Data) ###
+ ###################################
+ dataFolderName = 'Simulations/Linear_canonical/data' + '/'
+-dataFileName = '2x2_rq020_T100.pt'
++dataFileName = os.environ.get('RUN_TAG', '') + '2x2_rq020_T100.pt'  # [p2e] RUN_TAG prefix
+ print("Start Data Gen")
+ DataGen(args, sys_model, dataFolderName + dataFileName)
+ print("Data Load")
+diff --git a/main_lor_DT.py b/main_lor_DT.py
+index e8d74a9..576fdf3 100644
+--- a/main_lor_DT.py
++++ b/main_lor_DT.py
+@@ -38,7 +38,7 @@ args.N_T = 200
+ args.T = 100
+ args.T_test = 100
+ ### training parameters
+-args.use_cuda = True # use GPU or not
++args.use_cuda = False # use GPU or not  [p2e: CPU only]
+ args.n_steps = 2000
+ args.n_batch = 30
+ args.lr = 1e-3
+diff --git a/main_lor_DT_NLobs.py b/main_lor_DT_NLobs.py
+index 7924237..00474d7 100644
+--- a/main_lor_DT_NLobs.py
++++ b/main_lor_DT_NLobs.py
+@@ -1,3 +1,4 @@
++import os
+ import torch
+ from datetime import datetime
+ 
+@@ -39,8 +40,8 @@ args.in_mult_KNet = 40
+ args.out_mult_KNet = 5
+ 
+ ### training parameters
+-args.use_cuda = True # use GPU or not
+-args.n_steps = 2000
++args.use_cuda = False # use GPU or not  [p2e: CPU only]
++args.n_steps = int(os.environ.get('N_STEPS', 2000))  # [p2e] env override (timing runs only)
+ args.n_batch = 100
+ args.lr = 1e-4
+ args.wd = 1e-4
+@@ -62,7 +63,7 @@ chop = False
+ sequential_training = False
+ path_results = 'KNet/'
+ DatafolderName = 'Simulations/Lorenz_Atractor/data' + '/'
+-r2 = torch.tensor([1e-3]) # [10, 1, 0.1, 0.01, 1e-3]
++r2 = torch.tensor([10**(-float(os.environ.get('INV_R2_DB', 30))/10)]) # [10, 1, 0.1, 0.01, 1e-3]  [p2e] env override; repo default 1e-3 (1/r2 = 30 dB)
+ vdB = 0 # ratio v=q2/r2
+ v = 10**(vdB/10)
+ q2 = torch.mul(v,r2)
+@@ -74,7 +75,7 @@ print("1/r2 [dB]: ", 10 * torch.log10(1/r2[0]))
+ print("1/q2 [dB]: ", 10 * torch.log10(1/q2[0]))
+ 
+ traj_resultName = ['traj_lorDT_NLobs_rq3030_T20.pt']
+-dataFileName = ['data_lor_v0_rq3030_T20.pt']
++dataFileName = [os.environ.get('RUN_TAG', '') + 'data_lor_v0_rq3030_T20.pt']  # [p2e] RUN_TAG prefix
+ 
+ #########################################
+ ###  Generate and load data DT case   ###
+diff --git a/main_lor_decimation.py b/main_lor_decimation.py
+index 2a39165..426a470 100644
+--- a/main_lor_decimation.py
++++ b/main_lor_decimation.py
+@@ -1,3 +1,4 @@
++import os
+ import torch
+ import torch.nn as nn
+ from datetime import datetime
+@@ -38,8 +39,8 @@ args.N_T = 10
+ args.T = 3000
+ args.T_test = 3000
+ ### training parameters
+-args.use_cuda = True # use GPU or not
+-args.n_steps = 2000
++args.use_cuda = False # use GPU or not  [p2e: CPU only]
++args.n_steps = int(os.environ.get('N_STEPS', 2000))  # [p2e] env override (timing runs only)
+ args.n_batch = 8
+ args.lr = 1e-4
+ args.wd = 1e-4

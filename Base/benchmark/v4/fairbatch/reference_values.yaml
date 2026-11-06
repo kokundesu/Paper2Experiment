@@ -1,0 +1,85 @@
+# Reference re-runs of the official code (hidden).
+id: fairbatch
+recipe_status: draft
+commit: 4f652764be12ce18d237d563d291b63fa1ddf67f
+run_dir: /Users/allenhuw/Documents/Projects/Paper2Exp/Base/runs/reference/20261017-095521_fairbatch
+n: 5
+setup_logs:
+- cmd_001_setup.log
+- cmd_002_setup.log
+- cmd_003_setup.log
+- cmd_004_setup.log
+- cmd_005_setup.log
+runs:
+- i: 0
+  seed: 0
+  threads: default
+  exit: 0
+  wall_s: 14.1
+  log: cmd_006_ref_0.log
+  values:
+    synthetic_fairbatch_eo_accuracy: 0.8550000190734863
+    synthetic_fairbatch_eo_disparity: 0.012102903728662517
+- i: 1
+  seed: 1
+  threads: '1'
+  exit: 0
+  wall_s: 3.7
+  log: cmd_007_ref_1.log
+  values:
+    synthetic_fairbatch_eo_accuracy: 0.8550000190734863
+    synthetic_fairbatch_eo_disparity: 0.012102903728662517
+- i: 2
+  seed: 2
+  threads: default
+  exit: 0
+  wall_s: 3.6
+  log: cmd_008_ref_2.log
+  values:
+    synthetic_fairbatch_eo_accuracy: 0.8550000190734863
+    synthetic_fairbatch_eo_disparity: 0.012102903728662517
+- i: 3
+  seed: 3
+  threads: '1'
+  exit: 0
+  wall_s: 4.0
+  log: cmd_009_ref_3.log
+  values:
+    synthetic_fairbatch_eo_accuracy: 0.8550000190734863
+    synthetic_fairbatch_eo_disparity: 0.012102903728662517
+- i: 4
+  seed: 4
+  threads: default
+  exit: 0
+  wall_s: 4.8
+  log: cmd_010_ref_4.log
+  values:
+    synthetic_fairbatch_eo_accuracy: 0.8550000190734863
+    synthetic_fairbatch_eo_disparity: 0.012102903728662517
+values:
+  synthetic_fairbatch_eo_accuracy:
+  - 0.8550000190734863
+  - 0.8550000190734863
+  - 0.8550000190734863
+  - 0.8550000190734863
+  - 0.8550000190734863
+  synthetic_fairbatch_eo_disparity:
+  - 0.012102903728662517
+  - 0.012102903728662517
+  - 0.012102903728662517
+  - 0.012102903728662517
+  - 0.012102903728662517
+printed_places:
+  synthetic_fairbatch_eo_accuracy: 16
+  synthetic_fairbatch_eo_disparity: 18
+manifest:
+  cmd_001_setup.log: ff75bb75e8fa02434ea4b15f1aaad54302325343cb8df676ae109e0857d905f6
+  cmd_002_setup.log: 6287f6759a37475704ebb7715ff88faf29fc470a1af35655b7fc1f04602b0078
+  cmd_003_setup.log: cb3d750b0918f668f1cf5ac63c7a51bd74f36b1121b33cc1107743b28227731d
+  cmd_004_setup.log: c651f7e9ba1017b0d6fead83940b8a9ed323f7c52f37c1ce3689247f0181e2a7
+  cmd_005_setup.log: 2839b644fff23cf413d5997900daecd9ca8b424fe0f16ded6fe3b690813f0184
+  cmd_006_ref_0.log: de1afebb3fb0b44b0317d6e869122d61bf1d4ade846fb0622f9190bcd43f52cb
+  cmd_007_ref_1.log: 48be6f34e16008d6a77039133c0b5152f4c75e53a5d7c439260c817fc411cb8c
+  cmd_008_ref_2.log: aa99b7f14de793671f080eb315d08a9ee7f493c2268f16678b7f4cc7b2178def
+  cmd_009_ref_3.log: be64314a6e7b97bf735b1fed61a3b137fb0ee6925e80eb006ecde3eac9ba8833
+  cmd_010_ref_4.log: a57cead744266618839e69f56bb004370d9b5d521764e09156a1065bfd2a3c8e

@@ -1,0 +1,47 @@
+# ReproSpec (agent-visible, no values). FROZEN: see ../FROZEN.yaml.
+id: pinn_gradpath
+title: ''
+objective: 复现 Understanding and Mitigating Gradient Pathologies in PINNs 里 2D Helmholtz
+  方程的结果：M1 和 M2 两个模型的相对 L2 误差（表 2）。
+task_prompt: ''
+language: Python
+paper:
+  url: https://arxiv.org/abs/2001.04536
+  pdf: null
+code:
+  repo_url: https://github.com/PredictiveIntelligenceLab/GradientPathologiesPINNs
+  capsule: null
+questions:
+- id: helmholtz2d_m1_relative_l2_50x3
+  text: 二维 Helmholtz 方程实验中，采用每层 50 个单元、3 个隐藏层的 M1 原始 PINN，表 2 所报告的预测解相对 L2 误差是多少？
+  answer_type: number
+  metric: 预测解与解析解之间的相对 L2 误差
+  direction: lower
+  unit: ''
+  locator: 表 2（Helmholtz equation），行“50 units / 3 hidden layers”，列“M1”
+  setting: 二维 Helmholtz 方程；解析解 u(x,y)=sin(πx)sin(4πy)；M1 为原始全连接 PINN，不使用自适应损失权重；50
+    units / 3 hidden layers；40,000 次 Adam 更新。
+  runs: 3
+  evidence: log
+- id: helmholtz2d_m2_relative_l2_50x3
+  text: 二维 Helmholtz 方程实验中，采用每层 50 个单元、3 个隐藏层的 M2 PINN（学习率退火算法），表 2 所报告的预测解相对 L2 误差是多少？
+  answer_type: number
+  metric: 预测解与解析解之间的相对 L2 误差
+  direction: lower
+  unit: ''
+  locator: 表 2（Helmholtz equation），行“50 units / 3 hidden layers”，列“M2”
+  setting: 二维 Helmholtz 方程；解析解 u(x,y)=sin(πx)sin(4πy)；M2 为常规全连接 PINN 加自适应学习率退火/损失权重调整；50
+    units / 3 hidden layers；40,000 次 Adam 更新。
+  runs: 3
+  evidence: log
+origin:
+  source: user
+  reference: ''
+  prompt: 复现 Understanding and Mitigating Gradient Pathologies in PINNs 里 2D Helmholtz
+    方程的结果：M1 和 M2 两个模型的相对 L2 误差（表 2）。
+  drafted_by:
+  - sol
+  checked_by:
+  - sonnet55
+  - haiku55
+  user_confirmed: true

@@ -1,0 +1,45 @@
+# Task given to every workflow. Contains no target values.
+id: kalmannet
+paper_url: https://arxiv.org/pdf/2107.10043v3
+paper_pdf: paper/2107.10043.pdf
+repo_url: https://github.com/KalmanNet/KalmanNet_TSP
+objective: >
+  Reproduce two numerical results of KalmanNet (IEEE TSP 2022) with the official
+  code (main branch, which implements the paper's "architecture #2"), running on CPU:
+  (1) the T = 20 row of Table I (linear 2x2 state-space model, full information):
+  KalmanNet and the model-based Kalman filter test MSE when trained and tested on
+  T = 20; and (2) the 1/r^2 = 30 dB column of Table VI (Lorenz attractor with
+  non-linear, spherical-coordinate observations, T = 20, nu = 0 dB): KalmanNet and EKF
+  test MSE. Use the paper's experimental setup; where the paper is silent, use the
+  official repository's settings.
+claims:
+  - id: knet_lin_T20
+    metric: test_mse_db
+    setting: "Table I, row Test T = 20, KalmanNet column"
+    unit: "dB"
+    description: >
+      KalmanNet test MSE in dB (10*log10 of the mean per-sequence MSE over the test set)
+      on the 2x2 linear canonical model of Section IV-B (full information), trained and
+      tested on trajectories of length T = 20.
+  - id: kf_lin_T20
+    metric: test_mse_db
+    setting: "Table I, row Test T = 20, KF column"
+    unit: "dB"
+    description: >
+      Model-based Kalman filter (true F, H, Q, R) test MSE in dB on the same T = 20
+      test set as knet_lin_T20.
+  - id: knet_nlobs_30dB
+    metric: test_mse_db
+    setting: "Table VI, KalmanNet row, column 1/r^2 = 30 dB"
+    unit: "dB"
+    description: >
+      KalmanNet test MSE in dB on the discrete-time Lorenz attractor (J = 5, delta_tau = 0.02)
+      with non-linear observations h = cartesian-to-spherical, T = 20, nu = q^2/r^2 = 0 dB,
+      1/r^2 = 30 dB (full information).
+  - id: ekf_nlobs_30dB
+    metric: test_mse_db
+    setting: "Table VI, EKF row, column 1/r^2 = 30 dB"
+    unit: "dB"
+    description: >
+      EKF (full model information) test MSE in dB on the same test set as knet_nlobs_30dB.
+seeds: 3

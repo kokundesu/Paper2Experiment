@@ -1,0 +1,47 @@
+# ReproSpec (agent-visible, no values). FROZEN: see ../FROZEN.yaml.
+id: cyclenet
+title: ''
+objective: 复现 CycleNet（NeurIPS 2024）在 Weather 数据集上输入 96、预测 96 的 MLP 版本的 MSE 和 MAE（表
+  7）。
+task_prompt: ''
+language: Python
+paper:
+  url: https://arxiv.org/abs/2409.18479
+  pdf: null
+code:
+  repo_url: https://github.com/ACAT-SCUT/CycleNet
+  capsule: null
+questions:
+- id: weather_96_96_mlp_mse
+  text: CycleNet/MLP 在 Weather 数据集上，以 96 步历史输入预测未来 96 步时，表 7 报告的测试集 MSE 跨运行均值是多少？
+  answer_type: number
+  metric: MSE
+  direction: lower
+  unit: ''
+  locator: 附录 C.2，表 7，Weather 区块，预测长度 96 行，CycleNet/MLP 的 MSE 列（取 ± 前的均值）
+  setting: Weather 多变量长期时间序列预测；CycleNet/MLP（RCF 加双层 MLP）；look-back L=96，forecast horizon
+    H=96；默认周期长度 W=144，默认使用无可学习仿射参数的 RevIN。
+  runs: 3
+  evidence: log
+- id: weather_96_96_mlp_mae
+  text: CycleNet/MLP 在 Weather 数据集上，以 96 步历史输入预测未来 96 步时，表 7 报告的测试集 MAE 跨运行均值是多少？
+  answer_type: number
+  metric: MAE
+  direction: lower
+  unit: ''
+  locator: 附录 C.2，表 7，Weather 区块，预测长度 96 行，CycleNet/MLP 的 MAE 列（取 ± 前的均值）
+  setting: Weather 多变量长期时间序列预测；CycleNet/MLP（RCF 加双层 MLP）；look-back L=96，forecast horizon
+    H=96；默认周期长度 W=144，默认使用无可学习仿射参数的 RevIN。
+  runs: 3
+  evidence: log
+origin:
+  source: user
+  reference: ''
+  prompt: 复现 CycleNet（NeurIPS 2024）在 Weather 数据集上输入 96、预测 96 的 MLP 版本的 MSE 和 MAE（表
+    7）。
+  drafted_by:
+  - sol
+  checked_by:
+  - sonnet55
+  - haiku55
+  user_confirmed: true

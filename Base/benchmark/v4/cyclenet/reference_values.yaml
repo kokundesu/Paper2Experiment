@@ -1,0 +1,85 @@
+# Reference re-runs of the official code (hidden).
+id: cyclenet
+recipe_status: draft
+commit: d807e51fc2dcd143885ee639d97965a7ab0926f4
+run_dir: /Users/allenhuw/Documents/Projects/Paper2Exp/Base/runs/reference/20261017-101638_cyclenet
+n: 5
+setup_logs:
+- cmd_001_setup.log
+- cmd_002_setup.log
+- cmd_003_setup.log
+- cmd_004_setup.log
+- cmd_005_setup.log
+runs:
+- i: 0
+  seed: 0
+  threads: default
+  exit: 0
+  wall_s: 138.9
+  log: cmd_006_ref_0.log
+  values:
+    weather_96_96_mlp_mse: 0.1584705114364624
+    weather_96_96_mlp_mae: 0.20339758694171906
+- i: 1
+  seed: 1
+  threads: '1'
+  exit: 0
+  wall_s: 87.2
+  log: cmd_007_ref_1.log
+  values:
+    weather_96_96_mlp_mse: 0.15917322039604187
+    weather_96_96_mlp_mae: 0.20377591252326965
+- i: 2
+  seed: 2
+  threads: default
+  exit: 0
+  wall_s: 96.8
+  log: cmd_008_ref_2.log
+  values:
+    weather_96_96_mlp_mse: 0.15939249098300934
+    weather_96_96_mlp_mae: 0.20388633012771606
+- i: 3
+  seed: 3
+  threads: '1'
+  exit: 0
+  wall_s: 113.1
+  log: cmd_009_ref_3.log
+  values:
+    weather_96_96_mlp_mse: 0.15912918746471405
+    weather_96_96_mlp_mae: 0.20353949069976807
+- i: 4
+  seed: 4
+  threads: default
+  exit: 0
+  wall_s: 89.7
+  log: cmd_010_ref_4.log
+  values:
+    weather_96_96_mlp_mse: 0.1587165892124176
+    weather_96_96_mlp_mae: 0.20317308604717255
+values:
+  weather_96_96_mlp_mse:
+  - 0.1584705114364624
+  - 0.15917322039604187
+  - 0.15939249098300934
+  - 0.15912918746471405
+  - 0.1587165892124176
+  weather_96_96_mlp_mae:
+  - 0.20339758694171906
+  - 0.20377591252326965
+  - 0.20388633012771606
+  - 0.20353949069976807
+  - 0.20317308604717255
+printed_places:
+  weather_96_96_mlp_mse: 17
+  weather_96_96_mlp_mae: 17
+manifest:
+  cmd_001_setup.log: 229434207bd664901033844329f48588f3dd1efc9faf8f1248a61c82578971f2
+  cmd_002_setup.log: 6287f6759a37475704ebb7715ff88faf29fc470a1af35655b7fc1f04602b0078
+  cmd_003_setup.log: 308da1612605cda93942fa2abc57c0f469b260fe8460fd8d690a71a65e551f80
+  cmd_004_setup.log: d3471ecd18365c22a3a9597ee6348ef101f64499843a0b35b63efb8e076eeaff
+  cmd_005_setup.log: 2f4334bcf29c8f4421dc3cf4e074ee6faeef4168a50de3d8262efb7b4c544af1
+  cmd_006_ref_0.log: 14de077a4807e0ea52f43d12c2f05d7dfbb8e415eb53c6353486030fdf886e40
+  cmd_007_ref_1.log: 88a3103f2651324bbd5d26f5df3cca073838da11c7bb00dfc1d5e7d61763d565
+  cmd_008_ref_2.log: 30678bf933852dbda143c80f1468c08fc4e225b8a2ea8382e7018201d1f8ef5a
+  cmd_009_ref_3.log: af8ef4a8d2087f7066341efd7c272966f66fba5a80985a044f01cd43e944b12c
+  cmd_010_ref_4.log: a20d576adb01f718b193044a9d1e6e735bd4354ad2621c82f8a7c15d6f26254e

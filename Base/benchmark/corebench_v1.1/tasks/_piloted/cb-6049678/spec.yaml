@@ -1,0 +1,33 @@
+# CORE-Bench v1.1 task as a ReproSpec: what agents see. No answers.
+id: cb-6049678
+title: Multi-Instance Ensemble Learning with Discriminative Bags (ELDB)
+objective: 'Test the computational reproducibility of a scientific capsule (CORE-Bench,
+  Hard level): run its code and answer the questions from the output.'
+task_prompt: Run 'Main.py'.
+language: Python
+paper: null
+code:
+  repo_url: null
+  capsule: capsule-6049678
+questions:
+- id: q1
+  text: Report the f1 score for the Musk1+ dataset with the svm classifier.
+  answer_type: any
+  unit: ''
+  locator: program output
+  setting: ''
+  runs: 1
+  evidence: either
+- id: q2
+  text: Report the f1 score for the Musk1+ dataset with the j48 classifier.
+  answer_type: any
+  unit: ''
+  locator: program output
+  setting: ''
+  runs: 1
+  evidence: either
+origin:
+  source: corebench
+  reference: core-bench-v1.1-mainline sha256:d4aa5ebb984df7f293e04f2dd120722f172fddea6fcb54a0c928e09bc6ef837d
+  drafted_by: []
+  user_confirmed: false

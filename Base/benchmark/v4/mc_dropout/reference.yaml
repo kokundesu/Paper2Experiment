@@ -1,0 +1,17 @@
+# Reference recipe (hidden; written by the benchmark builder). status: draft until the setup,
+# the command and one regex per question have been checked by an actual run.
+id: mc_dropout
+status: draft
+repo: https://github.com/yaringal/DropoutUncertaintyExps
+commit: ''
+setup:
+- git clone https://github.com/yaringal/DropoutUncertaintyExps repo
+command: ''
+timeout_s: 1800
+seeded: true
+metrics: {}
+entry: '`experiment.py --dir bostonHousing --epochx 10 --hidden 1`'
+notes:
+- 'difficulty: 难; estimated time per run: 10–20 分钟'
+- 'risk: Theano + Keras 2.2，需要移植；论文和 README 数字不一致'
+- 'questions: boston_mc_dropout_test_rmse, boston_mc_dropout_test_ll'

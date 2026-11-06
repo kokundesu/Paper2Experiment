@@ -1,0 +1,46 @@
+diff --git a/run_longExp.py b/run_longExp.py
+index d672f96..d98a559 100644
+--- a/run_longExp.py
++++ b/run_longExp.py
+@@ -5,7 +5,9 @@ from exp.exp_main import Exp_Main
+ import random
+ import numpy as np
+ 
+-fix_seed = 2021
++fix_seed = int(os.environ.get('SEED', 2021))  # P2E patch: seed from env (default = original 2021)
++torch.set_num_threads(int(os.environ.get('TORCH_NUM_THREADS', 4)))  # P2E patch: limit CPU threads
++print('seed:', fix_seed, 'threads:', torch.get_num_threads())
+ random.seed(fix_seed)
+ torch.manual_seed(fix_seed)
+ np.random.seed(fix_seed)
+diff --git a/exp/exp_main.py b/exp/exp_main.py
+index 850370b..38f0481 100644
+--- a/exp/exp_main.py
++++ b/exp/exp_main.py
+@@ -289,6 +289,13 @@ class Exp_Main(Exp_Basic):
+ 
+         mae, mse, rmse, mape, mspe, rse, corr = metric(preds, trues)
+         print('mse:{}, mae:{}'.format(mse, mae))
++        # P2E patch: also report the metric as computed when the paper was written
++        # (test loader drop_last=True until upstream commit 6fe4c28, 2023-03-15).
++        # The test loader is not shuffled, so drop_last=True == keep the first floor(N/bs)*bs windows.
++        n_keep = (len(preds) // self.args.batch_size) * self.args.batch_size
++        mae_dl, mse_dl = metric(preds[:n_keep], trues[:n_keep])[:2]
++        print('test_windows:{}, kept_with_drop_last:{}'.format(len(preds), n_keep))
++        print('droplast_mse:{}, droplast_mae:{}'.format(mse_dl, mae_dl))
+         f = open("result.txt", 'a')
+         f.write(setting + "  \n")
+         f.write('mse:{}, mae:{}, rse:{}, corr:{}'.format(mse, mae, rse, corr))
+diff --git a/utils/tools.py b/utils/tools.py
+index 9f48a6c..8697d93 100644
+--- a/utils/tools.py
++++ b/utils/tools.py
+@@ -37,7 +37,7 @@ class EarlyStopping:
+         self.counter = 0
+         self.best_score = None
+         self.early_stop = False
+-        self.val_loss_min = np.Inf
++        self.val_loss_min = np.inf
+         self.delta = delta
+ 
+     def __call__(self, val_loss, model, path):

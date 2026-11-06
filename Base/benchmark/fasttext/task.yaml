@@ -1,0 +1,14 @@
+# Task given to every workflow. Contains no target values.
+id: fasttext
+paper_url: https://arxiv.org/pdf/1607.01759
+paper_pdf: paper/1607.01759.pdf
+repo_url: https://github.com/facebookresearch/fastText
+objective: >
+  Reproduce the "fastText, h = 10, bigram" row of Table 1 (test accuracy on the
+  sentiment / text classification datasets) for AG, DBpedia and Yelp polarity,
+  using the official code and the paper's experimental setup.
+claims:
+  - {id: ag_acc,     metric: test_accuracy, setting: "Table 1, fastText h=10 bigram, AG",       unit: "%", description: "Test accuracy on AG News"}
+  - {id: dbpedia_acc, metric: test_accuracy, setting: "Table 1, fastText h=10 bigram, DBpedia", unit: "%", description: "Test accuracy on DBpedia"}
+  - {id: yelp_p_acc, metric: test_accuracy, setting: "Table 1, fastText h=10 bigram, Yelp P.",  unit: "%", description: "Test accuracy on Yelp review polarity"}
+seeds: 3

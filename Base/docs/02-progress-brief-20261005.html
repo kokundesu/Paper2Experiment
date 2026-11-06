@@ -1,0 +1,348 @@
+<article data-hub-format="plain" data-title="Paper2Experiment 进度简报（v2）" data-subtitle="EE6008 项目（AY26S1-28-SPML，单人）· 截至 2026-10-05 · v2 正式实验 30 次完成 · 上一期见 01 篇（10/4）· 最终截止 2026-10-15">
+
+<section id="status" data-group="先看结论" data-group-note="项目现在走到哪一步、v2 正式实验说明了什么、四篇论文本身有什么问题。">
+<h2>01 / 项目现状</h2>
+<p>Paper2Experiment 让 LLM agent 复现工程类论文：给它论文 PDF 和官方仓库，它在沙箱里搭环境、跑实验、提交数字；一个不用 LLM 的评估器拿隐藏的 ground truth 打分，并给 agent 对失败的解释打分。项目对比三种做法：不用 LLM 的 deterministic baseline、一个 agent 包办的 single-agent、多个角色分工的 multi-agent。</p>
+<p>和 10/4 那期相比，benchmark 新增了 SGC 和 FITS 两篇论文（人工复现都是 full）；系统在新论文上暴露出 4 个设计缺陷，修复后定为 v2 版本，并按 5 个 case × 2 种 workflow × 3 次重复重跑了正式实验，共 30 次，用时 7.0 小时，花费 $1.03。系统现在冻结在 v2。</p>
+<aside class="takeaway"><b>三句话</b>
+<ul>
+<li><b>复现：</b>v2 下 single-agent 13/15 判 full，multi-agent 14/15；仅有的 3 次失败都在 KalmanNet 线性实验，卡在「从不需要训练的 KF 值反推论文没写的噪声水平」这一步。</li>
+<li><b>诚信：</b>v1、v2 共 48 次运行，失败的 claim 全部被如实标出，假成功 0 次、误报 0 次；没有一次为了凑数去调参。</li>
+<li><b>诊断深度：</b>原因类别约三分之二正确，但「类别和机制都对」的严格归类几乎为零；唯一一次自动命中经 10 个 seed 复核，方向对、机制不成立，只算半个。</li>
+</ul>
+</aside>
+<div class="tablewrap"><table>
+<thead><tr><th>部分</th><th>状态</th><th>说明</th></tr></thead>
+<tbody>
+<tr><td>系统代码 <code>p2e/</code></td><td>v2 冻结</td><td>约 1,735 行；离线测试 32 个，全部通过</td></tr>
+<tr><td>Benchmark</td><td>完成</td><td>7 个 case 都有人工复现作 ground truth；评估器校准 7/7 判 full</td></tr>
+<tr><td>正式实验</td><td>完成</td><td>v1 18 次（10/4）、v2 30 次（10/5），统一规则重新打分</td></tr>
+<tr><td>报告与 demo</td><td>未开始</td><td>截止 2026-10-15</td></tr>
+<tr><td>git 提交</td><td>未提交</td><td>代码快照在 <code>runs/formal2_20261005-1017/</code>，但 <code>runs/</code> 被 git 忽略</td></tr>
+</tbody>
+</table></div>
+</section>
+
+<section id="results" data-group="先看结论">
+<h2>02 / v2 正式实验结果</h2>
+<p>模型是 gpt-6-luna（OpenAI Responses API），普通角色推理强度 medium，multi-agent 的两个审查角色（Result Reviewer、Discrepancy Analyst）为 high。v1 和 v2 的 48 次运行都用当前的评估器和 <code>case.yaml</code> 重新打过分，规则一致（两次事后的评分修改见 PART 3 · Section03 和 PART 3 · Section04）。</p>
+
+<h3>两个版本总表</h3>
+<p><b>v2 覆盖的 case 更多，判定 full 的比例更高；诚信两版都一样好。</b></p>
+<div class="tablewrap"><table>
+<thead><tr><th>指标</th><th>v1 single</th><th>v1 multi</th><th>v2 single</th><th>v2 multi</th></tr></thead>
+<tbody>
+<tr><td>case 数</td><td>3</td><td>3</td><td>5</td><td>5</td></tr>
+<tr><td>判定 full</td><td>9/9</td><td>7/9</td><td><b>13/15</b></td><td><b>14/15</b></td></tr>
+<tr><td>检出（数值失败被标为有差异）</td><td>8/8</td><td>13/13</td><td>12/12</td><td>11/11</td></tr>
+<tr><td>假成功 / 误报</td><td>0 / 0</td><td>0 / 0</td><td>0 / 0</td><td>0 / 0</td></tr>
+<tr><td>原因类别正确</td><td>6/8</td><td>6/9</td><td>6/8</td><td>5/9</td></tr>
+<tr><td>严格归类（人工复核后）</td><td>0</td><td>0</td><td>0</td><td>0.5</td></tr>
+<tr><td>总用时</td><td>103 分钟</td><td>130 分钟</td><td>177 分钟</td><td>244 分钟</td></tr>
+<tr><td>总花费</td><td>$0.32</td><td>$0.44</td><td>$0.43</td><td>$0.60</td></tr>
+</tbody>
+</table></div>
+
+<h3>v2 分 case 结果</h3>
+<p><b>五个 case 里四个两种 workflow 都 3/3 full，只有 KalmanNet 各失败过。</b></p>
+<div class="tablewrap"><table>
+<thead><tr><th>Case</th><th>single</th><th>multi</th><th>分钟/次</th><th>说明</th></tr></thead>
+<tbody>
+<tr><td>GCN</td><td>full ×3</td><td>full ×3</td><td>3.6 / 4.0</td><td>两版都稳定</td></tr>
+<tr><td>DLinear</td><td>full ×3</td><td>full ×3</td><td>10.5 / 16.3</td><td>720 有 1 次碰巧通过</td></tr>
+<tr><td>KalmanNet</td><td>fail / full / fail</td><td>full / fail / full</td><td>20.0 / 27.0</td><td>失败都因没反推噪声</td></tr>
+<tr><td>SGC（新）</td><td>full ×3</td><td>full ×3</td><td>1.5 / 3.1</td><td>修复前 fail / partial</td></tr>
+<tr><td>FITS（新）</td><td>full ×3</td><td>full ×3</td><td>23.4 / 30.9</td><td>与人工复现吻合</td></tr>
+</tbody>
+</table></div>
+<p class="table-cap">分钟/次为 single / multi 各 3 次重复的均值。SGC 的 Citeseer 为 71.83–71.9；FITS 的测量值与人工复现吻合到小数点后 4 位；DLinear 的 ETTh1-720 是仅诊断 claim。单次花费 $0.007（SGC single）到 $0.080（KalmanNet multi）。FITS multi 有一次因两次调用 Debugger 并以单线程运行，用了 61 分钟。</p>
+
+<h3>KalmanNet 的推断瓶颈</h3>
+<p><b>论文只写了 ν = 0 dB、没写噪声的绝对大小；做了这一步反推的运行全部 full，没做的全部 fail，12 次里做到 7 次。</b></p>
+<div class="tablewrap"><table>
+<thead><tr><th>版本</th><th>single</th><th>multi</th><th>合计</th></tr></thead>
+<tbody>
+<tr><td>v1</td><td>3/3</td><td>1/3</td><td>4/6</td></tr>
+<tr><td>v2</td><td>1/3</td><td>2/3</td><td>3/6</td></tr>
+</tbody>
+</table></div>
+<p>两版差别在随机波动范围内，不是 v2 的退步。根本原因是规则的措辞：论文没写的设置「可以」从不需要训练的量反推，这是允许而不是要求，于是一半的 agent 选择保守：如实报告差异，但不修正设置。没有做反推的运行都把偏差标成了「有差异」，没有假成功。</p>
+
+<h3>诊断：方向对，机制难</h3>
+<p><b>最深的一次诊断翻了 git 历史、隔离出一个因素，但 10 个 seed 的复核否定了它给出的机制。</b></p>
+<p>v2 的 DLinear multi r2 发现旧代码里有一个 forward 从不使用的 <code>Linear_Decoder</code> 层：它的初始化会消耗随机数，从而改变固定 seed 下的 minibatch 顺序；只加回这一层，3 个 seed 的中位数降到 0.4805，回到容差内。严格归类因此自动命中。用 10 个 seed 复核：</p>
+<div class="tablewrap"><table>
+<thead><tr><th>ETTh1-720，各 10 个 seed</th><th>中位数</th><th>范围</th><th>容差内</th><th>3 个 seed 中位数达标的概率</th></tr></thead>
+<tbody>
+<tr><td>现行代码</td><td>0.499</td><td>0.478–0.615</td><td>3/10</td><td>18%</td></tr>
+<tr><td>现行代码 + 未使用的 decoder</td><td>0.482</td><td>0.475–0.525</td><td>6/10</td><td>67%</td></tr>
+<tr><td>论文时期的完整旧代码</td><td>0.475</td><td>0.471–0.484</td><td>10/10</td><td>100%</td></tr>
+</tbody>
+</table></div>
+<p>agent 的观察能复现（seed 2021 正好 0.4804），10 个 seed 的中位数也确实降了（单侧置换检验 p = 0.028）。但一个不参与计算的层只是把每个 seed 映射到另一串随机数，在所有 seed 上的结果分布不变，所以这更可能是重尾、高方差设置下的抽样波动；能稳定复现论文的只有完整的旧代码（更小的学习率和 batch）。人工判定：方向对（代码版本），机制不成立，算半个。</p>
+<aside class="note" data-label="解读"><b>3 个 seed 的诊断实验可能制造假机制</b>
+<p>当 seed 之间的波动和要解释的差距一样大时，一个单因素实验配 3 个 seed，足以得到看上去很有说服力的「机制」。这一条值得作为方法论教训写进报告，也说明严格归类必须人工复核。</p>
+</aside>
+</section>
+
+<section id="paper-gaps" data-group="先看结论">
+<h2>03 / 论文本身的问题</h2>
+<p>人工复现和系统运行在四篇论文里发现了论文与代码、论文与自身的不一致。前两处复现不出来，设为「仅诊断」claim，专门考 agent 的诊断能力；后两处能复现，但暴露了陷阱或协议问题。</p>
+
+<h3>DLinear：代码改了，论文没改</h3>
+<p><b>Table 2 的 DLinear 数字来自 2022 年 8 月更新之前的代码；那次更新改了权重初始化和 ETTh1 的超参数，论文的数字没有跟着变。</b></p>
+<p>旧 commit <code>721ab58</code> 用默认 seed 2021，检查的 12 个数字和论文逐位吻合（ETTh1-720 得 0.4719 / 0.4902，论文 0.472 / 0.490）；旧代码 10 个 seed 的中位数 0.475，现行代码 0.499。那次更新还删掉了未使用的 decoder 层，它只影响随机数流，不是原因（PART 1 · Section02）。原因类别：论文与代码不一致，已确认。</p>
+
+<h3>KalmanNet：论文的 EKF 不在工作</h3>
+<p><b>Table VI 的 EKF 那一行，和一个 Kalman 增益为零、完全忽略观测的滤波器在 5 个噪声水平上都吻合（误差 1.5 dB 以内）。</b></p>
+<div class="tablewrap"><table>
+<thead><tr><th>1/r²</th><th>−10</th><th>0</th><th>10</th><th>20</th><th>30 dB</th></tr></thead>
+<tbody>
+<tr><td>论文的 EKF</td><td>26.38</td><td>21.78</td><td>14.50</td><td>4.84</td><td>−4.02</td></tr>
+<tr><td>零增益 EKF（我们跑的）</td><td>27.3</td><td>22.7</td><td>14.5</td><td>4.5</td><td>−5.5</td></tr>
+<tr><td>正常的 EKF（真实 Q）</td><td>25.1</td><td>15.1</td><td>−4.9</td><td>−14.6</td><td>−25.1</td></tr>
+</tbody>
+</table></div>
+<p>论文声称 KalmanNet 比 EKF 好 11–16 dB，换成正常工作的 EKF 后只剩约 1 dB；KalmanNet 那一行为什么也偏还没查清。报告措辞建议写成「报告的 EKF 数值与零增益滤波器一致」，而不是「论文错了」。</p>
+
+<h3>SGC：正文和 README 不一致</h3>
+<p><b>论文正文写训练 100 个 epoch，README 给 Citeseer 的命令是 150 个；只有 150 个能复现表格（71.84 对 71.9），100 个得 71.2。</b></p>
+<p>README 附带的 weight decay 接近在 150 个 epoch 下调出的值，作者很可能就是按 150 调的参（推测）。按你选的方案 (a)，系统现在用官方命令测量，并把正文的设置跑一次作诊断。</p>
+
+<h3>FITS：在测试集上选参数</h3>
+<p><b>论文说超参数按验证集选，但官方日志里每个 <code>_best</code> 配置都是测试集上最好的那个；真按验证集选，ETTh2-96 会差 5.4%。</b></p>
+<p>数字本身能复现（四项都在 0.15% 以内，CPU 结果与作者的 GPU 日志逐个 seed 吻合到 1e-6），所以这不影响判定；它暴露的是系统的范围限制：系统只检查「数字能不能复现」，不检查「官方配置是否符合论文描述的流程」。两种 workflow 都没有发现这一点。</p>
+</section>
+
+<section id="benchmark" data-group="系统怎么工作" data-group-note="v2 的 benchmark、两种 LLM workflow 的流程，以及评估器怎么判复现和诊断。">
+<h2>01 / Benchmark</h2>
+<p>起初的 L2O 和 PINN 训练太慢（单次 7–17 分钟），被换成单次运行在分钟级以内、和信号处理背景相关的论文；LLM Agent 类论文因依赖的 GPT-3.5 / GPT-4 版本已下线而被否决。10/5 新增了 SGC 和 FITS，都由 subagent 在不看系统结果的前提下人工复现。</p>
+<div class="tablewrap"><table>
+<thead><tr><th>Case</th><th>领域</th><th>claim</th><th>单次运行</th><th>容差</th><th>人工复现</th></tr></thead>
+<tbody>
+<tr><td>GCN</td><td>图机器学习</td><td>3 + 0</td><td>几秒</td><td>±1.5 pp</td><td>full</td></tr>
+<tr><td>DLinear</td><td>时间序列预测</td><td>4 + 1</td><td>7–40 秒</td><td>±3–10%</td><td>full</td></tr>
+<tr><td>KalmanNet</td><td>卡尔曼滤波</td><td>2 + 2</td><td>约 1 分钟</td><td>±0.3 / 1.0 dB</td><td>full</td></tr>
+<tr><td>SGC</td><td>图上的低通滤波</td><td>3 + 0</td><td>4–6 秒</td><td>±0.5 pp</td><td>full</td></tr>
+<tr><td>FITS</td><td>频域时间序列预测</td><td>4 + 0</td><td>0.5–2 分钟</td><td>±1%</td><td>full</td></tr>
+<tr><td>L2O</td><td>无线通信优化</td><td>4 + 0</td><td>7–17 分钟</td><td>按 claim</td><td>full，不跑 LLM</td></tr>
+<tr><td>PINN</td><td>物理信息网络</td><td>3 + 0</td><td>几分钟</td><td>10 倍</td><td>full，不跑 LLM</td></tr>
+</tbody>
+</table></div>
+<p class="table-cap">claim 列为「计入判定 + 仅诊断」。论文：GCN = Kipf &amp; Welling，ICLR 2017；DLinear = Zeng et al.，AAAI 2023；KalmanNet = Revach et al.，IEEE TSP 2022；SGC = Wu et al.，ICML 2019；FITS = Xu et al.，ICLR 2024；L2O = Sun et al.，IEEE TSP 2018；PINN = Raissi et al.，JCP 2019。</p>
+<p>每个 case 的文件分两份：agent 看到的 <code>task.yaml</code> 只有论文、仓库和 claim 列表；目标值、容差、仅诊断标记和原因 ground truth 在 <code>case.yaml</code> 里，沙箱拦截任何碰它的命令。v2 起，runner 会把 <code>case.yaml</code> 里每个 claim 的容差、聚合方式和 seed 数写进任务说明（预注册判定标准），目标值和其他内容仍然隐藏。</p>
+<ul class="tree">
+<li><code>benchmark/</code> 每个 case 一个目录
+<ul>
+<li><code>dlinear/</code> 以 DLinear 为例
+<ul>
+<li><code>task.yaml</code> agent 可见：论文、仓库、claim 列表</li>
+<li><code>case.yaml</code> 隐藏：目标值、容差、证据模式、仅诊断标记、原因 ground truth</li>
+<li><code>MANUAL_REPRO.md</code> 人工复现记录，benchmark 据此校准</li>
+<li><code>DISCREPANCY.md</code> 复现不出来的原因调查（含 10/5 的 decoder 补记）</li>
+<li><code>results/</code> 人工复现的日志与 CSV
+<ul><li><code>logs/</code> 每次运行的完整输出</li></ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</section>
+
+<section id="multi-agent" data-group="系统怎么工作">
+<h2>02 / Multi-agent 工作流</h2>
+<p>multi-agent 把复现拆给 6 个角色，每个角色只拿到它需要的工具；数字只从 Executor 的日志里解析，任何 LLM 都不能直接写数字。</p>
+<figure class="diagram">
+<ol class="flow">
+<li class="key">Paper Analyst<small>只读：从论文抽出论文值、评测协议、超参数</small></li>
+<li>Env Agent<small>shell：完整克隆仓库、建环境、打补丁、smoke test 并实测运行时间</small></li>
+<li>Planner<small>只读：每个 claim × seed 一条运行命令；官方复现命令与正文冲突时用官方命令</small></li>
+<li class="key">Executor：pilot<small>代码，不是 LLM：每个 claim 先跑一次</small></li>
+<li class="key">设置审查<small>Result Reviewer：对照论文和预注册标准检查设置，只修设置不调参</small></li>
+<li>Executor：其余 seed<small>失败或抓不到数字时调用 Debugger，最多 4 次</small></li>
+<li class="key">差异诊断<small>Discrepancy Analyst：按预注册标准判断每个 claim，诊断原因并做诊断实验</small></li>
+<li>Evaluator<small>不用 LLM：判定 + 诊断打分</small></li>
+</ol>
+<figcaption>multi-agent 的执行顺序</figcaption>
+</figure>
+
+<h3>各角色的权限与预算</h3>
+<p><b>每个角色有自己的轮数上限和预算份额，所有角色共用每次运行 $5 的总预算。</b></p>
+<div class="tablewrap"><table>
+<thead><tr><th>角色</th><th>工具</th><th>推理强度</th><th>轮数上限</th><th>预算份额</th></tr></thead>
+<tbody>
+<tr><td>Paper Analyst</td><td>只读</td><td>medium</td><td>20</td><td>15%</td></tr>
+<tr><td>Env Agent</td><td>读写 + shell</td><td>medium</td><td>50</td><td>40%</td></tr>
+<tr><td>Planner</td><td>只读</td><td>medium</td><td>20</td><td>15%</td></tr>
+<tr><td>Result Reviewer</td><td>读写 + shell</td><td>high</td><td>30</td><td>15%</td></tr>
+<tr><td>Debugger（每次）</td><td>读写 + shell</td><td>medium</td><td>30</td><td>25%</td></tr>
+<tr><td>Discrepancy Analyst</td><td>只读 + shell</td><td>high</td><td>30</td><td>20%</td></tr>
+</tbody>
+</table></div>
+<p class="table-cap">预算份额是每个角色的上限，不是预留；按 gpt-6-luna 的价格，v2 每次运行只花 $0.007–0.09，$5 的上限从未触发。</p>
+
+<h3>设置检查规则</h3>
+<p><b>Reviewer 和 single-agent 遵守同一份规则：先查是否偏离论文，再决定要不要修正，修正必须有论文或代码依据。</b></p>
+<ul>
+<li><b>常见设置错误：</b>数据集、划分、噪声水平、指标、单位、停在仓库默认值上的参数、无故缩短的训练。</li>
+<li><b>论文没写的设置：</b>可以从一个不需要训练的量（解析的或模型驱动的基线）反推，但要说明从哪里推的。</li>
+<li><b>正文与官方命令冲突（v2 新增）：</b>测量用作者给的复现命令或脚本，正文的设置跑一次作诊断，两者都报告；只是代码默认值、没有复现命令设置过它的，仍以论文为准。</li>
+<li><b>禁止：</b>修改论文或官方脚本写明的设置；为了凑数搜索超参数、seed 或噪声水平。</li>
+</ul>
+
+<h3>失败诊断</h3>
+<p><b>实验跑完后，Discrepancy Analyst 为每个 claim 写一份诊断卡片，它跑的诊断实验不会改动已测得的数字。</b></p>
+<p>诊断卡片包含：状态（已复现 / 有差异 / 没测到，v2 起按预注册标准判断）、原因类别（7 选 1）、各个假设及支持与反对的证据、诊断实验的日志、结论、把握程度。检查清单要求：看不需要训练的量是否也偏了；论文发表后代码有没有改过（完整拉取 git 历史，对比两个版本，逐项并组合测试每处改动）；论文其他版本或附录的设置是否不同；偏差是固定的还是随机的。</p>
+</section>
+
+<section id="single-agent" data-group="系统怎么工作">
+<h2>03 / Single-agent 与 deterministic</h2>
+<p>single-agent 是一个拿着全部工具的 agent，从克隆仓库到提交数字和诊断一手包办，最多 80 轮；它和 multi-agent 共用同一份设置检查、运行时和诊断规则。v2 起它的提交在每个 claim 少于 seed 数个值时会被退回重交。deterministic baseline 不用 LLM：克隆仓库，按 requirements 安装，跑 README 里的命令，用正则抓数字，在最初三篇（GCN、L2O、PINN）上全部失败。</p>
+<div class="tablewrap"><table>
+<thead><tr><th></th><th>Deterministic</th><th>Single-agent</th><th>Multi-agent</th></tr></thead>
+<tbody>
+<tr><td>LLM</td><td>无</td><td>一个 agent</td><td>6 个角色</td></tr>
+<tr><td>谁产出数字</td><td>正则抓日志</td><td>agent 提交，核对日志</td><td>Executor 解析日志</td></tr>
+<tr><td>设置检查</td><td>无</td><td>自己做</td><td>Reviewer，一次</td></tr>
+<tr><td>调试</td><td>无</td><td>自由，限轮数与预算</td><td>Debugger，最多 4 次</td></tr>
+<tr><td>诊断</td><td>无</td><td>随结果提交</td><td>Discrepancy Analyst</td></tr>
+<tr><td>推理强度</td><td>–</td><td>全程 medium</td><td>审查 high，其余 medium</td></tr>
+<tr><td>v2 实测</td><td>–</td><td>13/15 full</td><td>14/15 full</td></tr>
+</tbody>
+</table></div>
+</section>
+
+<section id="evaluation" data-group="系统怎么工作">
+<h2>04 / 评估与诊断打分</h2>
+<p>评估分两层，都不调用 LLM：第一层判数字对不对，第二层判 agent 对失败的解释对不对。</p>
+
+<h3>第一层：数值判定</h3>
+<p><b>每个 claim 的多个 seed 取均值或中位数，落在预注册的容差内并且证据有效才算通过。</b></p>
+<ul>
+<li><b>取数：</b>multi-agent 由 Executor 用正则抓日志；single-agent 自己提交，每个 seed 一个值，不能交均值。</li>
+<li><b>证据（v2）：</b>每个值必须出现在一份同时匹配证据模式的日志里；证据模式只匹配训练过程的痕迹，不绑定输出格式；手动打印的数字不能单独作证据；每个 claim 都有证据模式。</li>
+<li><b>完整性：</b>日志必须是沙箱自己写的，沙箱在内存里给每份日志记 sha256，事后被改过或凭空出现的日志都不认。</li>
+<li><b>判定：</b>计入判定的 claim 全部通过为 full，部分通过为 partial，都没通过为 fail；仅诊断的 claim 照常测量，但不计入判定。</li>
+</ul>
+
+<h3>第二层：诊断打分</h3>
+<p><b>拿 agent 的诊断卡片和 <code>case.yaml</code> 里的原因 ground truth 对比，各项指标分开报告。</b></p>
+<div class="tablewrap"><table>
+<thead><tr><th>指标</th><th>定义</th><th>衡量什么</th></tr></thead>
+<tbody>
+<tr><td>检出率</td><td>数值上失败（没有值或聚合值超出容差）的 claim 中，被标为「有差异」的比例</td><td>有没有意识到没复现出来</td></tr>
+<tr><td>假成功</td><td>数值上失败却被标为「已复现」的 claim</td><td>诚信，最严重的错误</td></tr>
+<tr><td>误报</td><td>在容差内却被标为「有差异」的 claim</td><td>是否过度怀疑</td></tr>
+<tr><td>原因归类</td><td>类别命中 ground truth 的主类别或可接受类别</td><td>方向对不对</td></tr>
+<tr><td>严格归类</td><td>类别正确，并且提到决定性证据（自动匹配后人工复核）</td><td>机制找没找到</td></tr>
+<tr><td>证据覆盖</td><td>关键证据条目被提到的比例（关键词启发式）</td><td>仅供参考</td></tr>
+</tbody>
+</table></div>
+<p>seed 数不够或证据不足只影响第一层的判定，不计入诊断里的「失败」，否则数字正确的 claim 会被算成假成功（v2 修正）。</p>
+</section>
+
+<section id="infra-fixes" data-group="踩过的坑" data-group-note="按发现的先后，过程中出过的错和对应的改法；后两章有两处是评分规则本身的问题。">
+<h2>01 / 基础设施与操作上的错误</h2>
+<p>这一章和实验结论无关，但都实打实发生过，有一处是我自己的操作失误。</p>
+<div class="tablewrap"><table>
+<thead><tr><th>问题（后果）</th><th>改法</th></tr></thead>
+<tbody>
+<tr><td>从 Anthropic 迁到 OpenAI 时，Chat Completions 在 GPT-6 上只有推理强度为 none 才支持函数调用（agent 既要推理又要调工具，原路不通）</td><td>改用 Responses API；每次请求单独计费</td></tr>
+<tr><td>API key 以明文出现在终端输出里，被读进了对话记录（有泄露风险）</td><td>支持 <code>.env</code>，加入 .gitignore，沙箱拦截所有涉及 <code>.env</code> 的命令；建议轮换 key</td></tr>
+<tr><td>key 被填进了不被 git 忽略的 <code>.env.example</code>（下次 commit 会提交出去）</td><td>改名为 <code>.env</code>、权限 600，重建空模板</td></tr>
+<tr><td>我删一个冗余测试时删除范围过大，把原有的 single-agent 测试一起删了（仓库没有 commit，git 无法恢复）</td><td>从写这个测试的 subagent 的记录里找回原文并放回</td></tr>
+<tr><td>至今没有 commit（上一条就是代价）</td><td>两轮正式实验前都另存了代码快照与文件哈希；仍建议冻结 v2 时提交</td></tr>
+</tbody>
+</table></div>
+</section>
+
+<section id="smoke-fixes" data-group="踩过的坑">
+<h2>02 / 冒烟测试暴露的问题</h2>
+<p>第一轮在 DLinear 和 KalmanNet 上各跑一次 single 和 multi，判定是 fail、full、partial、fail，几乎每次都暴露了评估系统或 prompt 的问题。</p>
+<div class="tablewrap"><table>
+<thead><tr><th>问题（出现在）</th><th>改法</th></tr></thead>
+<tbody>
+<tr><td>agent 把训练输出重定向到 <code>/tmp</code>，正确的数字被判证据不足（DLinear single、KalmanNet single）</td><td>prompt 和工具说明写明：日志是唯一证据，不许重定向或过滤</td></tr>
+<tr><td>agent 能往日志目录写文件，可以伪造证据（KalmanNet single）</td><td>沙箱记日志哈希，评估器只认沙箱写的、未改动的日志</td></tr>
+<tr><td>类别对、理由错也能得满分（DLinear multi、KalmanNet single）</td><td>新增严格归类，要求提到决定性证据</td></tr>
+<tr><td>诊断结论是空的，诊断不做实验（多次）</td><td>有差异的 claim 必须填结论；每个差异至少一次诊断实验，加入检查清单</td></tr>
+<tr><td>multi-agent 没有环节拿结果对照论文，噪声水平用错也发现不了（KalmanNet multi）</td><td>新增 Result Reviewer 与 pilot</td></tr>
+<tr><td>无故缩减训练；在 macOS 卡死的 DataLoader 上白等 25 分钟</td><td>先实测再缩减；第一次运行设 120–300 秒短超时；仓库完整克隆</td></tr>
+</tbody>
+</table></div>
+</section>
+
+<section id="formal-fixes" data-group="踩过的坑">
+<h2>03 / 第二轮与 v1 正式实验暴露的问题</h2>
+<p>这一章开始出现评分规则本身的错误。</p>
+<div class="tablewrap"><table>
+<thead><tr><th>问题（出现在）</th><th>改法</th></tr></thead>
+<tbody>
+<tr><td>在容差内的结果被标为「有差异」（第二轮 DLinear，共 5 次）</td><td>加入全局经验规则「2–3% 以内算一致」，误报降为 0；这条规则后来在 SGC 上出了问题，v2 已删除（PART 3 · Section04）</td></tr>
+<tr><td>multi-agent 的 Analyst 不做诊断实验（只用 36 秒）</td><td>两个审查角色推理强度改为 high；DLinear multi 的 Analyst 每次 17–22 个 shell 调用（原来 2 个）</td></tr>
+<tr><td>单因素实验被过度解读（第二轮 DLinear single）</td><td>检查清单补充：逐项并组合测试每处改动</td></tr>
+<tr><td>严格归类出现 2 次假阳性（v1 DLinear multi r1、r2）</td><td>删掉不具判别力的「1/L」决定性证据，所有自动命中改为人工复核</td></tr>
+</tbody>
+</table></div>
+<details class="fold" id="fold-strict"><summary data-label="细节"><b>严格归类的假阳性是怎么发生的</b><span class="fold-meta">v1 · DLinear multi r1 / r2</span></summary>
+<p>两次运行自动判为严格命中，人工看上下文后发现，agent 提到「1/L」恰恰是为了排除它。问题有两层：这条证据本身不具判别力（单独改初始化没有效果，0.498 对 0.499）；短语匹配分不清肯定和否定。删除这条证据是在看到结果之后做的，<code>case.yaml</code> 里写明了原因，并在重新打分前完成。</p>
+</details>
+</section>
+
+<section id="v2-fixes" data-group="踩过的坑">
+<h2>04 / 新 case 与 v2 暴露的问题</h2>
+<p>用两篇新论文对比人工复现和系统运行时，SGC 上两边结论不一致（人工 full，系统 single fail、multi partial），顺着查出了下面的缺陷；v2 正式实验又发现了一处。</p>
+<div class="tablewrap"><table>
+<thead><tr><th>问题（出现在）</th><th>改法</th></tr></thead>
+<tbody>
+<tr><td>全局的「2–3% 算一致」规则让两种 workflow 都把 Citeseer 差 0.7 pp 判成「已复现」，而容差是 0.5 pp（SGC，我上一轮引入的）</td><td>删除全局阈值，改为预注册：runner 把每个 claim 的容差写进任务说明，agent 和评估器用同一个标准</td></tr>
+<tr><td>正文与官方命令冲突时没有规则，两种 workflow 都选了正文的 100 个 epoch（SGC）</td><td>方案 (a)：测量用官方命令，正文设置跑一次作诊断，两者都报告</td></tr>
+<tr><td>single 把 3 个 seed 的均值当成一个值提交，n = 1 被判失败（SGC）</td><td>schema 写明每个 seed 一个值；少于 seed 数的提交被退回</td></tr>
+<tr><td>agent 用 Python 打印手写的数字，「数字出现在日志里」的检查居然通过（SGC）</td><td>每个值必须出现在匹配证据模式的日志里；给 9 个缺证据模式的 claim 补上；GCN 补跑人工复现日志</td></tr>
+<tr><td>seed 不够也被算成假成功（SGC）</td><td>诊断只统计数值偏差</td></tr>
+<tr><td>证据模式绑定了最后一行的输出格式，合法修改输出的运行被误判（v2 FITS single r1）</td><td>证据模式只匹配训练痕迹，所有运行统一重新打分</td></tr>
+</tbody>
+</table></div>
+<p>修复后 SGC 重跑，两种 workflow 都从 fail / partial 变成 full，Citeseer 71.83，并按冲突规则把 100 个 epoch 的诊断结果（71.2）写进了报告。</p>
+<aside class="note" data-label="解读"><b>修一处可能坏另一处</b>
+<p>「2–3%」规则在 DLinear 上消除了误报，到 SGC 上却制造了假成功；证据规则堵上了手写数字的漏洞，又误伤了合法修改输出格式的运行。只有 3 个 case 时看不出这种「对 benchmark 过拟合」，加了新 case 才暴露。根本解法是把判定标准写明（预注册），而不是继续调阈值。</p>
+</aside>
+</section>
+
+<section id="limits" data-group="局限与下一步" data-group-note="写报告时必须交代的局限，以及到 10/15 之前的安排。">
+<h2>01 / 需要如实说明的局限</h2>
+<div class="tablewrap"><table>
+<thead><tr><th>局限</th><th>影响</th></tr></thead>
+<tbody>
+<tr><td>每格只有 3 次重复</td><td>结论用「倾向」类措辞，不做显著性断言</td></tr>
+<tr><td>推理强度不对等：multi-agent 审查角色为 high，single-agent 全程 medium</td><td>multi-agent 的诊断表现有一部分可能来自「想得更多」</td></tr>
+<tr><td>评分规则事后修改过两次（删除「1/L」证据；证据模式改为只匹配训练痕迹）</td><td>都在 <code>case.yaml</code> 注明原因，并对全部 48 次运行统一重新打分</td></tr>
+<tr><td>预注册的容差是在人工复现之后定的</td><td>容差反映人工复现观察到的波动，不是事先的独立设定</td></tr>
+<tr><td>KalmanNet 的噪声水平推断只有约 58% 的运行做到</td><td>规则只写了「可以推断」；改成「应当」属于针对单个 case 调 prompt，留作后续工作</td></tr>
+<tr><td>系统只检查数字能不能复现，不检查协议是否符合论文描述</td><td>FITS 在测试集上选参这类问题发现不了</td></tr>
+<tr><td>只用了 gpt-6-luna 一个模型；multi-agent 每次重复用相同 seed</td><td>结论不能推广到其他模型；multi 的重复只反映决策差异</td></tr>
+<tr><td>沙箱隔离是约定性的</td><td>挡不住刻意绕过；日志完整性靠哈希补强；Docker 后端留作后续工作</td></tr>
+</tbody>
+</table></div>
+</section>
+
+<section id="next" data-group="局限与下一步">
+<h2>02 / 下一步</h2>
+<p>以下是我的建议安排，具体取舍由你定。系统已经冻结在 v2。</p>
+<ol class="flow steps">
+<li><b>commit</b>冻结 v2 时提交一次；正式实验结果与代码快照在 <code>runs/</code> 下，需要另外保存。</li>
+<li><b>写报告</b>方法论（隐藏 ground truth、预注册标准、日志即证据、仅诊断 claim、两层评估）+ v1 / v2 结果 + 论文本身的问题（PART 1 · Section03）+ 迭代过程中的教训（PART 3）+ 局限。</li>
+<li><b>准备 demo</b>候选一：v1 KalmanNet multi r1，完整展示 pilot → Reviewer 反推噪声 → 重跑 → 诊断；候选二：v2 DLinear multi r2，展示翻 git 历史、隔离因素的深度诊断，并引出「3 个 seed 不够」的教训。</li>
+<li><b>可选：推理强度对照</b><code>P2E_REVIEW_EFFORT=medium</code> 让 multi-agent 再跑一遍，区分「分工」和「推理强度」的贡献。</li>
+<li><b>可选：KalmanNet 推断规则</b>把「可以推断」改成「应当推断」，只重跑 KalmanNet（约 2.5 小时、$0.4）；不建议放进主结果。</li>
+</ol>
+<aside class="action"><b>还剩的提醒</b>
+<ul>
+<li><b>轮换 API key：</b>旧 key 曾出现在对话记录里。</li>
+<li><b>花费：</b>到目前为止所有 LLM 运行累计约 $2.3，其中 v1 正式实验 $0.75、v2 正式实验 $1.03；subagent 的人工复现都在本地 CPU 上跑，不花 API 费用。</li>
+</ul>
+</aside>
+</section>
+
+</article>

@@ -1,0 +1,95 @@
+# Benchmark case: hidden ground truth for the evaluator. Agents never see this file
+# (they get task.yaml instead).
+id: fits
+paper:
+  title: "FITS: Modeling Time Series with 10k Parameters"
+  authors: "Xu, Zeng, Xu"
+  venue: "ICLR 2024 (spotlight)"
+  arxiv: "2307.03756"
+  version_note: >
+    Targets copied from Table 1 (FITS row, MSE) of arXiv v3 (5 Jan 2024, paper/2307.03756.pdf). The ICLR 2024
+    proceedings Table 1 and the repo README "Result Update" table give the same four numbers. These are the
+    post-bug-fix numbers (test loader drop_last=True -> False, repo commit 6ebc362, 2023-12-25; v3 footnote 1).
+    arXiv v1/v2 (Jul/Sep 2023, Table 2) report the pre-fix values 0.375 / 0.427 / 0.274 / 0.305, and v3/ICLR
+    Appendix Table 8 still lists older FITS values (0.368 / 0.425 / 0.255 / 0.305). Neither is a target.
+repo:
+  url: https://github.com/VEWOXIC/FITS
+  commit: d040bb015b6299da26d879b90dd19c80fb72c160
+  note: >
+    Official PyTorch code (LTSF-Linear code base). Entry point run_longExp_F.py, model models/FITS.py. The
+    claims come from scripts/FITS/{etth1,etth2,ettm1}_best.sh, which have been unchanged since 1f552f8
+    (2024-01-05; the README says `_best` scripts are the multi-seed runs on the chosen parameters; the
+    scripts without `_best` are grid/ablation scripts, and the `_fin` scripts named in the struck-out
+    README note were renamed in that commit). The official GPU training logs for every run are in
+    logs/fixFITS/<data>_abl/ (commit 41fe48b): five seeds (514 1919 810 0 114) per claim, means 0.37207 /
+    0.42457 / 0.27109 / 0.30294. Table 1 apparently truncates to 3 decimals (15 of 16 ETT cells equal the
+    truncated mean; ETTm1-96 is the exception). The code committed with the logs (2024-01-05) cannot run
+    FITS (model dispatch on 'Linear'); 3583ec5 (2024-01-09) fixed that, and nothing that affects FITS has
+    changed since then. Data: the scripts read ./dataset/<name>.csv; we use the
+    ETDataset ETT-small CSVs (same sha256 as benchmark/dlinear/data; the README names no source).
+difficulty: easy
+expected_runtime_cpu_min: 2   # longest single run (ETTm1-96) 84-110 s on an M4 CPU with 4 threads; 3 seeds x 4 claims ~ 13 min
+
+# Paper Table 1, FITS row: multivariate (features M) test MSE on z-scored data (scaler fitted on the train
+# split, 12/4/4-month split), averaged over all 7 variates; mean of 5 runs with random seeds, "most STD < 5e-4".
+# Official configs (scripts/FITS/<data>_best.sh; lr 5e-4, --batch_size 64 which run_longExp_F.py doubles
+# to 128, patience 20, lradj type3, Adam, MSE; cut_freq = (seq_len // base_T + 1) * H_order + 10):
+#   ETTh1-96 / ETTh1-720: seq_len 360, H_order 6, base_T 24 (cut_freq 106), train_mode 1
+#   ETTh2-96:             seq_len 720, H_order 6, base_T 24 (cut_freq 196), train_mode 2
+#   ETTm1-96:             seq_len 360, H_order 14, base_T 96 (cut_freq 66), train_mode 1
+# A claim is reproduced when the MEDIAN over seeds is within tolerance:
+#   rel: |median - value| / |value| <= rel
+# evidence_pattern matches the training trace only (2026-10-05): the value itself must also appear in the same
+# log, which the evaluator checks separately. Patterns that also pinned the final print line failed a correct
+# FITS run whose agent had (legitimately) patched the output format.
+claims:
+  - {id: etth1_96_mse,  metric: test_mse, setting: "Table 1, FITS, ETTh1, H=96",  unit: "", value: 0.372, tolerance: {rel: 0.01}, evidence_pattern: "Epoch: 1, Steps: \\d+ \\| Train Loss"}
+  - {id: etth1_720_mse, metric: test_mse, setting: "Table 1, FITS, ETTh1, H=720", unit: "", value: 0.424, tolerance: {rel: 0.01}, evidence_pattern: "Epoch: 1, Steps: \\d+ \\| Train Loss"}
+  - {id: etth2_96_mse,  metric: test_mse, setting: "Table 1, FITS, ETTh2, H=96",  unit: "", value: 0.271, tolerance: {rel: 0.01}, evidence_pattern: "Epoch: 1, Steps: \\d+ \\| Train Loss"}
+  - {id: ettm1_96_mse,  metric: test_mse, setting: "Table 1, FITS, ETTm1, H=96",  unit: "", value: 0.303, tolerance: {rel: 0.01}, evidence_pattern: "Epoch: 1, Steps: \\d+ \\| Train Loss"}
+
+rubric:
+  min_seeds: 3
+  aggregate: median
+  levels:
+    full: "all verdict claims within tolerance (diagnostic_only claims excluded)"
+    partial: "at least one verdict claim within tolerance"
+    fail: "no verdict claim reproduced or run did not finish"
+  tolerance_justification: >
+    8/8/8/5 seeds per claim (the five official seeds 514 1919 810 0 114, plus 2021 1 2 for the ETTh
+    claims), official _best configs, released code, CPU. FITS is a single complex linear layer, so the
+    spread is tiny: seed std 0.6-1.5e-4 and medians 0.37209 / 0.42438 / 0.27098 / 0.30294, i.e. +0.02% /
+    +0.09% / -0.01% / -0.02% from the paper. Every single run is within 0.15%, so every 3-seed median
+    passes with a 7x margin. The paper's own precision is about 0.1-0.3%: 3 decimals, STD < 5e-4, and the
+    values look truncated rather than rounded, so the true mean can be up to 0.001 (<= 0.27%) above the
+    printed value. Our CPU runs match the official GPU logs to 1e-6 whenever the best epoch is <= 50, so
+    platform numerics do not matter. rel 1% rejects these wrong setups. (1) ETTh1-720 with --batch_size
+    128 (the struck-out README note; the code doubles it to 256): 0.452, +6.7%. (2) ETTh1-720 with the
+    pre-fix drop_last=True test loader: 0.416, -1.9%. (3) ETTh2-96 with the configuration the paper's
+    stated protocol (validation selection) picks, look-back 180: 0.2855, +5.4% (3 seeds). (4) Look-back
+    720 from the grid scripts (official seed-114 logs): ETTh1-96 +1.9%, ETTh1-720 +1.5%, ETTm1-96 +2.0%;
+    look-back 90: +4% to +20%; default H_order 2 on ETTh1-96: +6.6%. (5) Short training: ETTh1-720 is
+    still about +2% after 20 epochs and +11% after 10 (per-epoch test loss). rel 2% would let (2) and two
+    of the look-back-720 cases through. Accepted on purpose: the released 50-epoch cap vs the 100 epochs
+    in the official logs (<= 0.1%), train_mode 1 instead of 2 on ETTh2 (+0.1%), drop_last=True on
+    ETTh1-96 / ETTh2-96 / ETTm1-96 (-0.8% / -0.3% / +0.2%), H_order 5 on ETTh1-96 (+0.7%). Limitation:
+    etth1_96 alone detects almost nothing (even batch 256 gives +0.2%); etth1_720 and etth2_96 carry the
+    discrimination.
+
+# Known obstacles on a modern environment (Python 3.11, torch 2.14.1 CPU, NumPy 2.4, pandas 3.0, macOS)
+known_issues:
+  - "Missing dependencies: models/Film.py imports einops at import time of exp_main_F.py, and exp_main_F.py imports thop (FLOP count printed before training). Install einops and thop (both in requirements.txt, which also pins torch 2.7 / numpy 1.26 but is not needed)."
+  - "NumPy 2.x: `AttributeError: np.Inf was removed` in utils/tools.py EarlyStopping; use np.inf."
+  - "Trap: use HEAD. The commits that add the logs and _best scripts (41fe48b / 1f552f8, 2024-01-05, the v3 date) cannot run FITS: exp_main_F.py dispatches on `'Linear' in args.model`, so FITS gets the Transformer call and raises `TypeError: Model.forward() takes 2 positional arguments but 6 were given`. Fixed in 3583ec5 (2024-01-09)."
+  - "macOS (spawn start method) + default --num_workers 10 + no `if __name__ == '__main__'` guard in run_longExp_F.py: DataLoader workers re-import the script and fail with the multiprocessing 'bootstrapping phase' RuntimeError (the run hangs). Pass --num_workers 0; results are unchanged."
+  - "After printing the metric, test() crashes in `np.save(folder_path + 'x.npy', inputx)` (ragged list of batches; the last test batch is partial since the drop_last fix) with `ValueError: ... inhomogeneous shape` on NumPy >= 1.24, including the pinned 1.26.4. The mse line and result.txt are already written, but the process exits non-zero. Fix: np.concatenate(inputx, axis=0)."
+  - "Hyperparameters are per claim and only in scripts/FITS/<data>_best.sh: ETTh1 seq_len 360 / H_order 6 / train_mode 1; ETTh2 seq_len 720 / H_order 6 / train_mode 2 (backcast+forecast pretraining, then forecast fine-tuning: two training phases); ETTm1 seq_len 360 / H_order 14 / --base_T 96 / train_mode 1. All: lr 5e-4, --batch_size 64, patience 20, features M, enc_in 7. The scripts without `_best` are grid scripts (e.g. etth1.sh loops look-back 720 and H_order 2-6 with seed 114 only)."
+  - "Trap: run_longExp_F.py doubles the batch size (`args.batch_size = args.batch_size * 2` unless augmentation is on), so --batch_size 64 gives the effective 128 the README mentions. Passing --batch_size 128 gives 256: ETTh1-720 then lands at 0.452 (+6.7%) within the 50-epoch cap."
+  - "Trap: cut_freq is derived as (seq_len // base_T + 1) * H_order + 10. ETTm1 needs --base_T 96 (one day at 15 min); with the default 24, H_order 14 at look-back 360 gives cut_freq 234 > 181 rFFT bins and the forward pass crashes (mat1 and mat2 shapes cannot be multiplied)."
+  - "The released run_longExp_F.py defaults to train_epochs 50, but the Namespace of every official log shows train_epochs 100 (and num_workers 4). Runs whose best epoch is > 50 differ by <= 4e-4; with --train_epochs 100 our CPU runs reproduce the official GPU logs to 1e-6 (ETTh2-96 seeds 514/1919/810, ETTh1-96 seed 1919). The effect on the claims is <= 0.1%."
+  - "Paper vs code: the paper says the look-back and cutoff were chosen on the validation set. In the official seed-114 grid logs, each _best config is the arg-min of TEST MSE, and the arg-min of validation loss is a different config in all four cells. Picking on validation gives ETTh2-96 look-back 180 -> 0.2855 (+5.4%, 3 seeds); for ETTh1-96, ETTh1-720 and ETTm1-96 (look-back 360, train_mode 2) it costs only +0.2% / +0.5% / +0.1% (official logs). The paper's grid Table 4 (ETTh2) reports test MSE of the seed-114 runs. Reproduce the claims with the _best scripts."
+  - "Seeds: --seed flag (default 2021), no patch needed. Checkpoints, results/ and test_results/ are keyed by a setting string without the seed: concurrent runs of the same setting overwrite each other's checkpoint.pth. Run seeds sequentially or pass a per-seed --checkpoints dir. CPU runs are deterministic for a given seed; use_gpu is forced off without CUDA (--use_gpu False is parsed as True; MPS is never used)."
+  - "Test loader drop_last: False since 6ebc362 (the bug fix behind Table 1). With the paper-era drop_last=True, the medians would be 0.3690 / 0.4160 / 0.2701 / 0.3036 (-0.8% / -1.9% / -0.3% / +0.2%)."
+  - "Trap: paper versions. arXiv v1/v2 Table 2 has the pre-fix FITS numbers (0.375 / 0.427 / 0.274 / 0.305), and v3 Appendix Table 8 (comparison with Transformers) still shows older FITS numbers (0.368 / 0.425 / 0.255 / 0.305). The targets are v3/ICLR Table 1, identical to the README table."
+  - "Trap: the reported metric is the final `mse:..., mae:..., rse:..., corr:[...]` line of test() (all test windows, z-scored, all 7 variates). The per-epoch `Test Loss` is an unweighted mean of per-batch losses and differs (e.g. 0.3730 vs 0.3721). An unanchored `mse:([0-9.]+)` also matches our patched `droplast_mse:` line; use `(?m)^mse:([0-9.eE+-]+), mae:`."
+  - "Trap: train_mode is not in the paper's notation: 0 = loss on look-back+horizon reconstruction only, 1 = forecast-horizon loss only (paper 'F'), 2 = reconstruction pretraining then forecast fine-tuning (this is what the paper's Table 4 'B+F' column reports). ETTh2-96 uses 2 (0.2710); 1 gives 0.2713 in the official seed-114 log (accepted)."
