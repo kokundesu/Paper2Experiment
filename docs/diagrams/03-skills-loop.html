@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>技能库的逐轮升级循环</title>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500;600&family=Noto+Sans+SC:wght@400;500;600&family=Noto+Serif+SC:wght@400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --paper: #f9f9f9; --ink: #171717; --muted: #4a4a4a; --soft: #6b6b6b;
+      --accent: #1664c0; --accent-tint: rgba(22,100,192,0.08); --link: #1c7935;
+      --sans: 'Geist', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', system-ui, sans-serif; --serif: 'Instrument Serif', 'Noto Serif SC', 'Songti SC', serif; --mono: 'Geist Mono', ui-monospace, monospace;
+    }
+    body { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 3rem 2rem;
+           background: var(--paper); color: var(--ink); font-family: var(--sans); }
+    .frame { width: 100%; max-width: 1000px; }
+    .eyebrow { margin-bottom: 0.5rem; color: var(--muted); font: 500 0.66rem var(--mono); letter-spacing: 0.18em; text-transform: uppercase; }
+    h1 { margin-bottom: 1.5rem; color: var(--ink); font: 400 clamp(1.5rem, 2.4vw + 0.75rem, 2rem)/1.15 var(--serif); letter-spacing: -0.02em; }
+    .diagram-container { width: 100%; overflow-x: auto; }
+    svg { display: block; width: 100%; min-width: 960px; }
+    @media print { .diagram-container { overflow-x: visible; } svg { min-width: 0; } }
+    .node-name { font: 600 12px var(--sans); text-anchor: middle; }
+    .sublabel { fill: var(--soft); font: 400 9px var(--mono); text-anchor: middle; }
+    .han-sub { fill: var(--soft); font: 400 12px var(--sans); text-anchor: middle; }
+    .arrow-label { fill: var(--soft); font: 400 8px var(--mono); letter-spacing: 0.06em; text-anchor: middle; }
+    .arrow-label-han { fill: var(--soft); font: 500 12px var(--sans); text-anchor: middle; }
+    .zone-label { fill: var(--soft); font: 500 12px var(--sans); text-anchor: middle; }
+    .legend-eyebrow { fill: var(--muted); font: 500 8px var(--mono); letter-spacing: 0.14em; }
+    .legend-text { fill: var(--muted); font: 400 12px var(--sans); }
+    .callout { fill: var(--muted); font: italic 400 14px var(--serif); }
+    .ring { fill: none; stroke: var(--muted); stroke-width: 1.2; } .spoke { fill: none; stroke: var(--soft); stroke-width: 1; stroke-dasharray: 5 4; } .hub-name { fill: var(--paper); font: 600 16px var(--sans); text-anchor: middle; } .hub-sub { fill: var(--paper); opacity: 0.78; font: 400 9px var(--mono); text-anchor: middle; }
+  </style>
+</head>
+<body>
+  <div class="frame">
+    <p class="eyebrow">Loop · Skill library</p>
+    <h1>技能库的逐轮升级循环</h1>
+    <div class="diagram-container">
+      <svg viewBox="0 0 960 720" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="p2e-skills-loop-title p2e-skills-loop-desc">
+        <title id="p2e-skills-loop-title">技能库的逐轮升级循环</title>
+        <desc id="p2e-skills-loop-desc">每轮开发集运行后，摘要、LLM 策展、泄漏检查、发布新版依次进行，新版本写回技能库供下一轮使用；测试集运行前冻结技能库。</desc>
+        <defs>
+          <marker id="arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#4a4a4a"/></marker>
+          <marker id="arrow-accent" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#1664c0"/></marker>
+          <marker id="arrow-link" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#1c7935"/></marker>
+          <marker id="arrow-soft" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#6b6b6b"/></marker>
+        </defs>
+        <rect width="960" height="720" fill="#f9f9f9"/>
+<path class="ring" d="M480.000 108.614 A260 260 0 0 1 634.121 242.918" marker-end="url(#arrow)"/>
+<path class="ring" d="M655.531 308.000 A260 260 0 0 1 588.445 535.132" marker-end="url(#arrow)"/>
+<path class="ring" d="M489.800 600.000 A260 260 0 0 1 311.327 600.412" marker-end="url(#arrow)"/>
+<path class="ring" d="M212.383 536.000 A260 260 0 0 1 144.250 309.180" marker-end="url(#arrow)"/>
+<path class="ring" d="M165.360 244.000 A260 260 0 0 1 318.859 108.986" marker-end="url(#arrow)"/>
+<path class="spoke" d="M400 128 V298" marker-end="url(#arrow-soft)"/>
+<rect x="408.0" y="205.0" width="56" height="16" rx="2" fill="#f9f9f9"/><text x="436.0" y="217.0" class="arrow-label-han">记录用量</text>
+<path class="spoke" d="M232.000 301.806 L294.290 321.900" marker-end="url(#arrow-soft)"/>
+<rect x="231.32078518919008" y="334.3078609769564" width="44" height="16" rx="2" fill="#f9f9f9"/><text x="253.32078518919008" y="346.3078609769564" class="arrow-label-han">新版本</text>
+<rect x="320" y="64" width="160" height="64" rx="6" fill="#f9f9f9"/>
+<rect x="320" y="64" width="160" height="64" rx="6" fill="#ffffff" stroke="#171717" stroke-width="1"/>
+<text x="400.0" y="93.5" class="node-name" fill="#171717">开发集运行</text>
+<text x="400.0" y="106.5" class="sublabel">A · B · D on dev split</text>
+<rect x="568" y="244" width="160" height="64" rx="6" fill="#f9f9f9"/>
+<rect x="568" y="244" width="160" height="64" rx="6" fill="#ffffff" stroke="#171717" stroke-width="1"/>
+<text x="648.0" y="273.5" class="node-name" fill="#171717">摘要</text>
+<text x="648.0" y="286.5" class="sublabel">digest · no answers</text>
+<rect x="472" y="536" width="160" height="64" rx="6" fill="#f9f9f9"/>
+<rect x="472" y="536" width="160" height="64" rx="6" fill="#ffffff" stroke="#171717" stroke-width="1"/>
+<text x="552.0" y="565.5" class="node-name" fill="#171717">策展</text>
+<text x="552.0" y="578.5" class="sublabel">curate · LLM proposes</text>
+<rect x="168" y="536" width="160" height="64" rx="6" fill="#f9f9f9"/>
+<rect x="168" y="536" width="160" height="64" rx="6" fill="rgba(22,100,192,0.08)" stroke="#1664c0" stroke-width="1.2"/>
+<text x="248.0" y="565.5" class="node-name" fill="#1664c0">泄漏检查</text>
+<text x="248.0" y="578.5" class="sublabel">check · no ids / values</text>
+<rect x="72" y="244" width="160" height="64" rx="6" fill="#f9f9f9"/>
+<rect x="72" y="244" width="160" height="64" rx="6" fill="#ffffff" stroke="#171717" stroke-width="1"/>
+<text x="152.0" y="273.5" class="node-name" fill="#171717">发布新版</text>
+<text x="152.0" y="286.5" class="sublabel">apply · history/vN</text>
+<rect x="300.0" y="304.0" width="200" height="104" rx="8" fill="#171717"/>
+<text x="400" y="352" class="hub-name">技能库</text>
+<text x="400" y="374" class="hub-sub">skills/ · read_skill · vN</text>
+<text x="744" y="508" class="callout">跑测试集之前先 freeze：</text>
+<text x="744" y="530" class="callout">测试集的运行不进入这个循环</text>
+<line x1="40" y1="656" x2="920" y2="656" stroke="rgba(23,23,23,0.10)" stroke-width="0.8"/>
+<text x="40" y="676" class="legend-eyebrow">LEGEND</text>
+<path d="M120,672 H144" fill="none" stroke="#4a4a4a" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="152" y="676" class="legend-text">每轮的步骤</text>
+<path d="M248,672 H272" fill="none" stroke="#6b6b6b" stroke-width="1" stroke-dasharray="5,4" marker-end="url(#arrow-soft)"/>
+<text x="280" y="676" class="legend-text">写回技能库</text>
+<rect x="376" y="664" width="24" height="16" rx="3" fill="rgba(22,100,192,0.08)" stroke="#1664c0" stroke-width="1"/>
+<text x="408" y="676" class="legend-text">防泄漏关卡</text>
+      </svg>
+    </div>
+  </div>
+</body>
+</html>

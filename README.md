@@ -1,27 +1,77 @@
 # Paper2Experiment: A Multi-Agent LLM System for Reproducing Engineering Research Papers
 
-Paper2Experiment (package `p2e`, v4) is an LLM agent system that reproduces the results of research papers. It reads
-the paper and its official repository, sets up the environment and runs the experiments in a sandbox, then reports
-the values it measured together with a diagnosis of every mismatch. Runs are scored against hidden ground truth by a
-deterministic evaluator, with no LLM judge.
+**English** · [中文](README.zh-CN.md)
 
-The repository compares three workflow designs (A, B, D) on the same tasks, with the same sandbox, model layer,
-skill library and evaluator:
+## What is this?
 
-- **A: a single ReAct agent** that holds every tool;
-- **B: a fixed multi-agent pipeline**, where code routes the work between six LLM roles;
-- **D: an LLM Planner over a verifying runtime**, with an isolated worker sub-agent for each agent task.
+Research papers report numbers ("our model reaches 92.5% accuracy"), but checking whether those numbers hold up
+means a person has to read the paper, clone the code, fix the environment, run the experiments and compare the
+results. That takes days per paper.
 
-The main benchmark is [CORE-Bench](docs/corebench-inventory.md). The dev split is the original train set and the test
-split is the v1.1 mainline. The 20 self-built papers in `Base/benchmark/v4` form a supplementary set. The design
-follows the close reading in [docs/reading-notes.md](docs/reading-notes.md) and the plan in
-[docs/v4-plan.md](docs/v4-plan.md) (both in Chinese).
+Paper2Experiment hands this job to LLM agents. Given a paper and its official code, the agents:
+
+1. read the paper and work out which results need to be reproduced;
+2. set up the environment and run the experiments in a sandbox;
+3. report the value they measured for each result, together with the log that proves it, and explain why if it does
+   not match the paper.
+
+A deterministic evaluator then scores the run against hidden ground truth. No LLM acts as judge, so a run cannot
+pass by sounding convincing: an answer counts only if it is within tolerance and appears in a log the sandbox wrote
+itself.
+
+The research question is **which agent architecture does this best**. The project builds three workflow designs (A,
+B, D) and runs them on the same tasks, with the same sandbox, models, skill library and evaluator, so that the
+architecture is the only thing that differs.
+
+## Architecture
+
+![Overall architecture](docs/images/01-architecture.png)
+
+The system is built from five parts:
+
+- **Task.** A reproduction task describes what to reproduce, either as a CORE-Bench capsule or as a paper case. It
+  is converted into one shared format, the ReproSpec, so every workflow reads tasks the same way.
+- **Workflow.** Each run uses one of three workflows (A, B or D), compared below.
+- **Shared infrastructure.** All three workflows use the same LLM layer, sandbox and skill library:
+  - *LLM layer:* Anthropic and OpenAI models, with cost tracking.
+  - *Sandbox:* runs every command in an isolated workspace and writes one log per command, with a sha256 hash.
+  - *Skill library:* reusable know-how the agents can read, such as setting up R or running notebooks.
+- **Hidden ground truth.** The target values and tolerances are stored in `case.yaml`. The sandbox's command guard
+  blocks the agents from reading it.
+- **Evaluator.** It compares each answer with the ground truth and checks the logs, without using an LLM, then gives
+  each run a verdict of full, partial or fail.
+
+## The three workflows
+
+![Comparison of the three workflows](docs/images/04-workflows.png)
+
+| | Workflow | Who plans | Who checks the work during a run | Contexts |
+|---|---|---|---|---|
+| **A** [SingleAgent](SingleAgent/) | `single` | one ReAct agent that holds every tool | nobody: only the evaluator, at the end | one |
+| **B** [FixedPipeline](Multiagent/FixedPipeline/) | `fixed` | code: six LLM roles in a fixed order | a Result Reviewer, once after a pilot run | one per role |
+| **D** [PlannerWorkers](Multiagent/PlannerWorkers/) | `planner_workers` | one LLM Planner that edits a task graph | a deterministic runtime with three gates; only the runtime can end a run | Planner + one fresh worker per agent task |
+
+- **A, the baseline.** A single agent does everything in one conversation: it reads the paper, installs the
+  environment, runs the experiments and submits. It is simple and cheap, but nothing catches its mistakes until the
+  run is scored.
+- **B, a division of labour fixed in code.** Six specialised roles run in a fixed order: Paper Analyst → Env Agent →
+  Planner → Executor ⇄ Debugger → Result Reviewer → Discrepancy Analyst. Each role sees only its own tools and has
+  its own budget. Because the routing is fixed in code, no role has an overview: a mistake made early is often found
+  only at the end.
+- **D, an LLM that plans and code that verifies.** One Planner proposes changes to a task graph, and a deterministic
+  runtime applies and runs them. The runtime checks every plan, runs a cut-down smoke version of each command first,
+  and checks the evidence in the full run's log. Setup, debugging and diagnosis go to worker sub-agents, each with a
+  clean context. Only the runtime can end a run.
+
+Versions C (D without workers) and C- (C without gates) were tried in the first development round. They remain only
+as ablation switches in D's code (`PlannerRuntimeWorkflow(ctx, gates=..., workers=...)`).
 
 ## Results
 
-**CORE-Bench test, Hard level.** The test set has 30 CPU tasks with 46 questions; 33 of the questions need reading a
-figure. The model was Haiku55 and the skill library was v5, frozen before the run. Each task and workflow pair ran
-once, with a budget of $5 per run. Full report: [Base/runs/reports/cb_test_summary.md](Base/runs/reports/cb_test_summary.md).
+**CORE-Bench test set, Hard level.** The test set has 30 CPU tasks with 46 questions; 33 of the questions need
+reading a figure. The model was Haiku55 and the skill library was v5, frozen before the run. Each task and workflow
+pair ran once, with a budget of $5 per run. Full report:
+[Base/runs/reports/cb_test_summary.md](Base/runs/reports/cb_test_summary.md).
 
 | Workflow | Fully correct | 95% CI (Wilson) | HAL rule | Questions correct | Mean cost / run |
 |---|---|---|---|---|---|
@@ -30,12 +80,12 @@ once, with a budget of $5 per run. Full report: [Base/runs/reports/cb_test_summa
 | D `planner_workers` | 26/30 (87%) | 70–95% | 22/30 | 40/46 | $0.025 |
 
 None of the paired differences is significant (exact McNemar test, p ≥ 0.25). A scores highest at the lowest cost.
-Our rule is stricter than HAL's in one way: an answer must also be proven to come from the run itself. It is more
-lenient in another, because it accepts unrounded answers, in line with the v1.1 fixes. Both sets of numbers are
-reported. One of D's failures was an evaluator bug (an unhandled `KeyError` in the patch check). It has been fixed and
-covered by a regression test.
+Our rule is stricter than HAL's in one way, since an answer must also be proven to come from the run itself, and
+more lenient in another, since it accepts unrounded answers in line with the v1.1 fixes. Both sets of numbers are
+reported. One of D's failures was an evaluator bug (an unhandled `KeyError` in the patch check), which has since been
+fixed and covered by a regression test.
 
-**CORE-Bench dev, round 3.** This round has 42 scored tasks and three groups of 135 runs each. Summary:
+**CORE-Bench dev set, round 3.** This round has 42 scored tasks and three groups of 135 runs each. Summary:
 [Base/runs/reports/cb_dev_round3_summary.md](Base/runs/reports/cb_dev_round3_summary.md).
 
 | Group | A | B | D |
@@ -44,83 +94,30 @@ covered by a regression test.
 | Sonnet55, skills v5 | 31 (74%) | 33 (79%) | 36 (86%) |
 | Haiku55, skills off | 31 (74%) | 33 (79%) | 31 (74%) |
 
-Three observations stand out:
+What the results say:
 
-- **D leads with skills on, but not significantly.** D ranks first in both skills-on groups, yet p > 0.1 in every
-  paired test. With skills off, its advantage disappears.
-- **Sonnet55 costs 7.6× as much with no gain.** It reached exactly the same total as Haiku55: 100 fully correct
-  runs in each group. On these tasks, the bottleneck is getting the environment installed and the programs to run to
-  completion, not model capability.
-- **The ranking flips between splits.** D is best on dev and worst on test. At this sample size, the three designs
-  cannot be told apart.
+- **No architecture wins clearly.** D leads on the dev set with skills on, but not significantly (p > 0.1), and is
+  last on the test set. At this sample size, the three designs cannot be told apart.
+- **The larger model buys nothing here.** Sonnet55 costs 7.6× as much as Haiku55 and reaches exactly the same total,
+  100 fully correct runs in each group. The bottleneck is getting environments installed and programs to finish, not
+  model capability.
+- **The skill library mainly helps D.** With skills off, D drops 4 tasks and the three workflows tie.
 
-## Versions
+## How a run is kept honest
 
-| | Workflow name | Who plans | Who verifies runs | Context |
-|---|---|---|---|---|
-| **A** [SingleAgent](SingleAgent/) | `single` | one ReAct agent, all tools | the evaluator, at the end | one |
-| **B** [FixedPipeline](Multiagent/FixedPipeline/) | `fixed` | code: a fixed six-role pipeline | a Result Reviewer once, the evaluator at the end | one per role |
-| **D** [PlannerWorkers](Multiagent/PlannerWorkers/) | `planner_workers` | one LLM Planner (task-DAG patches) | the runtime: plan check, smoke run, evidence check; only the runtime ends a run | Planner + a worker per agent task |
-
-The comparison is between three whole designs: a ReAct harness (A), a code-routed role pipeline (B), and an LLM
-planner over a verifying runtime with isolated workers (D). Versions C (D without workers) and C- (C without gates)
-were run in the first development round. They are kept only as ablation switches in D's code
-(`PlannerRuntimeWorkflow(ctx, gates=..., workers=...)`) and are not part of the comparison. All three versions read
-the same skill library through the same tool; `P2E_SKILLS=off` runs without it.
-
-## How it works
-
-**Sandbox.** Every run gets its own workspace outside the project tree, with timeouts, a scrubbed environment (API
-keys removed) and a guard that blocks commands touching the benchmark, `case.yaml` or `.env`. The full output of
-every command goes to its own log, and the sha256 of each log is recorded. See
-[Base/README.md](Base/README.md#sandbox-limits) for the limits.
-
-**Objective scoring.** An answer counts only if it lies within the pre-registered tolerance *and* a log the sandbox
-wrote, unchanged since, shows that the run actually produced it. For a figure question, viewing an image this run
-generated also counts as proof. The tolerance criterion is given to the agents in their brief; the target values stay
-hidden.
-
-**Failure diagnosis.** When a number does not match the paper, the agents must explain why. They write a
-`discrepancy_report.json` with a root-cause category, competing hypotheses and the evidence for each. The evaluator
-grades the report on detection, false success, attribution and strict attribution, still without an LLM.
-
-**Skill library.** [skills/](skills/) holds the reusable know-how every agent can read through the `read_skill` tool,
-for example `r-environment`, `legacy-environment` and `notebook-execution`. The library is upgraded round by round from
-development runs (digest → curator → leakage check → new version) and frozen before any test run.
-
-**Demo.** [Base/demo-web](Base/demo-web/) is a chat interface. The user says what to reproduce, and the assistant
-turns the request into a task, runs the chosen workflow and model, and shows a live graph of the agents. At the end
-it compares each answer with the value the paper reports.
-
-## Layout
-
-```
-Base/                         shared infrastructure (package p2e), benchmark cases, shared tests
-  p2e/sandbox.py              per-run workspace, timeouts, scrubbed env, command guard, one log per command (+ sha256)
-  p2e/llm.py                  agent loop as a LangGraph subgraph; every model-visible message is recorded in the
-                              trace; tool pipeline hooks (pre guards, post hooks); converse() continues a conversation
-  p2e/models.py, models.yaml  model profiles (Anthropic, OpenAI, OpenAI-compatible endpoints), tiered pricing
-  p2e/runtime.py              task DAG, three verification gates, event-driven wakes with deltas, stall counter,
-                              finish gate: the substrate of version D
-  p2e/skills.py               skill library shared by every agent (read_skill tool), upgraded round by round from
-                              development runs (digest -> curator -> leakage check -> new version), frozen before tests
-  p2e/corebench.py, spec.py   CORE-Bench adapter (dev/test splits) and the ReproSpec task format
-  p2e/runner.py, evaluator.py run setup, deterministic executor, objective scoring (tolerance + log evidence)
-  p2e/versions.py             discovers the version folders below; `p2e run --workflow <name>`
-  p2e/workflows/deterministic.py   built-in baseline without an LLM
-  p2e/demo.py, web/           demo backend (prompt -> spec -> run -> compare) and the web UIs
-  demo-web/                   demo frontend (Vite + React)
-  benchmark/<case>/           task.yaml (what agents see), case.yaml (hidden ground truth)
-  runs/reports/               result reports of the CORE-Bench rounds
-SingleAgent/                  A
-Multiagent/FixedPipeline/     B
-Multiagent/PlannerWorkers/    D (holds the shared Planner + runtime code; switches gates/workers for ablations)
-skills/                       the skill library: <name>/SKILL.md, CHANGELOG.md, history/, library.yaml
-docs/                         reading notes, the v4 plan, CORE-Bench inventory
-conftest.py, pytest.ini       fixtures and test paths for all folders
-```
-
-Each version folder has a `workflow.py` (defines `NAME`, `DESCRIPTION`, `run(ctx)`), a README and its own tests.
+- **Sandbox.** Each run gets its own workspace outside the project, with timeouts, API keys removed from the
+  environment, and a guard that blocks access to the ground truth. See
+  [Base/README.md](Base/README.md#sandbox-limits) for its limits.
+- **Evidence.** Every answer must cite a log. The evaluator accepts a log only if the sandbox wrote it and it is
+  unchanged since; this is checked by sha256. For a figure question, viewing an image that this run generated also
+  counts as proof.
+- **Pre-registered tolerance.** The tolerance rule is stated in the agents' brief, but the target values stay hidden.
+  The rule combines run-to-run noise, reported precision and floating-point error. Its full rationale is in the
+  docstring of [Base/p2e/corebench.py](Base/p2e/corebench.py).
+- **Diagnosis.** When a value does not match, the agents write a `discrepancy_report.json` with a root-cause category
+  and the evidence for it. The evaluator grades it on detection, false success and attribution.
+- **Frozen skills.** The [skill library](skills/) grows round by round from development runs (digest → curator →
+  leakage check → new version). It is frozen before any test run.
 
 ## Getting started
 
@@ -137,7 +134,18 @@ cp Base/.env.example Base/.env                  # then fill in ANTHROPIC_API_KEY
 Model profiles (`haiku55`, `sonnet55`, `luna`, `sol`, ...) are defined in [Base/models.yaml](Base/models.yaml).
 Settings, budgets, the evaluator and the sandbox are described in [Base/README.md](Base/README.md).
 
-## Usage
+### Try the demo
+
+The demo is a chat interface. Describe what to reproduce, for example by giving a GitHub repository and the
+results you want checked, then pick a workflow and a model. The demo shows a live graph of the agents at work, and at
+the end compares each answer with the value the paper reports.
+
+```bash
+cd Base/demo-web && npm install && npm run build && cd ../..   # once, and after frontend changes
+.venv/bin/p2e demo serve                                       # http://127.0.0.1:8780
+```
+
+### Command reference
 
 ```bash
 # CORE-Bench
@@ -155,21 +163,42 @@ Settings, budgets, the evaluator and the sandbox are described in [Base/README.m
 # results and UIs
 .venv/bin/p2e table                             # all runs so far
 .venv/bin/p2e serve                             # web UI: live view of any run, workflow comparison
-.venv/bin/p2e demo serve                        # demo chat UI at http://127.0.0.1:8780
+.venv/bin/p2e demo serve                        # demo chat UI
 ```
 
-Build the demo frontend once, and again after frontend changes, before running `p2e demo serve`:
+## Repository layout
 
-```bash
-cd Base/demo-web && npm install && npm run build
 ```
+Base/                         shared infrastructure (package p2e), benchmark cases, shared tests
+  p2e/sandbox.py              per-run workspace, timeouts, scrubbed env, command guard, one log per command (+ sha256)
+  p2e/llm.py                  agent loop as a LangGraph subgraph; every model-visible message is recorded in the trace
+  p2e/models.py, models.yaml  model profiles (Anthropic, OpenAI, OpenAI-compatible endpoints), tiered pricing
+  p2e/runtime.py              task DAG, three verification gates, event-driven wakes, stall counter, finish gate (D)
+  p2e/skills.py               skill library shared by every agent (read_skill tool)
+  p2e/corebench.py, spec.py   CORE-Bench adapter (dev/test splits), tolerance rule, the ReproSpec task format
+  p2e/runner.py, evaluator.py run setup, deterministic executor, objective scoring (tolerance + log evidence)
+  p2e/versions.py             discovers the version folders below; `p2e run --workflow <name>`
+  p2e/demo.py, web/           demo backend (prompt -> spec -> run -> compare) and the web UIs
+  demo-web/                   demo frontend (Vite + React)
+  benchmark/<case>/           task.yaml (what agents see), case.yaml (hidden ground truth)
+  runs/reports/               result reports of the CORE-Bench rounds
+SingleAgent/                  A
+Multiagent/FixedPipeline/     B
+Multiagent/PlannerWorkers/    D (holds the shared Planner + runtime code; switches gates/workers for ablations)
+skills/                       the skill library: <name>/SKILL.md, CHANGELOG.md, history/, library.yaml
+docs/diagrams/, docs/images/  architecture diagrams (HTML sources + generator, PNG exports)
+conftest.py, pytest.ini       fixtures and test paths for all folders
+```
+
+Each version folder has a `workflow.py` (defines `NAME`, `DESCRIPTION`, `run(ctx)`), a README and its own tests.
 
 ## Status
 
 - **Done:** all three workflows, the evaluator, the skill library (v5, frozen), three CORE-Bench dev rounds, the
   CORE-Bench test run, and the demo UI.
 - **Open:** the test run was single-shot, so repeated runs would tighten the confidence intervals. The supplementary
-  v4 paper set was last run in development round 1 (2026-10-17), before the final versions.
+  v4 paper set (20 self-built papers in `Base/benchmark/v4`) was last run in development round 1 (2026-10-17),
+  before the final versions.
 
 Project history before v4 (EE6008, single agent vs fixed pipeline): [Base/docs/OVERVIEW.en.md](Base/docs/OVERVIEW.en.md)
 · [Base/docs/OVERVIEW.zh.md](Base/docs/OVERVIEW.zh.md).

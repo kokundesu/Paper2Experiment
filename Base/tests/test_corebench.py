@@ -1,4 +1,4 @@
-"""CORE-Bench v1.1 graded with our tolerance rule (docs/benchmark-redesign.md section 3.3)."""
+"""CORE-Bench v1.1 graded with our tolerance rule (see the p2e.corebench docstring)."""
 import json
 
 import pytest

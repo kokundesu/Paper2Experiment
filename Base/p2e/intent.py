@@ -1,4 +1,4 @@
-"""Intent stage and GT stage: from a user's request to a ReproSpec and its hidden ground truth (docs/reprospec-plan.md).
+"""Intent stage and GT stage: from a user's request to a ReproSpec and its hidden ground truth.
 
     inputs     the user's prompt, the paper's text (arXiv PDF), the repository's README and file list
     draft      one model (the main LLM) writes the questions: metric, setting, table locator, runs. No values.
@@ -14,6 +14,7 @@
                clarifications.md for the user. Nothing is frozen until the user confirms.
 
 Isolation: every model call is its own conversation with no tools; the paper is passed as data inside tags; the
+pipeline never sees ground truth; the spec is frozen before the GT stage and the GT before any run; the
 pipeline reads nothing from benchmark/ except its own dataset.yaml (which holds no values); a question whose text
 contains an extracted value is flagged as a leak.
 """

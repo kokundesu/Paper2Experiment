@@ -2,7 +2,7 @@
 agents see) and case.yaml (hidden).
 
 Built from the frozen ReproSpec (spec.yaml), the paper values (gt.yaml) and the reference re-runs (case.yaml of
-benchmark/v4/<id>), following docs/benchmark-redesign.md section 3.3:
+benchmark/v4/<id>), following the tolerance rule of p2e.corebench / p2e.reference:
 
     target       the official code's mean over the reference re-runs (claim.target = "reference")
     tolerance    abs h from the reference re-runs, the mean over at least 3 seed runs is compared

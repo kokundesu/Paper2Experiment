@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>三种工作流对比</title>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500;600&family=Noto+Sans+SC:wght@400;500;600&family=Noto+Serif+SC:wght@400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --paper: #f9f9f9; --ink: #171717; --muted: #4a4a4a; --soft: #6b6b6b;
+      --accent: #1664c0; --accent-tint: rgba(22,100,192,0.08); --link: #1c7935;
+      --sans: 'Geist', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', system-ui, sans-serif; --serif: 'Instrument Serif', 'Noto Serif SC', 'Songti SC', serif; --mono: 'Geist Mono', ui-monospace, monospace;
+    }
+    body { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 3rem 2rem;
+           background: var(--paper); color: var(--ink); font-family: var(--sans); }
+    .frame { width: 100%; max-width: 1320px; }
+    .eyebrow { margin-bottom: 0.5rem; color: var(--muted); font: 500 0.66rem var(--mono); letter-spacing: 0.18em; text-transform: uppercase; }
+    h1 { margin-bottom: 1.5rem; color: var(--ink); font: 400 clamp(1.5rem, 2.4vw + 0.75rem, 2rem)/1.15 var(--serif); letter-spacing: -0.02em; }
+    .diagram-container { width: 100%; overflow-x: auto; }
+    svg { display: block; width: 100%; min-width: 1280px; }
+    @media print { .diagram-container { overflow-x: visible; } svg { min-width: 0; } }
+    .node-name { font: 600 12px var(--sans); text-anchor: middle; }
+    .sublabel { fill: var(--soft); font: 400 9px var(--mono); text-anchor: middle; }
+    .han-sub { fill: var(--soft); font: 400 12px var(--sans); text-anchor: middle; }
+    .arrow-label { fill: var(--soft); font: 400 8px var(--mono); letter-spacing: 0.06em; text-anchor: middle; }
+    .arrow-label-han { fill: var(--soft); font: 500 12px var(--sans); text-anchor: middle; }
+    .zone-label { fill: var(--soft); font: 500 12px var(--sans); text-anchor: middle; }
+    .legend-eyebrow { fill: var(--muted); font: 500 8px var(--mono); letter-spacing: 0.14em; }
+    .legend-text { fill: var(--muted); font: 400 12px var(--sans); }
+    .callout { fill: var(--muted); font: italic 400 14px var(--serif); }
+    
+  </style>
+</head>
+<body>
+  <div class="frame">
+    <p class="eyebrow">Comparison · Workflows</p>
+    <h1>三种工作流对比</h1>
+    <div class="diagram-container">
+      <svg viewBox="0 0 1280 800" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="p2e-workflows-title p2e-workflows-desc">
+        <title id="p2e-workflows-title">三种工作流对比</title>
+        <desc id="p2e-workflows-desc">A：一个 ReAct agent 持有全部工具，只在最后由评估器检查；B：代码把任务依次路由给六个 LLM 角色和确定性执行器；D：一个 Planner 提交补丁，确定性 Runtime 做三道检查、把 agent 任务交给隔离的 worker，并且只有它能结束运行。三者最后都交给同一个不用 LLM 的评估器。</desc>
+        <defs>
+          <marker id="arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#4a4a4a"/></marker>
+          <marker id="arrow-accent" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#1664c0"/></marker>
+          <marker id="arrow-link" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#1c7935"/></marker>
+          <marker id="arrow-soft" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#6b6b6b"/></marker>
+        </defs>
+        <rect width="1280" height="800" fill="#f9f9f9"/>
+<rect x="40" y="96" width="368" height="504" rx="8" fill="rgba(23,23,23,0.02)" stroke="rgba(23,23,23,0.14)" stroke-width="0.8"/><rect x="56" y="88" width="224" height="16" rx="2" fill="#f9f9f9"/><text x="168.0" y="100" class="zone-label">A · 单个 ReAct Agent（single）</text>
+<rect x="456" y="96" width="368" height="504" rx="8" fill="rgba(23,23,23,0.02)" stroke="rgba(23,23,23,0.14)" stroke-width="0.8"/><rect x="472" y="88" width="204" height="16" rx="2" fill="#f9f9f9"/><text x="574.0" y="100" class="zone-label">B · 固定六角色流水线（fixed）</text>
+<rect x="872" y="96" width="368" height="504" rx="8" fill="rgba(23,23,23,0.02)" stroke="rgba(23,23,23,0.14)" stroke-width="0.8"/><rect x="888" y="88" width="300" height="16" rx="2" fill="#f9f9f9"/><text x="1038.0" y="100" class="zone-label">D · Planner + Runtime（planner_workers）</text>
+<path d="M184,208 V296" fill="none" stroke="#4a4a4a" stroke-width="1.2" marker-end="url(#arrow)"/>
+<rect x="192.0" y="244.0" width="56" height="16" rx="2" fill="#f9f9f9"/><text x="220.0" y="256" class="arrow-label-han">工具调用</text>
+<path d="M264,296 V208" fill="none" stroke="#6b6b6b" stroke-width="1" stroke-dasharray="5,4" marker-end="url(#arrow-soft)"/>
+<rect x="272.0" y="244.0" width="32" height="16" rx="2" fill="#f9f9f9"/><text x="288.0" y="256" class="arrow-label-han">输出</text>
+<path d="M224,360 V640" fill="none" stroke="#1664c0" stroke-width="1.2" marker-end="url(#arrow-accent)"/>
+<rect x="232.0" y="504.0" width="104" height="16" rx="2" fill="#f9f9f9"/><text x="284.0" y="516" class="arrow-label-han">答案 + 引用日志</text>
+<text x="88" y="440" class="callout">运行中途</text>
+<text x="88" y="462" class="callout">没有任何检查</text>
+<rect x="88" y="128" width="272" height="80" rx="6" fill="#f9f9f9"/>
+<rect x="88" y="128" width="272" height="80" rx="6" fill="rgba(74,74,74,0.10)" stroke="#6b6b6b" stroke-width="1"/>
+<text x="224.0" y="157.5" class="node-name" fill="#171717">ReAct Agent</text>
+<text x="224.0" y="170.5" class="sublabel">all tools · one context</text>
+<text x="224.0" y="187.5" class="han-sub">读论文 → 装环境 → 跑实验 → 提交</text>
+<rect x="88" y="296" width="272" height="64" rx="6" fill="#f9f9f9"/>
+<rect x="88" y="296" width="272" height="64" rx="6" fill="#ffffff" stroke="#171717" stroke-width="1"/>
+<text x="224.0" y="317.5" class="node-name" fill="#171717">沙箱</text>
+<text x="224.0" y="330.5" class="sublabel">read / write / shell</text>
+<text x="224.0" y="347.5" class="han-sub">每条命令一份日志</text>
+<path d="M640,176 V198" fill="none" stroke="#4a4a4a" stroke-width="1.2" marker-end="url(#arrow)"/>
+<path d="M640,246 V268" fill="none" stroke="#4a4a4a" stroke-width="1.2" marker-end="url(#arrow)"/>
+<path d="M640,316 V338" fill="none" stroke="#4a4a4a" stroke-width="1.2" marker-end="url(#arrow)"/>
+<path d="M640,386 V408" fill="none" stroke="#4a4a4a" stroke-width="1.2" marker-end="url(#arrow)"/>
+<path d="M640,456 V478" fill="none" stroke="#4a4a4a" stroke-width="1.2" marker-end="url(#arrow)"/>
+<path d="M640,526 V640" fill="none" stroke="#1664c0" stroke-width="1.2" marker-end="url(#arrow-accent)"/>
+<rect x="648.0" y="596.0" width="104" height="16" rx="2" fill="#f9f9f9"/><text x="700.0" y="608" class="arrow-label-han">答案 + 引用日志</text>
+<rect x="504" y="128" width="272" height="48" rx="6" fill="#f9f9f9"/>
+<rect x="504" y="128" width="272" height="48" rx="6" fill="rgba(74,74,74,0.10)" stroke="#6b6b6b" stroke-width="1"/>
+<text x="640.0" y="148.5" class="node-name" fill="#171717">Paper Analyst</text>
+<text x="640.0" y="164.5" class="han-sub">读论文，列出要复现的结果</text>
+<rect x="504" y="198" width="272" height="48" rx="6" fill="#f9f9f9"/>
+<rect x="504" y="198" width="272" height="48" rx="6" fill="rgba(74,74,74,0.10)" stroke="#6b6b6b" stroke-width="1"/>
+<text x="640.0" y="218.5" class="node-name" fill="#171717">Env Agent</text>
+<text x="640.0" y="234.5" class="han-sub">克隆仓库、装环境</text>
+<rect x="504" y="268" width="272" height="48" rx="6" fill="#f9f9f9"/>
+<rect x="504" y="268" width="272" height="48" rx="6" fill="rgba(74,74,74,0.10)" stroke="#6b6b6b" stroke-width="1"/>
+<text x="640.0" y="288.5" class="node-name" fill="#171717">Planner</text>
+<text x="640.0" y="304.5" class="han-sub">写实验命令</text>
+<rect x="504" y="338" width="272" height="48" rx="6" fill="#f9f9f9"/>
+<rect x="504" y="338" width="272" height="48" rx="6" fill="#ffffff" stroke="#171717" stroke-width="1"/>
+<text x="640.0" y="358.5" class="node-name" fill="#171717">Executor ⇄ Debugger</text>
+<text x="640.0" y="374.5" class="han-sub">确定性执行 · 最多 4 次调试</text>
+<rect x="504" y="408" width="272" height="48" rx="6" fill="#f9f9f9"/>
+<rect x="504" y="408" width="272" height="48" rx="6" fill="rgba(74,74,74,0.10)" stroke="#6b6b6b" stroke-width="1"/>
+<text x="640.0" y="428.5" class="node-name" fill="#171717">Result Reviewer</text>
+<text x="640.0" y="444.5" class="han-sub">试跑后审一次结果</text>
+<rect x="504" y="478" width="272" height="48" rx="6" fill="#f9f9f9"/>
+<rect x="504" y="478" width="272" height="48" rx="6" fill="rgba(74,74,74,0.10)" stroke="#6b6b6b" stroke-width="1"/>
+<text x="640.0" y="498.5" class="node-name" fill="#171717">Discrepancy Analyst</text>
+<text x="640.0" y="514.5" class="han-sub">诊断与论文不符的原因</text>
+<path d="M1000,208 V272" fill="none" stroke="#4a4a4a" stroke-width="1.2" marker-end="url(#arrow)"/>
+<rect x="1008.0" y="232.0" width="56" height="16" rx="2" fill="#f9f9f9"/><text x="1036.0" y="244" class="arrow-label-han">提交补丁</text>
+<path d="M1112,272 V208" fill="none" stroke="#6b6b6b" stroke-width="1" stroke-dasharray="5,4" marker-end="url(#arrow-soft)"/>
+<rect x="1120.0" y="232.0" width="80" height="16" rx="2" fill="#f9f9f9"/><text x="1160.0" y="244" class="arrow-label-han">变化 + 进度</text>
+<path d="M984,352 V440" fill="none" stroke="#4a4a4a" stroke-width="1.2" marker-end="url(#arrow)"/>
+<rect x="992.0" y="388.0" width="32" height="16" rx="2" fill="#f9f9f9"/><text x="1008.0" y="400" class="arrow-label-han">派发</text>
+<path d="M1072,440 V352" fill="none" stroke="#6b6b6b" stroke-width="1" stroke-dasharray="5,4" marker-end="url(#arrow-soft)"/>
+<rect x="1080.0" y="388.0" width="32" height="16" rx="2" fill="#f9f9f9"/><text x="1096.0" y="400" class="arrow-label-han">报告</text>
+<path d="M1192,352 V640" fill="none" stroke="#1664c0" stroke-width="1.2" marker-end="url(#arrow-accent)"/>
+<rect x="1048.0" y="552.0" width="136" height="16" rx="2" fill="#f9f9f9"/><text x="1116.0" y="564" class="arrow-label-han">只有 Runtime 能结束</text>
+<rect x="904" y="128" width="304" height="80" rx="6" fill="#f9f9f9"/>
+<rect x="904" y="128" width="304" height="80" rx="6" fill="rgba(74,74,74,0.10)" stroke="#6b6b6b" stroke-width="1"/>
+<text x="1056.0" y="157.5" class="node-name" fill="#171717">Planner</text>
+<text x="1056.0" y="170.5" class="sublabel">ExperimentPatch</text>
+<text x="1056.0" y="187.5" class="han-sub">唯一的规划者，只提议不执行</text>
+<rect x="904" y="272" width="304" height="80" rx="6" fill="#f9f9f9"/>
+<rect x="904" y="272" width="304" height="80" rx="6" fill="rgba(22,100,192,0.08)" stroke="#1664c0" stroke-width="1.2"/>
+<text x="1056.0" y="301.5" class="node-name" fill="#1664c0">确定性 Runtime</text>
+<text x="1056.0" y="314.5" class="sublabel">runtime.py · task DAG</text>
+<text x="1056.0" y="331.5" class="han-sub">① 补丁校验 ② 冒烟运行 ③ 证据检查</text>
+<rect x="904" y="440" width="76" height="56" rx="6" fill="#f9f9f9"/>
+<rect x="904" y="440" width="76" height="56" rx="6" fill="rgba(74,74,74,0.10)" stroke="#6b6b6b" stroke-width="1"/>
+<text x="942.0" y="465.5" class="node-name" fill="#171717">setup</text>
+<text x="942.0" y="478.5" class="sublabel">worker</text>
+<rect x="988" y="440" width="76" height="56" rx="6" fill="#f9f9f9"/>
+<rect x="988" y="440" width="76" height="56" rx="6" fill="rgba(74,74,74,0.10)" stroke="#6b6b6b" stroke-width="1"/>
+<text x="1026.0" y="465.5" class="node-name" fill="#171717">debug</text>
+<text x="1026.0" y="478.5" class="sublabel">worker</text>
+<rect x="1072" y="440" width="76" height="56" rx="6" fill="#f9f9f9"/>
+<rect x="1072" y="440" width="76" height="56" rx="6" fill="rgba(74,74,74,0.10)" stroke="#6b6b6b" stroke-width="1"/>
+<text x="1110.0" y="465.5" class="node-name" fill="#171717">diagnose</text>
+<text x="1110.0" y="478.5" class="sublabel">worker</text>
+<text x="904" y="530" class="callout">每个 worker 一个新上下文</text>
+<rect x="40" y="640" width="1200" height="64" rx="6" fill="#f9f9f9"/>
+<rect x="40" y="640" width="1200" height="64" rx="6" fill="rgba(22,100,192,0.08)" stroke="#1664c0" stroke-width="1.2"/>
+<text x="640.0" y="661.5" class="node-name" fill="#1664c0">评估器（无 LLM）</text>
+<text x="640.0" y="674.5" class="sublabel">evaluator.py · 三个版本用同一套评分</text>
+<text x="640.0" y="691.5" class="han-sub">答案须在容差内，且出现在沙箱写下的未被改动的日志里 → full / partial / fail</text>
+<line x1="40" y1="744" x2="1240" y2="744" stroke="rgba(23,23,23,0.10)" stroke-width="0.8"/>
+<text x="40" y="764" class="legend-eyebrow">LEGEND</text>
+<rect x="120" y="752" width="24" height="16" rx="3" fill="rgba(74,74,74,0.10)" stroke="#6b6b6b" stroke-width="1"/>
+<text x="152" y="764" class="legend-text">LLM 角色</text>
+<rect x="244" y="752" width="24" height="16" rx="3" fill="#ffffff" stroke="#171717" stroke-width="1"/>
+<text x="276" y="764" class="legend-text">确定性组件</text>
+<rect x="372" y="752" width="24" height="16" rx="3" fill="rgba(22,100,192,0.08)" stroke="#1664c0" stroke-width="1"/>
+<text x="404" y="764" class="legend-text">验证 / 出口</text>
+<path d="M512,760 H536" fill="none" stroke="#4a4a4a" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="544" y="764" class="legend-text">流程</text>
+<path d="M604,760 H628" fill="none" stroke="#1664c0" stroke-width="1.2" marker-end="url(#arrow-accent)"/>
+<text x="636" y="764" class="legend-text">提交结果</text>
+<path d="M720,760 H744" fill="none" stroke="#6b6b6b" stroke-width="1" stroke-dasharray="5,4" marker-end="url(#arrow-soft)"/>
+<text x="752" y="764" class="legend-text">返回</text>
+      </svg>
+    </div>
+  </div>
+</body>
+</html>

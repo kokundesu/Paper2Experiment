@@ -1,8 +1,14 @@
-"""ReproSpec: what a run must reproduce, independent of where the task came from (docs/reprospec-plan.md).
+"""ReproSpec: what a run must reproduce, independent of where the task came from.
 
 Three sources produce the same spec: a user's prompt (the intent stage, later), CORE-Bench (a deterministic
 conversion, p2e.corebench) and the hand-built paper cases (to be migrated). The workflow versions read the spec's
 brief and submit `Answers`; only the evaluator knows the answers.
+
+Why one layer: every source answers the same question (which results, of what type, proven by what evidence). A
+branch per source in every version would cost sources x versions; with the spec each source needs one converter.
+The A-D comparison uses only the deterministic entries (spec given), so errors of the intent stage do not mix into
+the comparison of architectures. Design sources: CORE-Bench (answer keys must match the questions exactly) and
+ReplicationBench (fixed answer structure; scores rise from 0.19 to 0.46 when answers are not masked).
 """
 from __future__ import annotations
 

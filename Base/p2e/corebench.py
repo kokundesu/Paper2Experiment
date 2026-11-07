@@ -4,14 +4,33 @@ Ground truth is `benchmark/corebench_v1.1/core_test.json` from the Hugging Face 
 agent-evals/core-bench-v1.1-mainline: one entry per capsule, `results` = the answers of n=3 manual re-runs. The
 agent answers every question of a task once (m=1) in a dict keyed by the question text.
 
-Numeric answers pass when |answer - mean| <= h, where (docs/benchmark-redesign.md section 3.3)
+Numeric answers pass when |answer - mean| <= h, where (the project's tolerance rule, TOLERANCE_RULE; agreed
+2026-10-16, also used for the v4 reference re-runs in p2e.reference)
 
     h = max(t(0.975, n-1) * s * sqrt(1/m + 1/n),   # noise of the re-runs (CORE-Bench's prediction interval)
             half a unit of the ground truth's last printed digit,   # precision
             1e-5 * |mean|, or 1e-8 when the mean is 0)   # floating point
 
-With m=1 the noise term is CORE-Bench's own 95% prediction interval; the precision term plays the part of v1.1's
-"accept unrounded answers" fix. A question whose h exceeds 5% of |mean| is `stochastic`: reported, not scored.
+The question h answers: if the agent did exactly what the official code does and only the seed changed, how far
+from the reference mean could its result land? Each term covers one legitimate source of difference:
+
+- noise: randomness. s (ddof=1) estimates one run's spread; sqrt(1/m + 1/n) turns it into the spread of "mean of
+  the agent's m runs minus mean of the n reference runs" (independent, so variances add); t instead of 1.96 because
+  s itself comes from only n runs. With m=1 this is CORE-Bench's own 95% prediction interval (Fig. 4, HAL harness
+  `__eval_result_json`; arXiv 2606.26158 appendix A.5.3; Spence & Stanley 2016). An agent that changes epochs,
+  splits or other settings lands outside it systematically, which is what the rule should catch.
+- precision: resolution. No agreement finer than the reported precision is required, and unrounded answers are
+  accepted (the role of v1.1's fix 2, appendix A.1; ReplicationBench appendix D). Mostly the floor for
+  deterministic code (s = 0).
+- floor: floating point (thread counts, BLAS). Only the relative part of numpy.isclose's defaults is kept: an
+  absolute 1e-8 would pass any answer in [0, 1e-8] for capsule-0152700's p value of 2.34e-10 and wrongly make it
+  stochastic (revised 2026-10-16).
+
+The terms are taken as a maximum, not a sum: they are three lower bounds on one allowed gap, not independent errors
+(the noise term already contains floating-point noise), so adding them would count twice. No separate rounding is
+applied. A question whose h exceeds 5% of |mean| is `stochastic`: at that width "within tolerance" no longer shows
+the run was right, so it is reported, not scored. Tolerances are computed by code and frozen before any agent under
+test runs, never adjusted after; reports should add a sensitivity check at h x 0.5 / 1 / 2.
 Strings compare case-insensitively (booleans as "true"/"false"), except strings that hold a number, which compare
 as numbers. Lists compare element by element in order. A task is full when every scored question passes.
 
@@ -40,9 +59,11 @@ from .sandbox import Sandbox, file_sha256
 from .schemas import Task
 from .spec import Answers, AnswerItem, CodeInput, Question, ReproSpec, SpecOrigin, brief
 
-# Two splits (docs/corebench-inventory.md). test: the v1.1 mainline set (39 capsules), run once after the code and
-# the skill library are frozen. dev: the original CORE-Bench train set (45 capsules, disjoint from the test set),
-# which every tuning round and the skill library may use.
+# Two splits, both drawn by CORE-Bench itself, not by us. test: the v1.1 mainline set (39 capsules, core_test.json
+# from Hugging Face agent-evals), run once after the code and the skill library are frozen. dev: the original
+# CORE-Bench train set (45 capsules, core_train.json from GitHub siegelz/core-bench; v1.1 ships no train set), which
+# every tuning round and the skill library may use. The two are disjoint by capsule_id. The 5 PILOTED capsules below
+# were tried while building this adapter and the grader was changed after them, so they are excluded from test.
 ROOT = BENCHMARK / "corebench_v1.1"
 DATA = ROOT / "core_test.json"
 CAPSULES = ROOT / "capsules"
@@ -57,6 +78,7 @@ CAPSULE_URL = {"test": "https://huggingface.co/datasets/agent-evals/core-bench-v
 # Test capsules already run while the adapter was built (2026-10-16 pilots, three rounds, grader fixes made on what
 # they showed): seen during development, so they leave the test split.
 PILOTED = frozenset({"capsule-0201673", "capsule-6049678", "capsule-7655932", "capsule-7800694", "capsule-8412128"})
+TOLERANCE_RULE = "p2e tolerance rule 2026-10-16 (p2e/corebench.py docstring)"
 STOCHASTIC_SHARE = 0.05
 RTOL, ATOL = 1e-5, 1e-8  # numpy.isclose's defaults; ATOL only when the mean is 0, else it swamps tiny values
 
@@ -295,7 +317,7 @@ def freeze(entry: dict, data_sha256: str, split: str = "test") -> dict:
             row["alternates_pending"] = pending
         out.append(row)
     return {"capsule_id": entry["capsule_id"], "source": SOURCES[split], "split": split,
-            "data_sha256": data_sha256, "rule": "docs/benchmark-redesign.md section 3.3", "questions": out}
+            "data_sha256": data_sha256, "rule": TOLERANCE_RULE, "questions": out}
 
 
 def suits_local(entry: dict, languages: tuple[str, ...] = ("Python",), vision: bool = False) -> bool:

@@ -1,5 +1,5 @@
 """Reference re-runs: the official code run n times in our sandbox, which sets each question's tolerance
-(docs/benchmark-redesign.md section 3.3).
+(the tolerance rule explained in the p2e.corebench docstring).
 
 A recipe (benchmark/v4/<id>/reference.yaml, hidden) is written and checked by the benchmark builder, never by a
 workflow under test: setup commands, one run command with {seed}, and a regex per question. `run` executes it n times
@@ -11,6 +11,12 @@ and writes reference_values.yaml. `finalize` turns values + paper values into ca
     stochastic       h > 5% of |ref_mean|: reported, not scored
     paper_mismatch   |ref_mean - paper| > h + h_paper: the official code does not reproduce the paper here;
                      still scored against the reference, and the agent should report the gap
+
+n=5 rather than CORE-Bench's 3: with m=1 the noise term is about 5*s at n=3 and 3*s at n=5. Agents run at least
+m=3 seeds (stated in the task), which tightens h further. h_paper, the paper value's own tolerance (never scored):
+max(precision, 2*std/sqrt(k)) when the paper reports a std over k seeds (k=1 if unknown) or k folds; precision plus
+the noise term when it reports no spread. Each claim's case.yaml stores a justification: the three terms, which
+one won, n, m and s.
 
 Values are never typed into a recipe; they come only from the logs of these runs.
 """
@@ -27,7 +33,7 @@ from typing import Literal
 import yaml
 from pydantic import BaseModel, Field
 
-from .corebench import decimals, t975, tolerance
+from .corebench import TOLERANCE_RULE, decimals, t975, tolerance
 from .runner import RUNS, parse_metric
 from .sandbox import Sandbox
 
@@ -178,7 +184,7 @@ def finalize(pid: str, ref: dict, gt_values: dict, m: int = AGENT_RUNS) -> dict:
                               f"s={tol['s']:.3g}, n={tol['n']}, m={m}], precision {tol['precision']:.3g} "
                               f"[{places} places], floor {tol['floor']:.3g}) = {tol['h']:.3g} ({tol['term']}); "
                               f"paper gap {gap:.3g} vs h + h_paper {tol['h'] + h_paper:.3g}")}
-    return {"id": pid, "rule": "docs/benchmark-redesign.md section 3.3", "reference_run_dir": ref["run_dir"],
+    return {"id": pid, "rule": TOLERANCE_RULE, "reference_run_dir": ref["run_dir"],
             "questions": questions}
 
 

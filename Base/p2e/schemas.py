@@ -76,7 +76,7 @@ class GroundTruthClaim(BaseModel):
     value: float
     tolerance: Tolerance
     # paper: `value` is the paper's number. reference: `value` is the official code's mean over the benchmark's
-    # reference re-runs on this machine (v4, docs/benchmark-redesign.md section 3.3); the paper value is kept apart.
+    # reference re-runs on this machine (v4, see p2e.reference); the paper value is kept apart.
     target: Literal["paper", "reference"] = "paper"
     paper_value: float | None = None
     # standard deviation of the reference re-runs: when the official code varies between runs, identical submitted

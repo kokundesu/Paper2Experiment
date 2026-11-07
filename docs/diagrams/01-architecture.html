@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Paper2Exp 整体架构</title>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500;600&family=Noto+Sans+SC:wght@400;500;600&family=Noto+Serif+SC:wght@400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --paper: #f9f9f9; --ink: #171717; --muted: #4a4a4a; --soft: #6b6b6b;
+      --accent: #1664c0; --accent-tint: rgba(22,100,192,0.08); --link: #1c7935;
+      --sans: 'Geist', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', system-ui, sans-serif; --serif: 'Instrument Serif', 'Noto Serif SC', 'Songti SC', serif; --mono: 'Geist Mono', ui-monospace, monospace;
+    }
+    body { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 3rem 2rem;
+           background: var(--paper); color: var(--ink); font-family: var(--sans); }
+    .frame { width: 100%; max-width: 1320px; }
+    .eyebrow { margin-bottom: 0.5rem; color: var(--muted); font: 500 0.66rem var(--mono); letter-spacing: 0.18em; text-transform: uppercase; }
+    h1 { margin-bottom: 1.5rem; color: var(--ink); font: 400 clamp(1.5rem, 2.4vw + 0.75rem, 2rem)/1.15 var(--serif); letter-spacing: -0.02em; }
+    .diagram-container { width: 100%; overflow-x: auto; }
+    svg { display: block; width: 100%; min-width: 1280px; }
+    @media print { .diagram-container { overflow-x: visible; } svg { min-width: 0; } }
+    .node-name { font: 600 12px var(--sans); text-anchor: middle; }
+    .sublabel { fill: var(--soft); font: 400 9px var(--mono); text-anchor: middle; }
+    .han-sub { fill: var(--soft); font: 400 12px var(--sans); text-anchor: middle; }
+    .arrow-label { fill: var(--soft); font: 400 8px var(--mono); letter-spacing: 0.06em; text-anchor: middle; }
+    .arrow-label-han { fill: var(--soft); font: 500 12px var(--sans); text-anchor: middle; }
+    .zone-label { fill: var(--soft); font: 500 12px var(--sans); text-anchor: middle; }
+    .legend-eyebrow { fill: var(--muted); font: 500 8px var(--mono); letter-spacing: 0.14em; }
+    .legend-text { fill: var(--muted); font: 400 12px var(--sans); }
+    .callout { fill: var(--muted); font: italic 400 14px var(--serif); }
+    
+  </style>
+</head>
+<body>
+  <div class="frame">
+    <p class="eyebrow">Architecture · Paper2Exp</p>
+    <h1>Paper2Exp 整体架构</h1>
+    <div class="diagram-container">
+      <svg viewBox="0 0 1280 720" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="p2e-architecture-title p2e-architecture-desc">
+        <title id="p2e-architecture-title">Paper2Exp 整体架构</title>
+        <desc id="p2e-architecture-desc">复现任务交给三种工作流之一；三者共用 LLM 层、沙箱和技能库；评估器不用 LLM，只拿隐藏真值、agent 的答案和沙箱写下的带 sha256 的日志来判定。</desc>
+        <defs>
+          <marker id="arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#4a4a4a"/></marker>
+          <marker id="arrow-accent" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#1664c0"/></marker>
+          <marker id="arrow-link" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#1c7935"/></marker>
+          <marker id="arrow-soft" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#6b6b6b"/></marker>
+        </defs>
+        <rect width="1280" height="720" fill="#f9f9f9"/>
+<rect x="272" y="112" width="480" height="288" rx="8" fill="rgba(23,23,23,0.02)" stroke="rgba(23,23,23,0.14)" stroke-width="0.8"/><rect x="288" y="104" width="160" height="16" rx="2" fill="#f9f9f9"/><text x="368.0" y="116" class="zone-label">工作流（每次运行选一个）</text>
+<rect x="272" y="448" width="480" height="120" rx="8" fill="rgba(23,23,23,0.02)" stroke="rgba(23,23,23,0.14)" stroke-width="0.8"/><rect x="288" y="560" width="88" height="16" rx="2" fill="#f9f9f9"/><text x="332.0" y="572" class="zone-label">共享基础设施</text>
+<path d="M224,234 H248 Q256,234 256,226 V176 Q256,168 264,168 H296" fill="none" stroke="#4a4a4a" stroke-width="1.2" marker-end="url(#arrow)"/>
+<path d="M224,256 H296" fill="none" stroke="#4a4a4a" stroke-width="1.2" marker-end="url(#arrow)"/>
+<path d="M224,278 H248 Q256,278 256,286 V336 Q256,344 264,344 H296" fill="none" stroke="#4a4a4a" stroke-width="1.2" marker-end="url(#arrow)"/>
+<path d="M360,400 V472" fill="none" stroke="#4a4a4a" stroke-width="1.2" marker-end="url(#arrow)"/>
+<rect x="368.0" y="412.0" width="56" height="16" rx="2" fill="#f9f9f9"/><text x="396.0" y="424" class="arrow-label-han">调用模型</text>
+<path d="M512,400 V472" fill="none" stroke="#4a4a4a" stroke-width="1.2" marker-end="url(#arrow)"/>
+<rect x="520.0" y="412.0" width="56" height="16" rx="2" fill="#f9f9f9"/><text x="548.0" y="424" class="arrow-label-han">执行命令</text>
+<path d="M664,400 V472" fill="none" stroke="#4a4a4a" stroke-width="1.2" marker-end="url(#arrow)"/>
+<rect x="672.0" y="412.0" width="56" height="16" rx="2" fill="#f9f9f9"/><text x="700.0" y="424" class="arrow-label-han">读取技能</text>
+<path d="M752,256 H880" fill="none" stroke="#1664c0" stroke-width="1.2" marker-end="url(#arrow-accent)"/>
+<rect x="764.0" y="234.0" width="104" height="16" rx="2" fill="#f9f9f9"/><text x="816" y="246.0" class="arrow-label-han">答案 + 引用日志</text>
+<path d="M976,152 V216" fill="none" stroke="#4a4a4a" stroke-width="1.2" marker-end="url(#arrow)"/>
+<rect x="984.0" y="176.0" width="92" height="16" rx="2" fill="#f9f9f9"/><text x="1030.0" y="188" class="arrow-label-han">目标值 + 容差</text>
+<path d="M512,544 V592 Q512,600 520,600 H968 Q976,600 976,592 V296" fill="none" stroke="#4a4a4a" stroke-width="1.2" marker-end="url(#arrow)"/>
+<rect x="984.0" y="440.0" width="100" height="16" rx="2" fill="#f9f9f9"/><text x="1034.0" y="452" class="arrow-label-han">日志 + sha256</text>
+<rect x="48" y="212" width="176" height="88" rx="6" fill="#f9f9f9"/>
+<rect x="48" y="212" width="176" height="88" rx="6" fill="rgba(74,74,74,0.10)" stroke="#6b6b6b" stroke-width="1"/>
+<text x="136.0" y="245.5" class="node-name" fill="#171717">复现任务</text>
+<text x="136.0" y="258.5" class="sublabel">task.yaml / spec.yaml</text>
+<text x="136.0" y="275.5" class="han-sub">论文或 CORE-Bench 胶囊</text>
+<rect x="296" y="136" width="432" height="64" rx="6" fill="#f9f9f9"/>
+<rect x="296" y="136" width="432" height="64" rx="6" fill="#ffffff" stroke="#171717" stroke-width="1"/>
+<text x="512.0" y="165.5" class="node-name" fill="#171717">A · 单个 ReAct Agent</text>
+<text x="512.0" y="178.5" class="sublabel">single · SingleAgent/</text>
+<rect x="296" y="224" width="432" height="64" rx="6" fill="#f9f9f9"/>
+<rect x="296" y="224" width="432" height="64" rx="6" fill="#ffffff" stroke="#171717" stroke-width="1"/>
+<text x="512.0" y="253.5" class="node-name" fill="#171717">B · 固定六角色流水线</text>
+<text x="512.0" y="266.5" class="sublabel">fixed · Multiagent/FixedPipeline/</text>
+<rect x="296" y="312" width="432" height="64" rx="6" fill="#f9f9f9"/>
+<rect x="296" y="312" width="432" height="64" rx="6" fill="#ffffff" stroke="#171717" stroke-width="1"/>
+<text x="512.0" y="341.5" class="node-name" fill="#171717">D · Planner + 验证型 Runtime</text>
+<text x="512.0" y="354.5" class="sublabel">planner_workers · Multiagent/PlannerWorkers/</text>
+<rect x="296" y="472" width="128" height="72" rx="6" fill="#f9f9f9"/>
+<rect x="296" y="472" width="128" height="72" rx="6" fill="#ffffff" stroke="#171717" stroke-width="1"/>
+<text x="360.0" y="505.5" class="node-name" fill="#171717">LLM 层</text>
+<text x="360.0" y="518.5" class="sublabel">llm.py · models.yaml</text>
+<rect x="448" y="472" width="128" height="72" rx="6" fill="#f9f9f9"/>
+<rect x="448" y="472" width="128" height="72" rx="6" fill="#ffffff" stroke="#171717" stroke-width="1"/>
+<text x="512.0" y="497.5" class="node-name" fill="#171717">沙箱</text>
+<text x="512.0" y="510.5" class="sublabel">sandbox.py</text>
+<text x="512.0" y="527.5" class="han-sub">每条命令一份日志</text>
+<rect x="600" y="472" width="128" height="72" rx="6" fill="#f9f9f9"/>
+<rect x="600" y="472" width="128" height="72" rx="6" fill="#ffffff" stroke="#171717" stroke-width="1"/>
+<text x="664.0" y="505.5" class="node-name" fill="#171717">技能库</text>
+<text x="664.0" y="518.5" class="sublabel">skills/*/SKILL.md</text>
+<rect x="880" y="88" width="192" height="64" rx="6" fill="#f9f9f9"/>
+<rect x="880" y="88" width="192" height="64" rx="6" fill="rgba(23,23,23,0.05)" stroke="#4a4a4a" stroke-width="1"/>
+<text x="976.0" y="117.5" class="node-name" fill="#171717">隐藏真值</text>
+<text x="976.0" y="130.5" class="sublabel">case.yaml</text>
+<rect x="880" y="216" width="192" height="80" rx="6" fill="#f9f9f9"/>
+<rect x="880" y="216" width="192" height="80" rx="6" fill="rgba(22,100,192,0.08)" stroke="#1664c0" stroke-width="1.2"/>
+<text x="976.0" y="245.5" class="node-name" fill="#1664c0">评估器（无 LLM）</text>
+<text x="976.0" y="258.5" class="sublabel">evaluator.py</text>
+<text x="976.0" y="275.5" class="han-sub">→ full / partial / fail</text>
+<text x="1096" y="112" class="callout">agent 永远读不到它：</text>
+<text x="1096" y="132" class="callout">沙箱命令守卫会拦截</text>
+<line x1="40" y1="656" x2="1240" y2="656" stroke="rgba(23,23,23,0.10)" stroke-width="0.8"/>
+<text x="40" y="676" class="legend-eyebrow">LEGEND</text>
+<rect x="120" y="664" width="24" height="16" rx="3" fill="rgba(74,74,74,0.10)" stroke="#6b6b6b" stroke-width="1"/>
+<text x="152" y="676" class="legend-text">输入</text>
+<rect x="212" y="664" width="24" height="16" rx="3" fill="#ffffff" stroke="#171717" stroke-width="1"/>
+<text x="244" y="676" class="legend-text">组件</text>
+<rect x="304" y="664" width="24" height="16" rx="3" fill="rgba(23,23,23,0.05)" stroke="#4a4a4a" stroke-width="1"/>
+<text x="336" y="676" class="legend-text">隐藏数据</text>
+<rect x="420" y="664" width="24" height="16" rx="3" fill="rgba(22,100,192,0.08)" stroke="#1664c0" stroke-width="1"/>
+<text x="452" y="676" class="legend-text">焦点</text>
+<path d="M512,672 H536" fill="none" stroke="#1664c0" stroke-width="1.2" marker-end="url(#arrow-accent)"/>
+<text x="544" y="676" class="legend-text">主结果流</text>
+<path d="M628,672 H652" fill="none" stroke="#4a4a4a" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="660" y="676" class="legend-text">调用 / 数据</text>
+      </svg>
+    </div>
+  </div>
+</body>
+</html>
