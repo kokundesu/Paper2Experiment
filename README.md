@@ -25,7 +25,7 @@ architecture is the only thing that differs.
 
 ## Architecture
 
-![Overall architecture](docs/images/01-architecture.png)
+![Overall architecture](docs/images/01-architecture.en.png)
 
 The system is built from five parts:
 
@@ -43,7 +43,7 @@ The system is built from five parts:
 
 ## The three workflows
 
-![Comparison of the three workflows](docs/images/04-workflows.png)
+![Comparison of the three workflows](docs/images/04-workflows.en.png)
 
 | | Workflow | Who plans | Who checks the work during a run | Contexts |
 |---|---|---|---|---|

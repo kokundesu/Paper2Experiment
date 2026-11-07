@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The three workflows</title>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500;600&family=Noto+Sans+SC:wght@400;500;600&family=Noto+Serif+SC:wght@400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --paper: #f9f9f9; --ink: #171717; --muted: #4a4a4a; --soft: #6b6b6b;
+      --accent: #1664c0; --accent-tint: rgba(22,100,192,0.08); --link: #1c7935;
+      --sans: 'Geist', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', system-ui, sans-serif; --serif: 'Instrument Serif', 'Noto Serif SC', 'Songti SC', serif; --mono: 'Geist Mono', ui-monospace, monospace;
+    }
+    body { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 3rem 2rem;
+           background: var(--paper); color: var(--ink); font-family: var(--sans); }
+    .frame { width: 100%; max-width: 1320px; }
+    .eyebrow { margin-bottom: 0.5rem; color: var(--muted); font: 500 0.66rem var(--mono); letter-spacing: 0.18em; text-transform: uppercase; }
+    h1 { margin-bottom: 1.5rem; color: var(--ink); font: 400 clamp(1.5rem, 2.4vw + 0.75rem, 2rem)/1.15 var(--serif); letter-spacing: -0.02em; }
+    .diagram-container { width: 100%; overflow-x: auto; }
+    svg { display: block; width: 100%; min-width: 1280px; }
+    @media print { .diagram-container { overflow-x: visible; } svg { min-width: 0; } }
+    .node-name { font: 600 12px var(--sans); text-anchor: middle; }
+    .sublabel { fill: var(--soft); font: 400 9px var(--mono); text-anchor: middle; }
+    .han-sub { fill: var(--soft); font: 400 12px var(--sans); text-anchor: middle; }
+    .arrow-label { fill: var(--soft); font: 400 8px var(--mono); letter-spacing: 0.06em; text-anchor: middle; }
+    .arrow-label-han { fill: var(--soft); font: 500 12px var(--sans); text-anchor: middle; }
+    .zone-label { fill: var(--soft); font: 500 12px var(--sans); text-anchor: middle; }
+    .legend-eyebrow { fill: var(--muted); font: 500 8px var(--mono); letter-spacing: 0.14em; }
+    .legend-text { fill: var(--muted); font: 400 12px var(--sans); }
+    .callout { fill: var(--muted); font: italic 400 14px var(--serif); }
+    
+  </style>
+</head>
+<body>
+  <div class="frame">
+    <p class="eyebrow">Comparison · Workflows</p>
+    <h1>The three workflows</h1>
+    <div class="diagram-container">
+      <svg viewBox="0 0 1280 800" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="p2e-workflows-title p2e-workflows-desc">
+        <title id="p2e-workflows-title">The three workflows</title>
+        <desc id="p2e-workflows-desc">A: one ReAct agent holds every tool and is checked only by the evaluator at the end. B: code routes the task through six LLM roles and a deterministic executor. D: a Planner submits patches; a deterministic runtime runs three checks, hands agent tasks to isolated workers and is the only one that can end a run. All three end at the same evaluator, which uses no LLM.</desc>
+        <defs>
+          <marker id="arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#4a4a4a"/></marker>
+          <marker id="arrow-accent" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#1664c0"/></marker>
+          <marker id="arrow-link" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#1c7935"/></marker>
+          <marker id="arrow-soft" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#6b6b6b"/></marker>
+        </defs>
+        <rect width="1280" height="800" fill="#f9f9f9"/>
+<rect x="40" y="96" width="368" height="504" rx="8" fill="rgba(23,23,23,0.02)" stroke="rgba(23,23,23,0.14)" stroke-width="0.8"/><rect x="56" y="88" width="240" height="16" rx="2" fill="#f9f9f9"/><text x="176.0" y="100" class="zone-label">A · Single ReAct agent (single)</text>
+<rect x="456" y="96" width="368" height="504" rx="8" fill="rgba(23,23,23,0.02)" stroke="rgba(23,23,23,0.14)" stroke-width="0.8"/><rect x="472" y="88" width="268" height="16" rx="2" fill="#f9f9f9"/><text x="606.0" y="100" class="zone-label">B · Fixed six-role pipeline (fixed)</text>
+<rect x="872" y="96" width="368" height="504" rx="8" fill="rgba(23,23,23,0.02)" stroke="rgba(23,23,23,0.14)" stroke-width="0.8"/><rect x="888" y="88" width="300" height="16" rx="2" fill="#f9f9f9"/><text x="1038.0" y="100" class="zone-label">D · Planner + runtime (planner_workers)</text>
+<path d="M184,208 V296" fill="none" stroke="#4a4a4a" stroke-width="1.2" marker-end="url(#arrow)"/>
+<rect x="192.0" y="244.0" width="80" height="16" rx="2" fill="#f9f9f9"/><text x="232.0" y="256" class="arrow-label-han">tool calls</text>
+<path d="M288,296 V208" fill="none" stroke="#6b6b6b" stroke-width="1" stroke-dasharray="5,4" marker-end="url(#arrow-soft)"/>
+<rect x="296.0" y="244.0" width="52" height="16" rx="2" fill="#f9f9f9"/><text x="322.0" y="256" class="arrow-label-han">output</text>
+<path d="M224,360 V640" fill="none" stroke="#1664c0" stroke-width="1.2" marker-end="url(#arrow-accent)"/>
+<rect x="232.0" y="504.0" width="152" height="16" rx="2" fill="#f9f9f9"/><text x="308.0" y="516" class="arrow-label-han">answers + cited logs</text>
+<text x="72" y="440" class="callout">nothing checks</text>
+<text x="72" y="462" class="callout">the run midway</text>
+<rect x="88" y="128" width="272" height="80" rx="6" fill="#f9f9f9"/>
+<rect x="88" y="128" width="272" height="80" rx="6" fill="rgba(74,74,74,0.10)" stroke="#6b6b6b" stroke-width="1"/>
+<text x="224.0" y="157.5" class="node-name" fill="#171717">ReAct agent</text>
+<text x="224.0" y="170.5" class="sublabel">all tools · one context</text>
+<text x="224.0" y="187.5" class="han-sub">paper → env → experiments → submit</text>
+<rect x="88" y="296" width="272" height="64" rx="6" fill="#f9f9f9"/>
+<rect x="88" y="296" width="272" height="64" rx="6" fill="#ffffff" stroke="#171717" stroke-width="1"/>
+<text x="224.0" y="317.5" class="node-name" fill="#171717">Sandbox</text>
+<text x="224.0" y="330.5" class="sublabel">read / write / shell</text>
+<text x="224.0" y="347.5" class="han-sub">one log per command</text>
+<path d="M640,176 V198" fill="none" stroke="#4a4a4a" stroke-width="1.2" marker-end="url(#arrow)"/>
+<path d="M640,246 V268" fill="none" stroke="#4a4a4a" stroke-width="1.2" marker-end="url(#arrow)"/>
+<path d="M640,316 V338" fill="none" stroke="#4a4a4a" stroke-width="1.2" marker-end="url(#arrow)"/>
+<path d="M640,386 V408" fill="none" stroke="#4a4a4a" stroke-width="1.2" marker-end="url(#arrow)"/>
+<path d="M640,456 V478" fill="none" stroke="#4a4a4a" stroke-width="1.2" marker-end="url(#arrow)"/>
+<path d="M640,526 V640" fill="none" stroke="#1664c0" stroke-width="1.2" marker-end="url(#arrow-accent)"/>
+<rect x="648.0" y="596.0" width="152" height="16" rx="2" fill="#f9f9f9"/><text x="724.0" y="608" class="arrow-label-han">answers + cited logs</text>
+<rect x="504" y="128" width="272" height="48" rx="6" fill="#f9f9f9"/>
+<rect x="504" y="128" width="272" height="48" rx="6" fill="rgba(74,74,74,0.10)" stroke="#6b6b6b" stroke-width="1"/>
+<text x="640.0" y="148.5" class="node-name" fill="#171717">Paper Analyst</text>
+<text x="640.0" y="164.5" class="han-sub">reads the paper, lists the results</text>
+<rect x="504" y="198" width="272" height="48" rx="6" fill="#f9f9f9"/>
+<rect x="504" y="198" width="272" height="48" rx="6" fill="rgba(74,74,74,0.10)" stroke="#6b6b6b" stroke-width="1"/>
+<text x="640.0" y="218.5" class="node-name" fill="#171717">Env Agent</text>
+<text x="640.0" y="234.5" class="han-sub">clones the repo, installs the env</text>
+<rect x="504" y="268" width="272" height="48" rx="6" fill="#f9f9f9"/>
+<rect x="504" y="268" width="272" height="48" rx="6" fill="rgba(74,74,74,0.10)" stroke="#6b6b6b" stroke-width="1"/>
+<text x="640.0" y="288.5" class="node-name" fill="#171717">Planner</text>
+<text x="640.0" y="304.5" class="han-sub">writes the experiment commands</text>
+<rect x="504" y="338" width="272" height="48" rx="6" fill="#f9f9f9"/>
+<rect x="504" y="338" width="272" height="48" rx="6" fill="#ffffff" stroke="#171717" stroke-width="1"/>
+<text x="640.0" y="358.5" class="node-name" fill="#171717">Executor ⇄ Debugger</text>
+<text x="640.0" y="374.5" class="han-sub">deterministic · up to 4 debug sessions</text>
+<rect x="504" y="408" width="272" height="48" rx="6" fill="#f9f9f9"/>
+<rect x="504" y="408" width="272" height="48" rx="6" fill="rgba(74,74,74,0.10)" stroke="#6b6b6b" stroke-width="1"/>
+<text x="640.0" y="428.5" class="node-name" fill="#171717">Result Reviewer</text>
+<text x="640.0" y="444.5" class="han-sub">reviews once after a pilot run</text>
+<rect x="504" y="478" width="272" height="48" rx="6" fill="#f9f9f9"/>
+<rect x="504" y="478" width="272" height="48" rx="6" fill="rgba(74,74,74,0.10)" stroke="#6b6b6b" stroke-width="1"/>
+<text x="640.0" y="498.5" class="node-name" fill="#171717">Discrepancy Analyst</text>
+<text x="640.0" y="514.5" class="han-sub">explains mismatches with the paper</text>
+<path d="M1000,208 V272" fill="none" stroke="#4a4a4a" stroke-width="1.2" marker-end="url(#arrow)"/>
+<rect x="1008.0" y="232.0" width="96" height="16" rx="2" fill="#f9f9f9"/><text x="1056.0" y="244" class="arrow-label-han">submit patch</text>
+<path d="M1112,272 V208" fill="none" stroke="#6b6b6b" stroke-width="1" stroke-dasharray="5,4" marker-end="url(#arrow-soft)"/>
+<rect x="1120.0" y="232.0" width="60" height="16" rx="2" fill="#f9f9f9"/><text x="1150.0" y="244" class="arrow-label-han">updates</text>
+<path d="M984,352 V440" fill="none" stroke="#4a4a4a" stroke-width="1.2" marker-end="url(#arrow)"/>
+<rect x="992.0" y="388.0" width="68" height="16" rx="2" fill="#f9f9f9"/><text x="1026.0" y="400" class="arrow-label-han">dispatch</text>
+<path d="M1072,440 V352" fill="none" stroke="#6b6b6b" stroke-width="1" stroke-dasharray="5,4" marker-end="url(#arrow-soft)"/>
+<rect x="1080.0" y="388.0" width="52" height="16" rx="2" fill="#f9f9f9"/><text x="1106.0" y="400" class="arrow-label-han">report</text>
+<path d="M1192,352 V640" fill="none" stroke="#1664c0" stroke-width="1.2" marker-end="url(#arrow-accent)"/>
+<rect x="980.0" y="560.0" width="204" height="16" rx="2" fill="#f9f9f9"/><text x="1082.0" y="572" class="arrow-label-han">only the runtime ends a run</text>
+<rect x="904" y="128" width="304" height="80" rx="6" fill="#f9f9f9"/>
+<rect x="904" y="128" width="304" height="80" rx="6" fill="rgba(74,74,74,0.10)" stroke="#6b6b6b" stroke-width="1"/>
+<text x="1056.0" y="157.5" class="node-name" fill="#171717">Planner</text>
+<text x="1056.0" y="170.5" class="sublabel">ExperimentPatch</text>
+<text x="1056.0" y="187.5" class="han-sub">the only planner: proposes, never runs</text>
+<rect x="904" y="272" width="304" height="80" rx="6" fill="#f9f9f9"/>
+<rect x="904" y="272" width="304" height="80" rx="6" fill="rgba(22,100,192,0.08)" stroke="#1664c0" stroke-width="1.2"/>
+<text x="1056.0" y="301.5" class="node-name" fill="#1664c0">Deterministic runtime</text>
+<text x="1056.0" y="314.5" class="sublabel">runtime.py · task DAG</text>
+<text x="1056.0" y="331.5" class="han-sub">① plan check ② smoke run ③ evidence</text>
+<rect x="904" y="440" width="76" height="56" rx="6" fill="#f9f9f9"/>
+<rect x="904" y="440" width="76" height="56" rx="6" fill="rgba(74,74,74,0.10)" stroke="#6b6b6b" stroke-width="1"/>
+<text x="942.0" y="465.5" class="node-name" fill="#171717">setup</text>
+<text x="942.0" y="478.5" class="sublabel">worker</text>
+<rect x="988" y="440" width="76" height="56" rx="6" fill="#f9f9f9"/>
+<rect x="988" y="440" width="76" height="56" rx="6" fill="rgba(74,74,74,0.10)" stroke="#6b6b6b" stroke-width="1"/>
+<text x="1026.0" y="465.5" class="node-name" fill="#171717">debug</text>
+<text x="1026.0" y="478.5" class="sublabel">worker</text>
+<rect x="1072" y="440" width="76" height="56" rx="6" fill="#f9f9f9"/>
+<rect x="1072" y="440" width="76" height="56" rx="6" fill="rgba(74,74,74,0.10)" stroke="#6b6b6b" stroke-width="1"/>
+<text x="1110.0" y="465.5" class="node-name" fill="#171717">diagnose</text>
+<text x="1110.0" y="478.5" class="sublabel">worker</text>
+<text x="904" y="530" class="callout">a fresh context per worker</text>
+<rect x="40" y="640" width="1200" height="64" rx="6" fill="#f9f9f9"/>
+<rect x="40" y="640" width="1200" height="64" rx="6" fill="rgba(22,100,192,0.08)" stroke="#1664c0" stroke-width="1.2"/>
+<text x="640.0" y="661.5" class="node-name" fill="#1664c0">Evaluator (no LLM)</text>
+<text x="640.0" y="674.5" class="sublabel">evaluator.py · the same scoring for all three</text>
+<text x="640.0" y="691.5" class="han-sub">an answer must be within tolerance and appear in an untampered sandbox log → full / partial / fail</text>
+<line x1="40" y1="744" x2="1240" y2="744" stroke="rgba(23,23,23,0.10)" stroke-width="0.8"/>
+<text x="40" y="764" class="legend-eyebrow">LEGEND</text>
+<rect x="120" y="752" width="24" height="16" rx="3" fill="rgba(74,74,74,0.10)" stroke="#6b6b6b" stroke-width="1"/>
+<text x="152" y="764" class="legend-text">LLM role</text>
+<rect x="248" y="752" width="24" height="16" rx="3" fill="#ffffff" stroke="#171717" stroke-width="1"/>
+<text x="280" y="764" class="legend-text">deterministic part</text>
+<rect x="448" y="752" width="24" height="16" rx="3" fill="rgba(22,100,192,0.08)" stroke="#1664c0" stroke-width="1"/>
+<text x="480" y="764" class="legend-text">check / exit</text>
+<path d="M604,760 H628" fill="none" stroke="#4a4a4a" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="636" y="764" class="legend-text">flow</text>
+<path d="M704,760 H728" fill="none" stroke="#1664c0" stroke-width="1.2" marker-end="url(#arrow-accent)"/>
+<text x="736" y="764" class="legend-text">submitted result</text>
+<path d="M888,760 H912" fill="none" stroke="#6b6b6b" stroke-width="1" stroke-dasharray="5,4" marker-end="url(#arrow-soft)"/>
+<text x="920" y="764" class="legend-text">return</text>
+      </svg>
+    </div>
+  </div>
+</body>
+</html>

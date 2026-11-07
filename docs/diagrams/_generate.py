@@ -34,6 +34,13 @@ def has_han(text):
     return any(wide(c) for c in text)
 
 
+BIG = False  # English diagrams: draw Latin arrow labels at the 12px sans size of Han labels
+
+
+def big(text):
+    return BIG or has_han(text)
+
+
 def esc(s):
     return s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
 
@@ -72,7 +79,7 @@ def node(x, y, w, h, name, sub=None, line3=None, kind="backend"):
 
 def label(cx, cy, text):
     """Arrow label centred at (cx, cy) with an opaque mask. Han -> 12px sans 500, Latin -> 8px mono caps."""
-    if has_han(text):
+    if big(text):
         w, h = up4(tw(text, 12) + 8), 16
         return (f'<rect x="{cx - w / 2}" y="{cy - h / 2}" width="{w}" height="{h}" rx="2" fill="{T["paper"]}"/>'
                 f'<text x="{cx}" y="{cy + 4}" class="arrow-label-han">{esc(text)}</text>'), (cx - w / 2, cy - h / 2, w, h)
@@ -82,17 +89,17 @@ def label(cx, cy, text):
 
 
 def label_above(cx, line_y, text):
-    h = 16 if has_han(text) else 12
+    h = 16 if big(text) else 12
     return label(cx, line_y - 6 - h / 2, text)[0]
 
 
 def label_below(cx, line_y, text):
-    h = 16 if has_han(text) else 12
+    h = 16 if big(text) else 12
     return label(cx, line_y + 6 + h / 2, text)[0]
 
 
 def label_right(line_x, cy, text):
-    w = up4(tw(text, 12) + 8) if has_han(text) else up4(tw(text, 8, True) * 1.06 + 8)
+    w = up4(tw(text, 12) + 8) if big(text) else up4(tw(text, 8, True) * 1.06 + 8)
     return label(line_x + 8 + w / 2, cy, text)[0]
 
 
@@ -134,9 +141,9 @@ def legend(y, width, items):
     return "\n".join(out)
 
 
-def page(slug, eyebrow, title, desc, vw, vh, body, extra_css=""):
+def page(slug, eyebrow, title, desc, vw, vh, body, extra_css="", lang="zh-CN"):
     return f"""<!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="{lang}">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -458,7 +465,119 @@ def workflows():
                 "三者最后都交给同一个不用 LLM 的评估器。", 1280, 800, "\n".join(b))
 
 
+# ------------------------------------------------------------------ English versions (README.md)
+def architecture_en():
+    b = []
+    b.append(zone(272, 112, 480, 288, "Workflows (one per run)"))
+    b.append(zone(272, 448, 480, 120, "Shared infrastructure", bottom=True))
+    b.append(path("M224,234 H248 Q256,234 256,226 V176 Q256,168 264,168 H296"))
+    b.append(path("M224,256 H296"))
+    b.append(path("M224,278 H248 Q256,278 256,286 V336 Q256,344 264,344 H296"))
+    for x, t in ((360, "call models"), (512, "run commands"), (664, "read skills")):
+        b.append(path(f"M{x},400 V472"))
+        b.append(label_right(x, 420, t))
+    b.append(path("M752,256 H880", "accent"))
+    b.append(label_above(816, 256, "answers + logs"))
+    b.append(path("M976,152 V216"))
+    b.append(label_right(976, 184, "targets + tolerances"))
+    b.append(path("M512,544 V592 Q512,600 520,600 H968 Q976,600 976,592 V296"))
+    b.append(label_right(976, 448, "logs + sha256"))
+    b.append(node(48, 212, 176, 88, "Reproduction task", "task.yaml / spec.yaml", "a paper or a capsule", "input"))
+    b.append(node(296, 136, 432, 64, "A · Single ReAct agent", "single · SingleAgent/"))
+    b.append(node(296, 224, 432, 64, "B · Fixed six-role pipeline", "fixed · Multiagent/FixedPipeline/"))
+    b.append(node(296, 312, 432, 64, "D · Planner + verifying runtime", "planner_workers · Multiagent/PlannerWorkers/"))
+    b.append(node(296, 472, 128, 72, "LLM layer", "llm.py · models.yaml"))
+    b.append(node(448, 472, 128, 72, "Sandbox", "sandbox.py", "log per command"))
+    b.append(node(600, 472, 128, 72, "Skill library", "skills/*/SKILL.md"))
+    b.append(node(880, 88, 192, 64, "Hidden ground truth", "case.yaml", kind="store"))
+    b.append(node(880, 216, 192, 80, "Evaluator (no LLM)", "evaluator.py", "→ full / partial / fail", "focal"))
+    b.append('<text x="1096" y="104" class="callout">agents never see it:</text>')
+    b.append('<text x="1096" y="124" class="callout">the sandbox guard</text>')
+    b.append('<text x="1096" y="144" class="callout">blocks access</text>')
+    b.append(legend(672, 1280, [("input", "input"), ("backend", "component"), ("store", "hidden data"),
+                                ("focal", "focus"), ("accent", "main result flow"), ("muted", "call / data")]))
+    return page("p2e-architecture", "Architecture · Paper2Exp", "Paper2Exp architecture",
+                "A reproduction task goes to one of three workflows; all three share the LLM layer, the sandbox and "
+                "the skill library; the evaluator uses no LLM, only the hidden ground truth, the agents' answers and "
+                "the logs the sandbox wrote with their sha256.", 1280, 720, "\n".join(b), lang="en")
+
+
+def workflows_en():
+    b = []
+    b.append(zone(40, 96, 368, 504, "A · Single ReAct agent (single)"))
+    b.append(zone(456, 96, 368, 504, "B · Fixed six-role pipeline (fixed)"))
+    b.append(zone(872, 96, 368, 504, "D · Planner + runtime (planner_workers)"))
+
+    b.append(path("M184,208 V296"))
+    b.append(label_right(184, 252, "tool calls"))
+    b.append(path("M288,296 V208", "soft", dashed=True))
+    b.append(label_right(288, 252, "output"))
+    b.append(path("M224,360 V640", "accent"))
+    b.append(label_right(224, 512, "answers + cited logs"))
+    b.append('<text x="72" y="440" class="callout">nothing checks</text>')
+    b.append('<text x="72" y="462" class="callout">the run midway</text>')
+    b.append(node(88, 128, 272, 80, "ReAct agent", "all tools · one context",
+                  "paper → env → experiments → submit", "input"))
+    b.append(node(88, 296, 272, 64, "Sandbox", "read / write / shell", "one log per command"))
+
+    roles = [("Paper Analyst", "reads the paper, lists the results", "input"),
+             ("Env Agent", "clones the repo, installs the env", "input"),
+             ("Planner", "writes the experiment commands", "input"),
+             ("Executor ⇄ Debugger", "deterministic · up to 4 debug sessions", "backend"),
+             ("Result Reviewer", "reviews once after a pilot run", "input"),
+             ("Discrepancy Analyst", "explains mismatches with the paper", "input")]
+    ys = [128 + i * 70 for i in range(len(roles))]
+    for y in ys[:-1]:
+        b.append(path(f"M640,{y + 48} V{y + 70}"))
+    b.append(path(f"M640,{ys[-1] + 48} V640", "accent"))
+    b.append(label_right(640, 604, "answers + cited logs"))
+    for y, (name, sub, kind) in zip(ys, roles):
+        b.append(node(504, y, 272, 48, name, None, sub, kind))
+
+    b.append(path("M1000,208 V272"))
+    b.append(label_right(1000, 240, "submit patch"))
+    b.append(path("M1112,272 V208", "soft", dashed=True))
+    b.append(label_right(1112, 240, "updates"))
+    b.append(path("M984,352 V440"))
+    b.append(label_right(984, 396, "dispatch"))
+    b.append(path("M1072,440 V352", "soft", dashed=True))
+    b.append(label_right(1072, 396, "report"))
+    b.append(path("M1192,352 V640", "accent"))
+    txt = "only the runtime ends a run"
+    b.append(label(1192 - 8 - up4(tw(txt, 12) + 8) / 2, 568, txt)[0])
+    b.append(node(904, 128, 304, 80, "Planner", "ExperimentPatch", "the only planner: proposes, never runs", "input"))
+    b.append(node(904, 272, 304, 80, "Deterministic runtime", "runtime.py · task DAG",
+                  "① plan check ② smoke run ③ evidence", "focal"))
+    for i, w in enumerate(("setup", "debug", "diagnose")):
+        b.append(node(904 + i * 84, 440, 76, 56, w, "worker", kind="input"))
+    b.append('<text x="904" y="530" class="callout">a fresh context per worker</text>')
+
+    b.append(node(40, 640, 1200, 64, "Evaluator (no LLM)", "evaluator.py · the same scoring for all three",
+                  "an answer must be within tolerance and appear in an untampered sandbox log → full / partial / fail",
+                  "focal"))
+    b.append(legend(760, 1280, [("input", "LLM role"), ("backend", "deterministic part"), ("focal", "check / exit"),
+                                ("muted", "flow"), ("accent", "submitted result"), ("soft:dashed", "return")]))
+    return page("p2e-workflows", "Comparison · Workflows", "The three workflows",
+                "A: one ReAct agent holds every tool and is checked only by the evaluator at the end. B: code routes "
+                "the task through six LLM roles and a deterministic executor. D: a Planner submits patches; a "
+                "deterministic runtime runs three checks, hands agent tasks to isolated workers and is the only one "
+                "that can end a run. All three end at the same evaluator, which uses no LLM.",
+                1280, 800, "\n".join(b), lang="en")
+
+
+def english(fn):
+    def run():
+        global BIG
+        BIG = True
+        try:
+            return fn()
+        finally:
+            BIG = False
+    return run
+
+
 for name, fn in (("01-architecture.html", architecture), ("02-planner-runtime.html", planner_runtime),
-                 ("03-skills-loop.html", skills_loop), ("04-workflows.html", workflows)):
+                 ("03-skills-loop.html", skills_loop), ("04-workflows.html", workflows),
+                 ("01-architecture.en.html", english(architecture_en)), ("04-workflows.en.html", english(workflows_en))):
     (OUT / name).write_text(fn(), encoding="utf-8")
     print("wrote", OUT / name)
