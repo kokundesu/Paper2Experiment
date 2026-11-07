@@ -5,6 +5,7 @@
     p2e eval runs/<run_dir>            # re-score a finished run
     p2e table                          # summary of all runs
     p2e serve                          # web UI (live workflow view + workflow comparison)
+    p2e demo serve                     # demo UI: a user's prompt -> spec -> workflow A/B/D, live agent graph
     p2e corebench overview             # CORE-Bench v1.1 tasks and how our tolerance grades them
     p2e corebench grade <capsule> <report.json>
     p2e corebench export --split dev|test [--languages Python R] [--vision]   # spec.yaml + case.yaml per runnable task
@@ -213,6 +214,17 @@ def cmd_table(args) -> int:
 def cmd_serve(args) -> int:
     from .web.server import serve
     return serve(args.host, args.port, open_browser=not args.no_browser)
+
+
+def cmd_demo(args) -> int:
+    if args.action == "serve":
+        from .web.demo_server import serve
+        return serve(args.host, args.port)
+    from . import demo
+    if not args.spec or args.workflow not in WORKFLOWS:
+        print("error: demo run needs a spec file and --workflow", file=sys.stderr)
+        return 2
+    return demo.run(Path(args.spec), args.workflow, args.model)
 
 
 def cmd_corebench(args) -> int:
@@ -654,6 +666,14 @@ def main(argv: list[str] | None = None) -> int:
     s.add_argument("--port", type=int, default=8765)
     s.add_argument("--no-browser", action="store_true", help="do not open the page in the default browser")
     s.set_defaults(fn=cmd_serve)
+    dm = sub.add_parser("demo", help="demo UI: reproduce what a user's prompt asks for (serve), or run one spec")
+    dm.add_argument("action", choices=["serve", "run"])
+    dm.add_argument("spec", nargs="?", help="run: a ReproSpec JSON file (origin.source=user)")
+    dm.add_argument("--workflow", default="single")
+    dm.add_argument("--model", default=DEFAULT_MODEL)
+    dm.add_argument("--host", default="127.0.0.1")
+    dm.add_argument("--port", type=int, default=8780)
+    dm.set_defaults(fn=cmd_demo)
     cb = sub.add_parser("corebench", help="CORE-Bench v1.1: task overview, or grade a report with our tolerance")
     cb.add_argument("action", choices=["overview", "grade", "export", "download", "inspect", "run", "report"])
     cb.add_argument("--split", choices=["dev", "test"], default="dev",

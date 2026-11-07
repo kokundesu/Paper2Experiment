@@ -513,6 +513,9 @@ def finish(ctx: RunContext, started: float, error: str | None = None, answers: A
            data: Path = DATA, extra: dict | None = None) -> CapsuleEval:
     """Score a finished capsule run and write eval.json and summary.json (the counterpart of runner.finish)."""
     spec: ReproSpec = ctx.spec
+    if spec.origin.source == "user":  # a demo request: no ground truth to grade against
+        from . import demo
+        return demo.finish(ctx, started, error, answers=answers, extra=extra)
     if ctx.split == "dev":
         data = DEV_DATA
     entry = next(e for e in load_tasks(data) if e["capsule_id"] == spec.code.capsule)

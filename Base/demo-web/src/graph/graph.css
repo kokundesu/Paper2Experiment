@@ -1,0 +1,628 @@
+/* Agent graph: tokens, top bar, connectors and cards copied from agents_multi_agent_orchestration_graph.html.
+   Page chrome (body, stage, simulation dock) is left out; the dark theme hangs on .dark like AgentRun's. */
+    :root {
+      --bg-canvas: #f9f9f9;
+      --bg-card: #ffffff;
+      --bg-card-stopped: #fcfcfc;
+      --border-card: #ebebeb;
+      --border-card-stopped: #f0f0f0;
+      --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.02);
+      --border-avatar: #ececec;
+      --bg-avatar: #ffffff;
+      --text-primary: #171717;
+      --text-secondary: #767676;
+      --text-task: #4a4a4a;
+      --text-stopped: #8c8c8c;
+      --line-active: #7cadea;
+      --line-stopped: #dcdcdc;
+      --circle-fill: #ffffff;
+
+      /* Status Badges - Light */
+      --badge-running-bg: #e3f2fd;
+      --badge-running-text: #155894;
+      --badge-running-track: #b6dbf8;
+
+      --badge-done-bg: #e2f6e6;
+      --badge-done-text: #1c7935;
+
+      --badge-needs-bg: #fdead1;
+      --badge-needs-text: #903207;
+
+      --badge-failed-bg: #fbe4e3;
+      --badge-failed-text: #9b221e;
+
+      --badge-stopped-bg: #f2f2f2;
+      --badge-stopped-text: #808080;
+
+      /* Topbar Pills - Light */
+      --pill-running-text: #1664c0;
+      --pill-needs-bg: #f8e7cd;
+      --pill-needs-text: #903207;
+      --pill-failed-bg: #f5dedd;
+      --pill-failed-text: #c01e1a;
+
+      /* Collapse button */
+      --btn-collapse-hover: #eeeeee;
+      --btn-collapse-active: #eaeaea;
+
+      /* Popover */
+      --popover-bg: #ffffff;
+      --popover-border: #ebebeb;
+      --popover-shadow: 0 14px 36px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04);
+      --btn-dismiss-bg: #ffffff;
+      --btn-dismiss-border: #e5e5e5;
+      --btn-dismiss-text: #171717;
+      --btn-retry-bg: #222222;
+      --btn-retry-text: #ffffff;
+    }
+
+    .dark {
+      --bg-canvas: #1b1a1d;
+      --bg-card: #19181b;
+      --bg-card-stopped: #18171a;
+      --border-card: #262529;
+      --border-card-stopped: #222125;
+      --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.25);
+      --border-avatar: #2b2a2f;
+      --bg-avatar: #19181b;
+      --text-primary: #f2f2f3;
+      --text-secondary: #8a898e;
+      --text-task: #b8b7bc;
+      --text-stopped: #6e6d72;
+      --line-active: #4c82c8;
+      --line-stopped: #323136;
+      --circle-fill: #1b1a1d;
+
+      /* Status Badges - Dark */
+      --badge-running-bg: #152a46;
+      --badge-running-text: #6bb1f7;
+      --badge-running-track: #234775;
+
+      --badge-done-bg: #173220;
+      --badge-done-text: #4fe08f;
+
+      --badge-needs-bg: #382411;
+      --badge-needs-text: #f59e0b;
+
+      --badge-failed-bg: #3a1a1a;
+      --badge-failed-text: #f87171;
+
+      --badge-stopped-bg: #242326;
+      --badge-stopped-text: #7e7d82;
+
+      /* Topbar Pills - Dark */
+      --pill-running-text: #68aef8;
+      --pill-needs-bg: #382411;
+      --pill-needs-text: #f59e0b;
+      --pill-failed-bg: #3a1a1a;
+      --pill-failed-text: #f87171;
+
+      /* Collapse button */
+      --btn-collapse-hover: #26252a;
+      --btn-collapse-active: #2c2b31;
+
+      /* Popover */
+      --popover-bg: #201f23;
+      --popover-border: #313036;
+      --popover-shadow: 0 16px 40px rgba(0, 0, 0, 0.48), 0 2px 10px rgba(0, 0, 0, 0.3);
+      --btn-dismiss-bg: #27262b;
+      --btn-dismiss-border: #38373e;
+      --btn-dismiss-text: #f2f2f3;
+      --btn-retry-bg: #f2f2f3;
+      --btn-retry-text: #171717;
+    }
+
+
+    /* Top Header Bar */
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 36px;
+      margin-bottom: 18px;
+      position: relative;
+      z-index: 30;
+    }
+
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .agents-title {
+      font-size: 16.5px;
+      font-weight: 600;
+      letter-spacing: -0.015em;
+      color: var(--text-primary);
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-size: 15.5px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .stat-agents {
+      color: var(--text-secondary);
+      font-weight: 400;
+      letter-spacing: -0.01em;
+    }
+
+    .stat-running {
+      color: var(--pill-running-text);
+      font-weight: 500;
+      letter-spacing: -0.01em;
+      transition: opacity 0.2s ease;
+    }
+
+    .top-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 10px;
+      border-radius: 7px;
+      font-size: 14.5px;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      font-family: inherit;
+      letter-spacing: -0.01em;
+      transition: transform 0.12s ease, filter 0.15s ease;
+    }
+
+    .top-pill:hover {
+      filter: brightness(0.97);
+    }
+
+    .top-pill:active {
+      transform: scale(0.98);
+    }
+
+    .top-pill.needs-pill {
+      background-color: var(--pill-needs-bg);
+      color: var(--pill-needs-text);
+    }
+
+    .top-pill.failed-pill {
+      background-color: var(--pill-failed-bg);
+      color: var(--pill-failed-text);
+    }
+
+    .stat-total-cost {
+      font-weight: 500;
+      color: var(--text-primary);
+      letter-spacing: -0.01em;
+      min-width: 44px;
+      text-align: right;
+    }
+
+    .stat-total-cost .dollar-sign {
+      color: var(--text-secondary);
+      font-weight: 400;
+      margin-right: 0.5px;
+    }
+
+    /* Floating Popover Alert (Tester Failed / Writer Needs You) */
+    .alert-popover {
+      position: absolute;
+      top: 44px;
+      right: 0px;
+      width: 452px;
+      background: var(--popover-bg);
+      border: 1px solid var(--popover-border);
+      border-radius: 14px;
+      box-shadow: var(--popover-shadow);
+      padding: 18px 20px 16px 18px;
+      z-index: 50;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(-6px) scale(0.985);
+      transform-origin: top right;
+      transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1), transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .alert-popover.open {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0) scale(1);
+    }
+
+    .popover-header {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+    }
+
+    .popover-icon-box {
+      width: 26px;
+      height: 26px;
+      border-radius: 7px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .popover-icon-box.failed {
+      background: var(--badge-failed-bg);
+      color: var(--badge-failed-text);
+    }
+
+    .popover-icon-box.needs {
+      background: var(--badge-needs-bg);
+      color: var(--badge-needs-text);
+    }
+
+    .popover-title-row {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    .popover-agent-name {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-primary);
+      letter-spacing: -0.015em;
+    }
+
+    .popover-agent-task {
+      font-size: 15.5px;
+      color: var(--text-secondary);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      letter-spacing: -0.01em;
+    }
+
+    .popover-message {
+      margin-top: 8px;
+      margin-left: 37px;
+      font-size: 16px;
+      line-height: 1.44;
+      color: var(--text-task);
+      letter-spacing: -0.012em;
+    }
+
+    .popover-actions {
+      margin-top: 15px;
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    .popover-btn {
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 500;
+      padding: 8px 16px;
+      border-radius: 9px;
+      cursor: pointer;
+      letter-spacing: -0.01em;
+      transition: transform 0.1s ease, opacity 0.15s ease;
+    }
+
+    .popover-btn:active {
+      transform: scale(0.97);
+    }
+
+    .popover-btn-dismiss {
+      background: var(--btn-dismiss-bg);
+      border: 1px solid var(--btn-dismiss-border);
+      color: var(--btn-dismiss-text);
+    }
+
+    .popover-btn-primary {
+      background: var(--btn-retry-bg);
+      border: 1px solid transparent;
+      color: var(--btn-retry-text);
+    }
+
+    /* Graph Canvas Area: sized from the layout in OrchestrationGraph */
+    .graph-canvas {
+      position: relative;
+    }
+
+    .connections-svg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+      overflow: visible;
+    }
+
+    .conn-path {
+      fill: none;
+      stroke: var(--line-active);
+      stroke-width: 1.85px;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      transition: d 0.35s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.28s ease, stroke 0.3s ease;
+    }
+
+    .conn-path.stopped-branch {
+      stroke: var(--line-stopped);
+    }
+
+    .conn-node-circle {
+      fill: var(--circle-fill);
+      stroke: var(--line-active);
+      stroke-width: 1.85px;
+      transition: cx 0.35s cubic-bezier(0.22, 1, 0.36, 1), cy 0.35s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.28s ease, fill 0.35s ease, stroke 0.35s ease;
+    }
+
+    /* Agent Card */
+    .agent-card {
+      position: absolute;
+      width: 324px;
+      height: 168px;
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-card);
+      border-radius: 14px;
+      padding: 15px 16px 14px 16px;
+      box-shadow: var(--shadow-card);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      z-index: 2;
+      transition:
+        left 0.42s cubic-bezier(0.22, 1, 0.36, 1),
+        top 0.42s cubic-bezier(0.22, 1, 0.36, 1),
+        opacity 0.32s cubic-bezier(0.22, 1, 0.36, 1),
+        transform 0.32s cubic-bezier(0.22, 1, 0.36, 1),
+        background-color 0.35s ease,
+        border-color 0.35s ease;
+    }
+
+    .agent-card.hidden-card {
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(-10px) scale(0.97);
+    }
+
+    .agent-card.collapsed-child {
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(-12px) scale(0.97);
+    }
+
+    .agent-card.status-stopped {
+      background-color: var(--bg-card-stopped);
+      border-color: var(--border-card-stopped);
+    }
+
+    /* Card Top Row */
+    .card-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .agent-identity {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+    }
+
+    .model-avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 9px;
+      border: 1px solid var(--border-avatar);
+      background-color: var(--bg-avatar);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: opacity 0.25s ease, border-color 0.35s ease, background-color 0.35s ease;
+    }
+
+    .status-stopped .model-avatar {
+      opacity: 0.52;
+    }
+
+    .agent-titles {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+
+    .agent-role {
+      font-size: 16px;
+      font-weight: 600;
+      line-height: 1.22;
+      letter-spacing: -0.016em;
+      color: var(--text-primary);
+      transition: color 0.25s ease;
+    }
+
+    .status-stopped .agent-role {
+      color: var(--text-stopped);
+      font-weight: 500;
+    }
+
+    .agent-model {
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 1.2;
+      letter-spacing: -0.01em;
+      color: var(--text-secondary);
+      transition: color 0.25s ease;
+    }
+
+    .status-stopped .agent-model {
+      color: var(--text-stopped);
+      opacity: 0.85;
+    }
+
+    /* Status Badge */
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5.5px;
+      padding: 4px 9px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 500;
+      line-height: 1.2;
+      letter-spacing: -0.01em;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: background-color 0.25s ease, color 0.25s ease, transform 0.1s ease;
+    }
+
+    .status-badge:active {
+      transform: scale(0.96);
+    }
+
+    .status-badge.running {
+      background-color: var(--badge-running-bg);
+      color: var(--badge-running-text);
+    }
+
+    .status-badge.done {
+      background-color: var(--badge-done-bg);
+      color: var(--badge-done-text);
+    }
+
+    .status-badge.needs-you {
+      background-color: var(--badge-needs-bg);
+      color: var(--badge-needs-text);
+    }
+
+    .status-badge.failed {
+      background-color: var(--badge-failed-bg);
+      color: var(--badge-failed-text);
+    }
+
+    .status-badge.stopped {
+      background-color: var(--badge-stopped-bg);
+      color: var(--badge-stopped-text);
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .spinner-svg {
+      animation: spin 1s linear infinite;
+    }
+
+    /* Card Middle Task Row (Inline overlapping tool badges + wrapping text) */
+    .card-task {
+      font-size: 16px;
+      line-height: 1.42;
+      letter-spacing: -0.014em;
+      color: var(--text-task);
+      margin-top: 1px;
+      transition: color 0.25s ease;
+    }
+
+    .status-stopped .card-task {
+      color: var(--text-stopped);
+    }
+
+    .tool-stack {
+      display: inline-flex;
+      align-items: center;
+      vertical-align: -5px;
+      margin-right: 7px;
+    }
+
+    .tool-badge {
+      width: 22px;
+      height: 22px;
+      border-radius: 6px;
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-avatar);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-left: -3px;
+      position: relative;
+      box-shadow: 0 1px 1px rgba(0,0,0,0.03);
+      transition: background-color 0.35s ease, border-color 0.35s ease, opacity 0.25s ease;
+    }
+
+    .tool-badge:first-child {
+      margin-left: 0;
+    }
+
+    .status-stopped .tool-badge {
+      opacity: 0.52;
+    }
+
+    /* Card Bottom Meta Row */
+    .card-bottom {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 24px;
+      font-size: 14.5px;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -0.01em;
+    }
+
+    .card-metrics {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .metric-cost {
+      font-weight: 500;
+      color: var(--text-primary);
+      transition: color 0.25s ease;
+    }
+
+    .status-stopped .metric-cost {
+      color: var(--text-stopped);
+    }
+
+    .metric-dot {
+      color: var(--text-secondary);
+      opacity: 0.7;
+    }
+
+    .metric-time {
+      color: var(--text-secondary);
+      font-weight: 400;
+    }
+
+    .status-stopped .metric-time {
+      color: var(--text-stopped);
+    }
+
+    /* Collapse / Expand Children Button */
+    .collapse-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 8px;
+      border-radius: 6px;
+      border: none;
+      background: transparent;
+      color: var(--text-secondary);
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 0.15s ease, color 0.15s ease;
+    }
+
+    .collapse-btn:hover {
+      background-color: var(--btn-collapse-hover);
+      color: var(--text-primary);
+    }
+
+    .collapse-btn.is-collapsed {
+      background-color: var(--btn-collapse-active);
+      color: var(--text-primary);
+    }

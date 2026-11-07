@@ -13,3 +13,5 @@ Base/benchmark/corebench_v1_train/capsules/
 .pytest_cache/
 *.tar.gz
 Base/benchmark/v4/*/paper/
+node_modules/
+Base/demo-web/dist/

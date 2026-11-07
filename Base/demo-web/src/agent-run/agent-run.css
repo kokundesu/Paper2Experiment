@@ -1,0 +1,148 @@
+/* 对话里 agent 的运行面板（agent-run.tsx），尺寸、颜色、动效照 agent-run-widget.html */
+.arp{
+ --arp-bg:#fff;--arp-ring:rgba(15,23,42,.07);
+ --arp-shadow:0 18px 42px -8px rgba(15,23,42,.09),0 4px 12px -2px rgba(15,23,42,.05),0 0 0 1px var(--arp-ring);
+ --arp-text:#111827;--arp-done:#1f2937;--arp-active:#6b7280;--arp-muted:#9ca3af;--arp-subtle:#64748b;
+ --arp-coral:#d97757;--arp-badge:#fff5f0;--arp-spin:#111827;
+ --arp-blue:#3b82f6;--arp-track:#e5e7eb;--arp-green:#16a34a;--arp-green-bg:#f0fdf4;--arp-red:#dc2626;--arp-red-bg:#fef2f2;
+ --arp-btn:#f8fafc;--arp-btn-hover:#f1f5f9;--arp-btn-border:rgba(15,23,42,.1);
+ --arp-shimmer-a:#4b5563;--arp-shimmer-b:#9ca3af;
+ position:relative;width:min(100%,420px);margin:12px 0;padding:12px 14px 13px;border-radius:20px;background:var(--arp-bg);box-shadow:var(--arp-shadow);
+ color:var(--arp-text);overflow:hidden;
+ transition:width .42s cubic-bezier(.22,1,.36,1),border-radius .42s cubic-bezier(.22,1,.36,1),padding .42s cubic-bezier(.22,1,.36,1),box-shadow .3s ease;
+}
+.dark .arp{
+ --arp-bg:#262626;--arp-ring:rgba(255,255,255,.09);
+ --arp-shadow:0 18px 42px -10px rgba(0,0,0,.5),0 0 0 1px var(--arp-ring);
+ --arp-text:#f3f4f6;--arp-done:#e5e7eb;--arp-active:#a3a3a3;--arp-muted:#8a8a8a;--arp-subtle:#a3a3a3;
+ --arp-badge:#3a2a24;--arp-spin:#f3f4f6;--arp-track:#3f3f46;--arp-green-bg:#14301f;--arp-red-bg:#3a1d1d;
+ --arp-btn:#2f2f2f;--arp-btn-hover:#3a3a3a;--arp-btn-border:rgba(255,255,255,.12);
+ --arp-shimmer-a:#d4d4d4;--arp-shimmer-b:#737373;
+}
+.arp.is-collapsed{width:min(100%,300px);border-radius:999px;padding:7px 13px 7px 7px;cursor:pointer}
+.arp.is-collapsed:hover{box-shadow:0 20px 44px -8px rgba(15,23,42,.13),0 4px 14px -2px rgba(15,23,42,.07),0 0 0 1px rgba(15,23,42,.1)}
+.arp.is-collapsed:focus-visible{outline:2px solid var(--arp-blue);outline-offset:2px}
+
+/* ---------- 顶栏 ---------- */
+.arp-head{display:flex;align-items:center;gap:9px;height:24px;position:relative}
+.arp:not(.is-collapsed):not(.is-running):not(.is-approval) .arp-head{cursor:pointer}
+.arp-badge{position:relative;flex:none;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--arp-badge);transition:background .3s}
+.arp-ring{position:absolute;inset:0;width:24px;height:24px;pointer-events:none}
+.arp-ring-track{fill:none;stroke:rgba(15,23,42,.08);stroke-width:1.6}
+.dark .arp-ring-track{stroke:rgba(255,255,255,.1)}
+.arp-ring-spin{fill:none;stroke:var(--arp-spin);stroke-width:1.75;stroke-linecap:round;stroke-dasharray:22 48;transform-origin:12px 12px;animation:arp-spin 1.15s linear infinite;transition:opacity .25s}
+.arp.is-approval .arp-ring-spin,.arp.is-done .arp-ring-spin,.arp.is-done .arp-ring-track,.arp.is-failed .arp-ring-spin,.arp.is-failed .arp-ring-track{opacity:0}
+@keyframes arp-spin{to{transform:rotate(360deg)}}
+.arp-badge-icon{display:flex;align-items:center;justify-content:center;width:14px;height:14px;color:var(--arp-coral);transition:opacity .25s,transform .3s cubic-bezier(.22,1,.36,1)}
+.arp-badge-icon svg{width:13px;height:13px}
+.arp-badge-icon .alex-face{width:16px!important;height:16px!important}
+.arp.is-done .arp-badge-icon,.arp.is-failed .arp-badge-icon{opacity:0;transform:scale(.5)}
+.arp-dot{position:absolute;top:-1px;right:-1px;width:7px;height:7px;border-radius:50%;background:var(--arp-blue);box-shadow:0 0 0 1.75px var(--arp-bg);opacity:0;transform:scale(.4);transition:opacity .25s,transform .3s cubic-bezier(.34,1.56,.64,1);pointer-events:none}
+.arp.is-approval .arp-dot{opacity:1;transform:scale(1)}
+.arp-check{position:absolute;inset:0;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--arp-green-bg);border:1.6px solid var(--arp-green);color:var(--arp-green);opacity:0;transform:scale(.6);transition:opacity .28s,transform .34s cubic-bezier(.34,1.56,.64,1);pointer-events:none}
+.arp.is-failed .arp-check{background:var(--arp-red-bg);border-color:var(--arp-red);color:var(--arp-red)}
+.arp.is-done .arp-check,.arp.is-failed .arp-check{opacity:1;transform:scale(1)}
+
+.arp-title{flex:1;min-width:0;height:22px;position:relative;overflow:hidden;display:flex;align-items:center}
+.arp-title-item{position:absolute;left:0;right:0;display:flex;align-items:center;gap:6px;font-size:13.5px;font-weight:500;letter-spacing:-.012em;color:var(--arp-active);white-space:nowrap;min-width:0}
+.arp-title-item.is-primary{color:var(--arp-text);font-weight:550}
+.arp-title-icon{flex:none;width:15px;height:15px;display:inline-flex;align-items:center;justify-content:center;color:var(--arp-subtle)}
+.arp-title-icon svg{width:14px;height:14px}
+.arp-title-text{min-width:0;overflow:hidden;text-overflow:ellipsis}
+.arp-shimmer{background:linear-gradient(90deg,var(--arp-shimmer-a) 0%,var(--arp-shimmer-a) 35%,var(--arp-shimmer-b) 50%,var(--arp-shimmer-a) 65%,var(--arp-shimmer-a) 100%);background-size:220% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:arp-shimmer 2.4s infinite linear}
+@keyframes arp-shimmer{0%{background-position:100% 0}100%{background-position:-100% 0}}
+.arp-timer{flex:none;font-size:13px;font-weight:500;font-variant-numeric:tabular-nums;letter-spacing:-.01em;color:var(--arp-muted)}
+
+/* ---------- 展开的部分：用 grid 0fr ↔ 1fr 做高度过渡 ---------- */
+.arp-body-wrap{display:grid;grid-template-rows:1fr;transition:grid-template-rows .42s cubic-bezier(.22,1,.36,1)}
+.arp-body{min-height:0;overflow:hidden;padding-top:10px;opacity:1;transform:none;transition:opacity .28s ease,transform .36s cubic-bezier(.22,1,.36,1),padding-top .36s cubic-bezier(.22,1,.36,1)}
+.arp.is-collapsed .arp-body-wrap{grid-template-rows:0fr}
+.arp.is-collapsed .arp-body{opacity:0;transform:translateY(-6px);padding-top:0;pointer-events:none}
+
+.arp-meta{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:11.5px;font-weight:500;color:var(--arp-muted);letter-spacing:-.005em;margin-bottom:6px}
+.arp-meta-left{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.arp-counter{flex:none;font-variant-numeric:tabular-nums}
+.arp-segments{display:grid;gap:3.5px;margin-bottom:10px}
+.arp-seg{position:relative;height:2.5px;border-radius:99px;background:var(--arp-track);overflow:hidden}
+.arp-seg>i{position:absolute;inset:0 auto 0 0;background:var(--arp-blue);border-radius:99px;transition:width .3s ease}
+.arp-seg.is-failed>i{background:var(--arp-red)}
+.arp-seg>b{position:absolute;inset:0;width:40%;border-radius:99px;background:linear-gradient(90deg,transparent,var(--arp-blue),transparent);animation:arp-seg-run 1.4s ease-in-out infinite}
+@keyframes arp-seg-run{0%{transform:translateX(-100%)}100%{transform:translateX(250%)}}
+
+/* ---------- 步骤列表：一行 26px，最多显示 5 行，可以滚 ---------- */
+.arp-steps{overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none;margin:0 -6px;padding:0 6px}
+.arp-steps::-webkit-scrollbar{display:none}
+.arp-row{display:flex;align-items:center;gap:8px;height:26px;margin:0 -6px;padding:0 6px;border-radius:8px;font-size:13px;letter-spacing:-.01em;cursor:default;outline:none;animation:arp-row-in .32s cubic-bezier(.22,1,.36,1);transition:background .15s}
+.arp-row:hover,.arp-row:focus-visible,.arp-row[data-state=open]{background:color-mix(in oklab,var(--arp-text) 5%,transparent)}
+@keyframes arp-row-in{from{opacity:0;transform:translateY(8px)}}
+.arp-row-icon{flex:none;width:15px;height:15px;display:flex;align-items:center;justify-content:center;color:var(--arp-subtle)}
+.arp-row-icon svg{width:14px;height:14px}
+.arp-row-label{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:460;color:var(--arp-active)}
+.arp-row.is-done .arp-row-label{color:var(--arp-done);font-weight:480}
+.arp-row-summary{color:var(--arp-muted);font-weight:450}
+.arp-row.is-awaiting_approval .arp-row-icon{color:var(--arp-blue)}
+.arp-row.is-awaiting_approval .arp-row-label{color:var(--arp-text);font-weight:520}
+.arp-row.is-running .arp-row-label{background:linear-gradient(90deg,var(--arp-shimmer-a) 0%,var(--arp-shimmer-a) 35%,var(--arp-shimmer-b) 50%,var(--arp-shimmer-a) 65%,var(--arp-shimmer-a) 100%);background-size:220% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:arp-shimmer 2.4s infinite linear}
+.arp-row.is-error .arp-row-icon,.arp-row.is-error .arp-row-mark{color:var(--arp-red)}
+.arp-row.is-denied .arp-row-label{color:var(--arp-muted);text-decoration:line-through;text-decoration-color:color-mix(in oklab,var(--arp-muted) 60%,transparent)}
+.arp-row-mark{flex:none;color:var(--arp-muted)}
+.arp-row-time{flex:none;font-size:12px;font-weight:480;font-variant-numeric:tabular-nums;color:var(--arp-muted)}
+
+/* ---------- 底栏 ---------- */
+.arp-foot{display:flex;align-items:center;gap:7px;margin-top:11px;min-height:30px}
+.arp-foot-right{margin-left:auto;display:flex;align-items:center;gap:6px;min-width:0;flex-wrap:wrap;justify-content:flex-end}
+.arp-btn,.arp-foot-right>a,.arp-foot-right>button{height:30px;padding:0 12px;border-radius:999px;border:1px solid var(--arp-btn-border);background:var(--arp-btn);color:var(--arp-done);font-size:12.5px;font-weight:540;letter-spacing:-.01em;display:inline-flex;align-items:center;gap:6px;cursor:pointer;text-decoration:none;transition:background .16s,border-color .16s,transform .12s}
+.arp-btn:hover,.arp-foot-right>a:hover,.arp-foot-right>button:hover{background:var(--arp-btn-hover)}
+.arp-btn:active,.arp-foot-right>a:active,.arp-foot-right>button:active{transform:scale(.97)}
+.arp-foot-right .arp-foot-note{font-size:12px;color:var(--arp-muted);display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+
+/* 步骤列表下面的附加内容（Alex 的报告） */
+.arp-extra{margin-top:10px;padding-top:10px;border-top:1px solid color-mix(in oklab,var(--arp-text) 8%,transparent)}
+.arp-extra-label{font-size:11.5px;font-weight:550;color:var(--arp-muted);margin-bottom:4px}
+.arp-extra-body{max-height:320px;overflow-y:auto;font-size:13.5px}
+
+/* ---------- 悬停一步的详情卡 ---------- */
+.arp-detail{
+ --d-bg:#fff;--d-text:#111827;--d-muted:#6b7280;--d-border:rgba(15,23,42,.09);--d-code:#f1f5f9;
+ z-index:80;width:min(340px,calc(100vw - 24px));max-height:min(420px,calc(100vh - 24px));overflow-y:auto;padding:12px 13px;border-radius:14px;background:var(--d-bg);color:var(--d-text);
+ border:1px solid var(--d-border);box-shadow:0 18px 40px -12px rgba(15,23,42,.22),0 4px 12px -4px rgba(15,23,42,.08);font-size:12.5px;line-height:1.5;
+ animation:arp-detail-in .16s ease-out;
+}
+.dark .arp-detail{--d-bg:#262626;--d-text:#f3f4f6;--d-muted:#a3a3a3;--d-border:rgba(255,255,255,.1);--d-code:#333}
+@keyframes arp-detail-in{from{opacity:0;transform:translateY(3px) scale(.98)}}
+.arp-detail-head{display:flex;align-items:center;gap:7px;margin-bottom:8px}
+.arp-detail-icon{display:inline-flex;color:var(--d-muted)}
+.arp-detail-icon svg{width:14px;height:14px}
+.arp-detail-head b{font-size:13px;font-weight:600}
+.arp-detail-head code{margin-left:auto;font-size:11px;color:var(--d-muted);font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+.arp-detail dl{display:grid;grid-template-columns:auto 1fr;gap:4px 10px;margin:0}
+.arp-detail dt{color:var(--d-muted)}
+.arp-detail dd{margin:0;min-width:0;overflow-wrap:anywhere;white-space:pre-wrap}
+.arp-detail dd.is-error{color:#dc2626}
+.arp-detail dd.is-awaiting_approval{color:#2563eb}
+.arp-detail-args{margin-top:9px;padding-top:9px;border-top:1px solid var(--d-border)}
+.arp-detail-label{color:var(--d-muted);margin-bottom:4px}
+.arp-arg{display:grid;grid-template-columns:auto 1fr;gap:8px;align-items:baseline;margin-top:3px}
+.arp-arg span{color:var(--d-muted);font-size:11.5px}
+.arp-arg code{min-width:0;padding:2px 6px;border-radius:6px;background:var(--d-code);font-size:11.5px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;white-space:pre-wrap;overflow-wrap:anywhere;max-height:120px;overflow-y:auto}
+.arp-detail-link{margin-top:10px;width:100%;height:30px;border-radius:9px;border:1px solid var(--d-border);background:transparent;color:var(--d-text);font-size:12.5px;cursor:pointer}
+.arp-detail-link:hover{background:var(--d-code)}
+
+@media (prefers-reduced-motion:reduce){.arp,.arp *{animation-duration:0s!important;transition-duration:0s!important}}
+
+/* 面板里的审批（某一步执行前要用户批准） */
+.arp-approval{margin-top:10px;padding:11px 12px;border-radius:14px;background:color-mix(in oklab,#3b82f6 6%,transparent);border:1px solid color-mix(in oklab,#3b82f6 22%,transparent)}
+.arp-approval-title{font-size:13px;font-weight:600;color:var(--foreground)}
+.arp-approval-desc{margin-top:3px;font-size:12px;line-height:1.55;color:var(--muted-foreground);overflow-wrap:anywhere}
+.arp-approval-toggle{display:inline-flex;align-items:center;gap:3px;margin-top:6px;font-size:12px;color:var(--muted-foreground)}
+.arp-approval-toggle:hover{color:var(--foreground)}
+.arp-approval-toggle svg{transition:transform .2s}.arp-approval-toggle svg.is-open{transform:rotate(180deg)}
+.arp-approval-details{margin-top:6px;display:flex;flex-direction:column;gap:6px;max-height:260px;overflow:auto;font-size:12px}
+.arp-approval-details>div{display:grid;grid-template-columns:64px 1fr;gap:8px}
+.arp-approval-details dt{color:var(--muted-foreground)}
+.arp-approval-details dd{margin:0;white-space:pre-wrap;overflow-wrap:anywhere;color:var(--foreground)}
+.arp-approval-actions{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px}
+.arp-btn.is-approve{background:#dbeafe;border-color:rgba(59,130,246,.32);color:#1d4ed8;font-weight:580}
+.arp-btn.is-approve:hover{background:#bfdbfe;border-color:rgba(37,99,235,.45)}
+.dark .arp-btn.is-approve{background:color-mix(in oklab,#3b82f6 28%,transparent);color:#bfdbfe;border-color:color-mix(in oklab,#3b82f6 45%,transparent)}
+.arp-btn:disabled{opacity:.55;pointer-events:none}
