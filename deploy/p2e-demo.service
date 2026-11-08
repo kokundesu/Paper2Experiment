@@ -21,6 +21,10 @@ Environment=P2E_MAMBA_ROOT=/srv/p2e/mamba
 Environment=P2E_DEMO_FIXED_WORKDIR=1
 # Every LLM call of the demo and its runs together: at most this much per calendar month (UTC).
 Environment=P2E_MONTHLY_BUDGET_USD=5
+# At most this many runs at once (6 cores, 12 GB); more wait in line and start by themselves.
+Environment=P2E_DEMO_MAX_RUNS=2
+# The entrance: P2E_DEMO_CODE and P2E_DEMO_CODE_EXPIRES, kept off the repository (deploy.sh writes this file).
+EnvironmentFile=-/etc/p2e-demo.env
 # Files the server and the command user both work on stay group-writable (group p2e-shared on /srv/p2e).
 UMask=0002
 Restart=on-failure

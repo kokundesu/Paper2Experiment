@@ -1,11 +1,9 @@
 {{DOMAIN}} {
 	encode gzip
 
-	# The demo has no accounts of its own and every run spends API credit, so the whole site needs a password.
-	basic_auth {
-		{{AUTH_USER}} {{AUTH_HASH}}
-	}
-
+	# No password here: the demo has its own entrance (a name and an access code, Base/p2e/web/access.py), and every
+	# API call without its session cookie is refused. Caddy replaces any X-Forwarded-For a client sends with the real
+	# address, which the demo uses to limit wrong codes.
 	reverse_proxy 127.0.0.1:8780 {
 		flush_interval -1
 	}

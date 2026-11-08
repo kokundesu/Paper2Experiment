@@ -1,15 +1,31 @@
-import type {ExampleTask, HistoryRun, JobState, Options, PaperValues, Spec, Workdir} from './types';
+import type {AuthState, ExampleTask, HistoryRun, JobState, Options, PaperValues, Presence, Spec, Workdir} from './types';
+
+/** Fired when the server says the session is gone (the access code expired): the gate takes the page back. */
+export const LOCKED_EVENT = 'p2e-locked';
 
 async function call<T>(path: string, body?: unknown): Promise<T> {
   const res = await fetch(path, body === undefined ? undefined : {
     method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(body),
   });
   const data = await res.json().catch(() => ({error: `HTTP ${res.status}`}));
+  if (res.status === 401 && data.error === 'locked') window.dispatchEvent(new Event(LOCKED_EVENT));
   if (!res.ok || data.error) throw new Error(data.error ?? `HTTP ${res.status}`);
   return data as T;
 }
 
+/** The code check answers with a status and a reason, not an error to throw. */
+async function tryCode(code: string, name: string): Promise<{ok: boolean; reason?: 'wrong' | 'too_many' | 'expired' | 'name'; tries_left?: number; retry_after?: number}> {
+  const res = await fetch('/api/auth', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({code, name})});
+  return res.json().catch(() => ({ok: false}));
+}
+
 export const api = {
+  auth: () => call<AuthState>('/api/auth'),
+  tryCode,
+  /** this page is open (id: one per browser); people online, runs running and waiting */
+  presence: (id: string) => call<Presence>('/api/presence', {id}),
+  /** forget this browser's session (to sign in under another name) */
+  logout: () => fetch('/api/logout', {method: 'POST'}),
   options: () => call<Options>('/api/options'),
   examples: () => call<{examples: ExampleTask[]}>('/api/examples'),
   history: () => call<{runs: HistoryRun[]}>('/api/history'),

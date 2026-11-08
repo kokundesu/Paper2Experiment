@@ -42,8 +42,11 @@ export type ExampleTask = {
   case: string; title: string; source: 'corebench' | 'user'; code: string; language: string; questions: number;
   fastest_s: number; workflows: string[]; run: string;
 };
+export type AuthState = {required: boolean; ok: boolean; name: string | null; expired: boolean; expires: string | null};
+export type Presence = {online: number; names: string[]; me: string | null; running: number; queued: number; max_running: number | null};
 export type JobState = {
-  phase: 'preparing' | 'running' | 'done' | 'failed' | 'stopped';
+  phase: 'queued' | 'preparing' | 'running' | 'done' | 'failed' | 'stopped';
+  position?: number; running?: number; max_running?: number | null;  // queued: place in line and the slots ahead
   workflow: string; run?: string; spec?: Spec | null; model?: string; profile?: string; vendor?: string; started?: string;  // spec: null until the run wrote spec.json
   nodes: GraphNode[]; answers: Answer[] | null; cost?: number; now: number; error: string | null;
   summary?: {verdict: string; answered?: number; questions?: number; wall_s: number} | null;

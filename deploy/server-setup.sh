@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # One-time (and re-runnable) setup of the demo on an Ubuntu 24.04 VPS. Run as root on the server:
 #
-#   sudo DOMAIN=<host name> AUTH_PASSWORD='<site password>' bash server-setup.sh   (deploy.sh does this)
+#   sudo DOMAIN=<host name> bash server-setup.sh   (deploy.sh does this, and writes /etc/p2e-demo.env: the access code)
 #
 # It hardens the machine (firewall, fail2ban, automatic security updates), creates the unprivileged user `p2e` that
 # runs the demo server and a second one, `p2e-run`, that runs every command the agents issue: the code of arbitrary
@@ -12,8 +12,6 @@
 set -euo pipefail
 
 DOMAIN=${DOMAIN:?set DOMAIN, e.g. 51-79-156-230.sslip.io}
-AUTH_USER=${AUTH_USER:-demo}
-AUTH_PASSWORD=${AUTH_PASSWORD:?set AUTH_PASSWORD, the password of the site}
 REPO_URL=${REPO_URL:-https://github.com/kokundesu/Paper2Experiment.git}
 BRANCH=${BRANCH:-main}
 APP_USER=p2e
@@ -108,10 +106,9 @@ systemctl enable p2e-demo >/dev/null
 systemctl restart p2e-demo
 
 echo "== caddy site $DOMAIN"
-AUTH_HASH=$(caddy hash-password --plaintext "$AUTH_PASSWORD")
-sed -e "s|{{DOMAIN}}|$DOMAIN|" -e "s|{{AUTH_USER}}|$AUTH_USER|" -e "s|{{AUTH_HASH}}|$AUTH_HASH|" \
+sed -e "s|{{DOMAIN}}|$DOMAIN|" \
   "$HERE/Caddyfile.template" > /etc/caddy/Caddyfile
 caddy validate --config /etc/caddy/Caddyfile --adapter caddyfile >/dev/null
 systemctl reload caddy || systemctl restart caddy
 
-echo "== done: https://${DOMAIN%%,*} (user $AUTH_USER)"
+echo "== done: https://${DOMAIN%%,*}"

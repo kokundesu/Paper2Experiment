@@ -4,7 +4,7 @@
 // results against the paper. The message box (Composer) picks the workflow, the model, the run folder and the example
 // tasks; the top bar reopens the user's earlier runs. AI messages carry the model vendor's logo, as in Alex.
 import {useCallback, useEffect, useRef, useState, type ReactNode} from 'react';
-import {Check, ChevronDown, FlaskConical, Github, History, Languages, ListChecks, Loader2, Maximize2, Minimize2, Moon, Package, Play, Square, Sun, X} from 'lucide-react';
+import {Check, ChevronDown, Clock, FlaskConical, Github, History, Languages, ListChecks, Loader2, Maximize2, Minimize2, Moon, Package, Play, Square, Sun, X} from 'lucide-react';
 import {api} from './api';
 import {AgentRun, type RunOutcome} from './agent-run/agent-run';
 import {OrchestrationGraph} from './graph/OrchestrationGraph';
@@ -16,7 +16,7 @@ import {ChangelogPage} from './Changelog';
 import {ProviderGlyph} from './alex/modules/chat/components/ui/model-picker';
 import {Loader} from './alex/modules/chat/components/ui/loader';
 import {ShiningText} from './alex/modules/chat/components/ui/shining-text';
-import type {Answer, Comparison, ExampleTask, GraphNode, HistoryRun, JobState, Options, PaperValues, Spec, Workdir} from './types';
+import type {Answer, Comparison, ExampleTask, GraphNode, HistoryRun, JobState, Options, PaperValues, Presence, Spec, Workdir} from './types';
 
 const PROVENANCE: Record<string, [string, string]> = {produced: ['Produced by this run', '由本次运行产生'],
   typed: ['Only in text the agent wrote itself', '只出现在 agent 自己写的文字里'],
@@ -83,7 +83,7 @@ function revealTimeline(spec: Spec, paper: PaperValues) {
   return {chips, task, typeMs, q0, qStep, r0, rStep, note, end: note + 350};
 }
 
-const isLive = (job: JobState | null) => !!job && (job.phase === 'running' || job.phase === 'preparing');
+const isLive = (job: JobState | null) => !!job && (job.phase === 'running' || job.phase === 'preparing' || job.phase === 'queued');
 export const minutes = (s: number, lang: Lang = 'en') => s < 60 ? `${Math.round(s)} ${lang === 'zh' ? '秒' : 's'}`
   : `${(s / 60).toFixed(s < 600 ? 1 : 0)} ${lang === 'zh' ? '分钟' : 'min'}`;
 const ago = (t: number, lang: Lang) => {
@@ -145,6 +145,57 @@ function HistoryMenu({runs, onOpen, onRefresh}: {runs: HistoryRun[] | null; onOp
   </div>;
 }
 
+/** One id per browser, so several tabs of one person count once. */
+function clientId() {
+  try {
+    let id = localStorage.getItem('p2e-client');
+    if (!id) { id = Math.random().toString(36).slice(2) + Date.now().toString(36); localStorage.setItem('p2e-client', id); }
+    return id;
+  } catch { return 'anonymous'; }
+}
+
+/** People on the site now, runs going and runs waiting: this page says it is here every 15 s and reads the answer. */
+function OnlineStatus() {
+  const {L} = useLang();
+  const [p, setP] = useState<Presence | null>(null);
+  useEffect(() => {
+    const id = clientId();
+    let stop = false;
+    const beat = () => api.presence(id).then(r => { if (!stop) setP(r); }, () => undefined);
+    beat();
+    const t = setInterval(beat, 15000);
+    const onVisible = () => { if (document.visibilityState === 'visible') beat(); };
+    document.addEventListener('visibilitychange', onVisible);
+    return () => { stop = true; clearInterval(t); document.removeEventListener('visibilitychange', onVisible); };
+  }, []);
+  if (!p) return null;
+  const full = p.max_running != null && p.running >= p.max_running;
+  const others = p.online - p.names.length;  // pages open without a name (a server without an access code)
+  const signOut = async () => { await api.logout(); window.location.reload(); };
+  return <Menu wide label={<span className="online-pill">
+    <span className="online-dot"/><b>{p.online}</b><span>{L('online', '在线')}</span>
+    <span className="online-sep"/>
+    <span className={`online-runs${full ? ' is-full' : ''}`}><b>{p.running}</b>{p.max_running != null ? <i>/{p.max_running}</i> : null}<span>{L('running', '运行中')}</span></span>
+    {p.queued > 0 && <><span className="online-sep"/><span className="online-queue"><Clock size={12}/><b>{p.queued}</b><span>{L('queued', '排队')}</span></span></>}
+  </span>}>
+    {close => <>
+      <div className="menu-head">{L(`${p.online} online now`, `当前 ${p.online} 人在线`)}</div>
+      <div className="menu-scroll">
+        {p.names.map(n => <div key={n} className="menu-item online-person"><span className="online-dot"/>
+          <span className="menu-main"><b>{n}</b></span>{n === p.me && <span className="menu-meta">{L('you', '你')}</span>}</div>)}
+        {others > 0 && <div className="menu-item online-person"><span className="online-dot"/>
+          <span className="menu-main"><b>{L(`${others} without a name`, `${others} 位未署名`)}</b></span></div>}
+      </div>
+      <div className="menu-head online-note">{p.max_running != null
+        ? L(`${p.running} of ${p.max_running} run slots busy${p.queued ? `, ${p.queued} waiting` : ''}. A new run waits in line when all are busy and starts by itself.`,
+          `运行名额 ${p.running}/${p.max_running}${p.queued ? `，${p.queued} 个在排队` : ''}。名额用满时新的任务会排队，轮到时自动开始。`)
+        : L(`${p.running} running`, `${p.running} 个运行中`)}</div>
+      {p.me && <button type="button" className="menu-item online-signout" onClick={() => { close(); signOut(); }}>
+        <span className="menu-main"><b>{L(`Sign out (${p.me})`, `退出登录（${p.me}）`)}</b><small>{L('To come back under another name', '可换一个名字重新进入')}</small></span></button>}
+    </>}
+  </Menu>;
+}
+
 /** The language of the whole site, English or Chinese; remembered in this browser. */
 function LanguageMenu() {
   const {lang, setLang} = useLang();
@@ -168,6 +219,7 @@ function TopBar({dark, onTheme, children}: {dark: boolean; onTheme: () => void; 
       <span className="topbar-sub">{L('reproduction demo', '论文复现演示')}</span>
     </div>
     <div className="topbar-right">
+      <OnlineStatus/>
       {children}
       <LanguageMenu/>
       <button type="button" className="icon-btn" onClick={onTheme} aria-label={L('Toggle dark mode', '切换深色模式')}>{dark ? <Sun size={15}/> : <Moon size={15}/>}</button>
@@ -297,7 +349,12 @@ function RunMessage({msg, job, wall, selectedId, onSelect, onStop}: {msg: Extrac
   const elapsed = job.summary && !live ? job.summary.wall_s : job.started ? Math.max(0, (wall - Date.parse(job.started)) / 1000) : 0;
   const provider = job.vendor ?? 'anthropic';
   let status: ReactNode;
-  if (job.phase === 'preparing') status = <><Loader2 size={13} className="spin"/><span>{L('Preparing the workspace…', '正在准备工作目录…')}</span></>;
+  if (job.phase === 'queued') status = <><Clock size={13}/><span>{job.position === 1
+    ? L(`Waiting in line: next to start (${job.running ?? 0} of ${job.max_running ?? '?'} slots busy). It starts by itself.`,
+      `排队中：下一个就轮到你（${job.max_running ?? '?'} 个名额都在使用）。轮到时会自动开始。`)
+    : L(`Waiting in line: ${(job.position ?? 1) - 1} ahead of you. It starts by itself.`,
+      `排队中：前面还有 ${(job.position ?? 1) - 1} 个任务。轮到时会自动开始。`)}</span></>;
+  else if (job.phase === 'preparing') status = <><Loader2 size={13} className="spin"/><span>{L('Preparing the workspace…', '正在准备工作目录…')}</span></>;
   else if (live && c) status = <><span className="now-live"/>{(() => { const I = ROLE_ICONS[c.node.kind]; return <I size={14}/>; })()}
     <span><b>{c.node.role}</b>{c.step ? <> · {c.step.label}{c.step.target ? <code>{c.step.target}</code> : null}</> : L(' · thinking…', ' · 思考中…')}</span></>;
   else if (live) status = <><Loader2 size={13} className="spin"/><span>{job.nodes[0]?.status === 'waiting'

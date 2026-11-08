@@ -13,7 +13,13 @@ subprocess, and the page follows the run through its trace as a graph of agents.
     GET  /api/jobs/<key>                  the run as a graph: nodes (agents, tasks), their steps, answers when done
     POST /api/jobs/<key>/stop             terminate the run's process group
     GET  /api/jobs/<key>/file?path=...    an image or text file of the run's workspace (figures the run made)
+    GET  /api/auth | POST /api/auth {code}   whether an access code is needed / try one (sets the session cookie)
+    POST /api/presence {id}               this page is open; returns who is online, runs running and queued
+    POST /api/logout                      forget this browser's session (to sign in under another name)
     GET  /*                               the built frontend (Base/demo-web, `npm run build`)
+
+On a shared server (P2E_DEMO_CODE set) every other /api/ call needs the session cookie: see access.py. At most
+P2E_DEMO_MAX_RUNS runs go at once; the rest wait in a queue, first come first served.
 """
 from __future__ import annotations
 
@@ -33,6 +39,7 @@ from pathlib import Path
 from urllib.parse import parse_qs, unquote, urlparse
 
 from .. import corebench, demo, spend
+from . import access
 from ..models import load_profiles
 from ..runner import RUNS
 from ..sandbox import PROJECT_ROOT, workspace_root
@@ -106,12 +113,21 @@ def choose_run_folder() -> dict:
     return set_run_folder(r.stdout.strip())
 
 
+def max_runs() -> int | None:
+    """How many runs may go at once (P2E_DEMO_MAX_RUNS); None: no limit, the default on one's own machine."""
+    raw = os.environ.get("P2E_DEMO_MAX_RUNS", "").strip()
+    return max(1, int(raw)) if raw else None
+
+
 class Jobs:
-    """Runs launched from the page: key (spec id + workflow) -> process."""
+    """Runs launched from the page: key (spec id + workflow) -> process, and the runs waiting for a free slot."""
 
     def __init__(self):
         self.procs: dict[str, subprocess.Popen] = {}
+        self.queue: list[tuple[str, list[str], Path]] = []  # (key, command, output file), first in line first
+        self.cancelled: set[str] = set()  # stopped while still in the queue
         self.lock = threading.Lock()
+        threading.Thread(target=self._dispatch_forever, daemon=True).start()
 
     def start(self, spec: ReproSpec, workflow: str, model: str) -> str:
         demo.DRAFTS.mkdir(parents=True, exist_ok=True)
@@ -120,20 +136,57 @@ class Jobs:
         key = f"{spec.id}_{workflow}"
         out = demo.DRAFTS / f"{key}.out"
         cmd = [sys.executable, "-m", "p2e.cli", "demo", "run", str(path), "--workflow", workflow, "--model", model]
-        env = {**os.environ, "P2E_WORKSPACE_ROOT": str(run_folder())}
-        proc = subprocess.Popen(cmd, cwd=RUNS.parent, stdout=out.open("w"), stderr=subprocess.STDOUT,
-                                start_new_session=True, env=env)
         with self.lock:
-            self.procs[key] = proc
+            self.cancelled.discard(key)
+            self.queue.append((key, cmd, out))
+            self._dispatch()
         return key
+
+    def _running(self) -> int:
+        return sum(p.poll() is None for p in self.procs.values())
+
+    def _dispatch(self) -> None:
+        """Start queued runs while there is a free slot (the caller holds the lock)."""
+        limit = max_runs()
+        while self.queue and (limit is None or self._running() < limit):
+            key, cmd, out = self.queue.pop(0)
+            env = {**os.environ, "P2E_WORKSPACE_ROOT": str(run_folder())}
+            self.procs[key] = subprocess.Popen(cmd, cwd=RUNS.parent, stdout=out.open("w"), stderr=subprocess.STDOUT,
+                                               start_new_session=True, env=env)
+
+    def _dispatch_forever(self) -> None:
+        while True:
+            time.sleep(2)
+            with self.lock:
+                self._dispatch()
+
+    def position(self, key: str) -> int | None:
+        """1 for the next run to start, None when the run is not waiting."""
+        with self.lock:
+            return next((i + 1 for i, (k, _, _) in enumerate(self.queue) if k == key), None)
+
+    def was_cancelled(self, key: str) -> bool:
+        with self.lock:
+            return key in self.cancelled
+
+    def counts(self) -> dict:
+        with self.lock:
+            return {"running": self._running(), "queued": len(self.queue), "max_running": max_runs()}
 
     def alive(self, key: str) -> bool | None:
         with self.lock:
+            if any(k == key for k, _, _ in self.queue):
+                return True
             proc = self.procs.get(key)
         return None if proc is None else proc.poll() is None
 
     def stop(self, key: str) -> bool:
         with self.lock:
+            waiting = [q for q in self.queue if q[0] == key]
+            if waiting:
+                self.queue.remove(waiting[0])
+                self.cancelled.add(key)
+                return True
             proc = self.procs.get(key)
         if proc is None or proc.poll() is not None:
             return False
@@ -359,8 +412,13 @@ def build_state(key: str) -> dict:
     """The run as a graph, rebuilt from its trace."""
     workflow = "planner_workers" if key.endswith("planner_workers") else key.rsplit("_", 1)[-1]
     d = run_dir_of(key)
+    if (pos := JOBS.position(key)) is not None:
+        return {"phase": "queued", "position": pos, **JOBS.counts(), "workflow": workflow, "nodes": [],
+                "now": time.time(), "error": None}
     alive = JOBS.alive(key)
     if d is None:
+        if JOBS.was_cancelled(key):
+            return {"phase": "stopped", "workflow": workflow, "nodes": [], "now": time.time(), "error": None}
         return {"phase": "preparing" if alive else "failed", "workflow": workflow, "nodes": [], "now": time.time(),
                 "error": None if alive else _launch_error(key)}
     events = _read_jsonl(d / "trace.jsonl")
@@ -585,27 +643,47 @@ def list_history(limit: int = 50) -> list[dict]:
     return out
 
 
+GUARD = access.Guard()
+PRESENCE = access.Presence()
+
+
 class Handler(BaseHTTPRequestHandler):
     server_version = "p2e-demo/0.1"
 
     def log_message(self, fmt, *args):
         pass
 
-    def _send(self, body: bytes, ctype: str, status: int = 200) -> None:
+    def _address(self) -> str:
+        """The visitor's address: Caddy, in front, puts it last in X-Forwarded-For (and drops what a client sent)."""
+        forwarded = (self.headers.get("X-Forwarded-For") or "").split(",")[-1].strip()
+        return forwarded or self.client_address[0]
+
+    def _locked(self, parts: list[str]) -> bool:
+        """An /api/ call that needs the session cookie and has none (the code check itself is always open)."""
+        return parts[:1] == ["api"] and parts[:2] != ["api", "auth"] and not access.valid_session(self.headers.get("Cookie"))
+
+    def _send(self, body: bytes, ctype: str, status: int = 200, headers: dict | None = None) -> None:
         self.send_response(status)
         self.send_header("Content-Type", ctype)
         self.send_header("Content-Length", str(len(body)))
         self.send_header("Cache-Control", "no-store")
+        for k, v in (headers or {}).items():
+            self.send_header(k, v)
         self.end_headers()
         self.wfile.write(body)
 
-    def _json(self, obj, status: int = 200) -> None:
-        self._send(json.dumps(obj, default=str, ensure_ascii=False).encode(), "application/json; charset=utf-8", status)
+    def _json(self, obj, status: int = 200, headers: dict | None = None) -> None:
+        self._send(json.dumps(obj, default=str, ensure_ascii=False).encode(), "application/json; charset=utf-8", status,
+                   headers)
 
     def do_GET(self):
         url = urlparse(self.path)
         parts = [unquote(p) for p in url.path.split("/") if p]
         try:
+            if parts == ["api", "auth"]:
+                return self._json(access.status(self.headers.get("Cookie")))
+            if self._locked(parts):
+                return self._json({"error": "locked"}, 401)
             if parts == ["api", "options"]:
                 return self._json(options())
             if parts == ["api", "workdir"]:
@@ -656,6 +734,24 @@ class Handler(BaseHTTPRequestHandler):
         except json.JSONDecodeError:
             return self._json({"error": "bad json"}, 400)
         try:
+            if parts == ["api", "auth"]:
+                name = access.clean_name(body.get("name") or "")
+                status, out = access.check_code(GUARD, self._address(), body.get("code") or "", name)
+                if status != 200 or not access.required():
+                    return self._json(out, status)
+                cookie, age = access.new_session(name)
+                out = {**out, "name": name}
+                return self._json(out, 200, {"Set-Cookie": f"{access.COOKIE}={cookie}; Max-Age={age}; Path=/; HttpOnly; "
+                                                            f"SameSite=Lax{'; Secure' if access.required() else ''}"})
+            if parts == ["api", "logout"]:
+                return self._json({"ok": True}, 200, {"Set-Cookie": f"{access.COOKIE}=; Max-Age=0; Path=/; HttpOnly; SameSite=Lax"})
+            if self._locked(parts):
+                return self._json({"error": "locked"}, 401)
+            if parts == ["api", "presence"]:
+                me = access.session_name(self.headers.get("Cookie")) if access.required() else None
+                PRESENCE.ping(str(body.get("id") or self._address()), me)
+                people = PRESENCE.people()
+                return self._json({"online": len(people), "names": [n for n in people if n], "me": me, **JOBS.counts()})
             if parts == ["api", "draft"]:
                 if not (body.get("prompt") or "").strip():
                     return self._json({"error": "Say what to reproduce first"}, 400)
