@@ -182,7 +182,7 @@ program and do not answer the questions.
 
 WORKER = """You are a {role} worker in a team reproducing a paper. The Planner delegated one task to you. Do only that
 task, stay within its boundaries, and submit the requested report. Logs sit outside the workspace: read them with
-run_shell, e.g. `tail -n 60 ../logs/<name>`."""
+the read_log tool (the shell cannot reach them)."""
 
 
 class SetupReport(BaseModel):
@@ -295,7 +295,7 @@ class PlannerRuntimeWorkflow:
         if task.boundaries:
             parts.append(f"Boundaries: {task.boundaries}")
         if task.context_refs:
-            parts.append("Read these files (logs are at ../logs/<name>): " + ", ".join(task.context_refs))
+            parts.append("Read these files (logs with read_log): " + ", ".join(task.context_refs))
         if task.done_criteria:
             parts.append(f"Done when: {task.done_criteria}")
         if task.role == "debug" and task.about_task in rt.tasks:
@@ -312,7 +312,7 @@ class PlannerRuntimeWorkflow:
     def run_agent(self, task: AgentTask, rt: Runtime) -> tuple[bool, dict, str]:
         """Execute an agent task: in C inside the Planner's own conversation, in D by a fresh worker."""
         output = ROLE_OUTPUT[task.role]
-        tools = sandbox_tools(self.ctx.sandbox, write=task.role != "diagnose", max_timeout_s=1800)
+        tools = sandbox_tools(self.ctx.sandbox, write=task.role != "diagnose", max_timeout_s=1800) + [self._read_log_tool()]
         message = self.delegation(task, rt)
         if self.workers:
             worker = Agent(f"{task.role}_{task.task_id}", WORKER.format(role=task.role) + "\n\n" + RUNTIME_RULES,
@@ -401,11 +401,24 @@ class PlannerRuntimeWorkflow:
                 message = ("The runtime refused to finish:\n- " + "\n- ".join(problems)
                            + "\nFix this with another patch (tasks, or not-measured reasons backed by attempts).")
                 continue
+            if not problems and self._nothing_would_happen(patch, rt):
+                # a patch with no tasks while nothing runs: without this the Planner only learns on the next wake, a
+                # wake that costs a stall (a demo run twice announced tasks in `reasoning` and submitted none)
+                self.ctx.trace.log("planner_runtime", "empty_patch", wakes=wakes)
+                message = ("The patch added, cancelled, replaced or reparsed no task, and no task is pending or "
+                           "running: nothing would happen. Put the tasks you described in add_tasks, or finish "
+                           "(answers, or not-measured reasons backed by attempts).")
+                continue
             if not problems:
                 return {"phase": "execute", "wakes": wakes, "note": "", **self._carry(rt)}
             message = ("The runtime refused the patch; nothing in it was applied:\n- " + "\n- ".join(problems)
                        + "\nSubmit a corrected ExperimentPatch.")
         return {"phase": "execute", "wakes": wakes, "note": "", **self._carry(rt)}
+
+    @staticmethod
+    def _nothing_would_happen(patch: ExperimentPatch, rt: Runtime) -> bool:
+        empty = not (patch.add_tasks or patch.cancel_task_ids or patch.replace or patch.reparse)
+        return empty and not any(t["status"] in ("pending", "running") for t in rt.tasks.values())
 
     def execute(self, state: PlannerState) -> dict:
         rt = self._runtime(state)

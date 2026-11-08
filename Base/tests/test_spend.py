@@ -34,11 +34,12 @@ def test_the_monthly_cap_stops_requests_before_they_cross_it(ledger, monkeypatch
     budget = Budget(profile=get_profile("haiku55"))
     spend.record(1.0)
     budget.check("agent")  # well under the cap
-    spend.record(5.0 - 1.0 - budget.reserve_usd / 2)  # less than one large request left
+    spend.record(5.0 - 1.0 - spend.PAGE_RESERVE_USD - 0.01)  # just over one large request left
+    budget.check("agent")
+    assert spend.status()["exhausted"] is False
+    spend.record(spend.PAGE_RESERVE_USD + 0.01 - budget.reserve_usd / 2)  # less than one request left: both agree
     with pytest.raises(BudgetExceeded, match="monthly budget exhausted"):
         budget.check("agent")
-    assert spend.status()["exhausted"] is False  # the page still lets small things through until it is all spent
-    spend.record(1.0)
     assert spend.status()["exhausted"] is True
 
 
@@ -89,3 +90,25 @@ def test_the_run_file_endpoint_does_not_follow_a_symlink_out_of_the_workspace(tm
     assert sent == {"status": 200, "body": b"inside"}
     Fake()._file("k", "leak.txt")
     assert sent["status"] == 404 and b"sk-test" not in repr(sent["body"]).encode()
+
+
+def test_stopping_a_run_kills_the_command_it_is_executing(tmp_path):
+    """Stop on the page ends the run process; the command it was running (its own session, another user on a
+    server) must go with it, or it would keep a core busy unattended."""
+    import threading
+    import time
+
+    sb = sandbox.Sandbox(tmp_path / "run", root=tmp_path / "work")
+    results = []
+    t = threading.Thread(target=lambda: results.append(sb.run("sleep 30; echo survived", timeout_s=60)))
+    t.start()
+    for _ in range(100):
+        if sb._live:
+            break
+        time.sleep(0.05)
+    assert sb._live
+    t0 = time.monotonic()
+    sb.kill_live()
+    t.join(timeout=10)
+    assert results and "survived" not in results[0].output and time.monotonic() - t0 < 10
+    assert not sb._live

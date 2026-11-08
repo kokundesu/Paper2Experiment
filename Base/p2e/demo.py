@@ -16,6 +16,7 @@ from __future__ import annotations
 import json
 import math
 import re
+import threading
 import time
 from dataclasses import asdict
 from datetime import datetime
@@ -147,16 +148,20 @@ def compare(answer, paper) -> dict:
     return {"status": "match" if norm(answer) == norm(paper) else "mismatch"}
 
 
+_ID_LOCK = threading.Lock()  # the server drafts on request threads: two in the same second must not share an id
+
+
 def new_spec_id() -> str:
     """user-<timestamp>, one second later than any spec already drafted in the same second."""
     t = time.time()
-    while True:
-        sid = "user-" + datetime.fromtimestamp(t).strftime("%Y%m%d-%H%M%S")
-        if not any(DRAFTS.glob(f"{sid}*")) and not any(RUNS.glob(f"*_{sid}_*")):
-            DRAFTS.mkdir(parents=True, exist_ok=True)
-            (DRAFTS / f"{sid}.paper.json").touch()  # claims the id
-            return sid
-        t += 1
+    with _ID_LOCK:
+        while True:
+            sid = "user-" + datetime.fromtimestamp(t).strftime("%Y%m%d-%H%M%S")
+            if not any(DRAFTS.glob(f"{sid}*")) and not any(RUNS.glob(f"*_{sid}_*")):
+                DRAFTS.mkdir(parents=True, exist_ok=True)
+                (DRAFTS / f"{sid}.paper.json").touch()  # claims the id
+                return sid
+            t += 1
 
 
 def capsule_path(capsule_id: str) -> Path | None:
@@ -268,9 +273,19 @@ def run(spec_path: Path, workflow: str, model: str | None, keep_workspace: bool 
     """Run one user spec with one workflow version (the demo server's subprocess). The workspace is kept by default,
     so the UI can show the figures and files the run made."""
     from .cli import WORKFLOWS
+    import os
+    import signal
     spec = ReproSpec.model_validate_json(spec_path.read_text())
     ctx = new_run(spec, workflow, model)
     print(ctx.run_dir.name, flush=True)
+
+    def stopped(signum, frame):
+        # Stop on the page sends SIGTERM here. The command being run lives in its own session (and on a server
+        # belongs to another user), so this process must kill it on the way out or it would run on unattended.
+        ctx.sandbox.kill_live()
+        os._exit(128 + signum)
+
+    signal.signal(signal.SIGTERM, stopped)
     try:
         WORKFLOWS[workflow](ctx)
     finally:

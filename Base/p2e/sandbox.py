@@ -138,6 +138,7 @@ class Sandbox:
         self.default_timeout_s = default_timeout_s
         self._n = len(list(self.log_dir.glob("cmd_*.log")))
         self._lock = threading.Lock()
+        self._live: set[int] = set()  # sessions of the commands running right now
         # log file name -> sha256 of what the sandbox wrote; in memory only, since on disk the agent could edit it
         self.manifest: dict[str, str] = {}
         # workspace files an agent wrote directly (write_file), not through a command: their content is the agent's
@@ -209,6 +210,8 @@ class Sandbox:
             stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True,
             errors="replace", start_new_session=True,
         )
+        with self._lock:
+            self._live.add(proc.pid)
         try:
             output, _ = proc.communicate(timeout=timeout_s)
             exit_code: int | None = proc.returncode
@@ -217,9 +220,19 @@ class Sandbox:
             output, _ = proc.communicate()
             output += f"\n[killed after {timeout_s}s timeout]"
             exit_code = None
+        finally:
+            with self._lock:
+                self._live.discard(proc.pid)
         duration = time.monotonic() - start
         self._write_log(log_path, f"$ cd {workdir} && {command}\n# exit={exit_code} duration={duration:.1f}s\n{output}")
         return CommandResult(command, exit_code, duration, output, log_path)
+
+    def kill_live(self) -> None:
+        """Kill every command running right now (the run is being stopped)."""
+        with self._lock:
+            live = list(self._live)
+        for session in live:
+            self._kill(session)
 
     @staticmethod
     def _kill(session: int) -> None:
@@ -239,9 +252,14 @@ class Sandbox:
     def discard_workspace(self) -> None:
         """Delete the workspace (cloned repo, venv, data: often over 1 GB per run) once the run is scored.
         logs/ stays in run_dir, and logs/ plus the run's json files are all the evaluator reads."""
-        if RUN_AS:  # what the command user wrote with its own permissions, it removes itself
-            subprocess.run(as_runner(["rm", "-rf", "--", str(self.home)]), capture_output=True, timeout=600)
-        shutil.rmtree(self.home, ignore_errors=True)  # the logs link inside is removed, not followed
-        link = self.run_dir / "workspace"
-        if link.is_symlink():
-            link.unlink()
+        remove_workspace(self.home, self.run_dir)
+
+
+def remove_workspace(home: Path, run_dir: Path) -> None:
+    """Delete a run's workspace folder `home` and the run directory's link to it; the run directory stays."""
+    if RUN_AS:  # what the command user wrote with its own permissions, it removes itself
+        subprocess.run(as_runner(["rm", "-rf", "--", str(home)]), capture_output=True, timeout=600)
+    shutil.rmtree(home, ignore_errors=True)  # the logs link inside is removed, not followed
+    link = run_dir / "workspace"
+    if link.is_symlink():
+        link.unlink()

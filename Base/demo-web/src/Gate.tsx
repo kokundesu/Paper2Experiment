@@ -37,7 +37,7 @@ function Backdrop() {
           <h1>{L('What should we reproduce?', '想复现什么？')}</h1>
           <p>{L('Name the paper or code and the numbers or figures you want, ideally with the GitHub address. I’ll turn it into a task, run it with the workflow and model below, and compare the results with the paper.',
             '说出论文或代码，以及想复现的数字或图，最好附上 GitHub 地址。我会把它整理成任务，用下面选的 workflow 和模型运行，再把结果和论文对比。')}</p>
-          <div className="suggest"><span className="suggest-btn">{L('KalmanNet, Table I (signal processing, ~5 min)', 'KalmanNet 表 I（信号处理，约 5 分钟）')}</span>
+          <div className="suggest"><span className="suggest-btn">{L('KalmanNet, Table I (signal processing, 8–16 min)', 'KalmanNet 表 I（信号处理，8–16 分钟）')}</span>
             <span className="suggest-btn">{L('A request without the code’s address', '一个没给代码地址的请求')}</span></div>
         </div>
         <div className="composer"><div className="composer-field"><div className="gate-fake-input">{L('Start by typing…', '输入你的请求…')}</div></div>

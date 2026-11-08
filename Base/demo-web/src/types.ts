@@ -32,7 +32,10 @@ export type Answer = {
 export type Reference = {source: 'paper' | 'corebench'; value: unknown; unit?: string; location?: string; quote?: string; arxiv?: string | null};
 export type Comparison = {status: 'match' | 'close' | 'mismatch' | 'unknown'; diff?: number; rel?: number | null};
 export type PaperValues = {arxiv: string | null; source?: 'paper' | 'corebench'; values: Record<string, Reference>; error?: string};
-export type Workdir = {path: string; name: string; default: string; chosen: boolean};
+export type RunWorkspace = {run: string; title: string; size_mb: number; live: boolean; cleans_in_s: number | null};
+// fixed: a shared server, where each person's runs go to a folder named after them and are cleaned up after a while
+export type Workdir = {path: string; name: string; default: string; chosen: boolean; fixed?: boolean;
+  cleanup_min?: number | null; runs?: RunWorkspace[]};
 export type HistoryRun = {
   key: string; title: string; workflow: string; profile: string | null; started: number | null;
   status: 'running' | 'done' | 'failed' | 'stopped'; answered: number | null; questions: number;

@@ -137,6 +137,25 @@ def test_runtime_refuses_bad_patches_and_early_finish(toy_case, monkeypatch):
     assert any("refused to finish" in m for m in msgs) and any("refused the patch" in m for m in msgs)
 
 
+def test_a_patch_with_no_tasks_while_nothing_runs_is_sent_back_at_once(toy_case, monkeypatch):
+    fake = FakeClient({KEY: [
+        [patch(add_tasks=[SETUP_TASK])],
+        *setup_turns(toy_case),
+        [patch("next I will run two seeds")],  # describes tasks, submits none: sent back in the same wake
+        [patch(add_tasks=[run_task(0), run_task(1)])],
+        [patch(finish={})],
+        [report()],
+    ]})
+    use_fake(monkeypatch, fake)
+    ctx = runner.new_run("toy", "planner")
+    assert run_c(ctx).verdict == "full"
+    ev = events(ctx)
+    assert sum(e["event"] == "empty_patch" for e in ev) == 1
+    msgs = [e["task"] for e in ev if e["agent"] == "planner" and e["event"] == "start"]
+    assert any("nothing would happen" in m for m in msgs)
+    assert json.loads((ctx.run_dir / "summary.json").read_text())["replans"] == 0  # and it cost no stall
+
+
 def test_stalls_reset_the_conversation_and_the_run_can_end_not_measured(toy_case, monkeypatch):
     def failing(i):
         return run_task(0, tid=f"try{i}", extra="--seed-typo").copy() | {

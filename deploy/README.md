@@ -30,6 +30,14 @@ browser ──HTTPS──▶ Caddy :443 ──▶ p2e demo serve 127.0.0.1:8780 
   names), how many runs are going out of the 2 slots, and how many wait.
 - **Queue.** At most `P2E_DEMO_MAX_RUNS` (2) runs at once. More wait in line, first come first served, and start by
   themselves; the run window shows the place in line, and Stop takes a run out of it.
+- **Run folders.** Each person's runs work in a sub-folder of `/srv/p2e/work` named after them (the folder button
+  under the prompt shows it, with each run's size). `P2E_DEMO_CLEANUP_MIN` (30) minutes after a run last did anything,
+  its workspace (code, environment, files it wrote) is deleted to free the disk; the run's record, logs and answers
+  stay. Stop also ends the command the run was executing. The folders group runs, they do not isolate people from
+  each other: every command runs as the one `p2e-run` user.
+- **Examples.** `Base/demo_examples.json` lists the tasks the menu offers, with the seconds each took on this server;
+  without the file every quick finished task is offered. A deploy never overwrites the server's spend ledger
+  (`runs/.spend`) or session secret.
 
 ## Protecting the API keys
 

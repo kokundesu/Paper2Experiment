@@ -29,7 +29,7 @@ export const api = {
   options: () => call<Options>('/api/options'),
   examples: () => call<{examples: ExampleTask[]}>('/api/examples'),
   history: () => call<{runs: HistoryRun[]}>('/api/history'),
-  workdir: () => call<Workdir>('/api/workdir'),
+  workdir: (runs = false) => call<Workdir>(runs ? '/api/workdir?runs=1' : '/api/workdir'),
   setWorkdir: (path: string) => call<Workdir>('/api/workdir', {path}),
   /** the macOS folder dialog on the machine the server runs on; `cancelled` when dismissed */
   chooseWorkdir: () => call<Workdir & {cancelled?: boolean}>('/api/workdir/choose', {}),

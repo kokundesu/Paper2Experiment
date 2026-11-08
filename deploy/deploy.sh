@@ -65,8 +65,10 @@ ssh "$SSH_HOST" "rm -rf ~/$STAGE && mkdir -p ~/$STAGE"
 rsync -a "$ROOT/Base/demo-web/dist/" "$SSH_HOST:$STAGE/dist/"
 if ! $APP_ONLY; then
   rsync -a "$ROOT/Base/.env" "$SSH_HOST:$STAGE/.env"
-  # Past runs are where the page's examples come from. The uv cache and this machine's run-folder setting stay here.
-  rsync -a --exclude '.uv-cache' --exclude 'demo_drafts/settings.json' "$ROOT/Base/runs/" "$SSH_HOST:$STAGE/runs/"
+  # Past runs are where the page's examples come from. The uv cache, this machine's run-folder setting, its spend
+  # ledger and its session secret stay here: the server's own must not be overwritten.
+  rsync -a --exclude '.uv-cache' --exclude 'demo_drafts/settings.json' --exclude '.spend' --exclude '.demo_secret' \
+    "$ROOT/Base/runs/" "$SSH_HOST:$STAGE/runs/"
 fi
 ssh "$SSH_HOST" "sudo bash -c '
   set -e

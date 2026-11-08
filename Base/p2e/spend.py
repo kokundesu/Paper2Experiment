@@ -82,12 +82,17 @@ def spent(of_month: str | None = None) -> float:
         return float(_read(f).get("usd", 0.0))
 
 
+# Budget.check keeps one large request's worth of room under the cap (its profile's reserve, up to about $0.50
+# for the largest models); the page calls the month exhausted at the same point, so a run it lets start can run.
+PAGE_RESERVE_USD = 0.5
+
+
 def status() -> dict:
     """This month's spend and cap, for the page."""
     limit = monthly_limit()
     used = spent()
     return {"month": month(), "spent_usd": round(used, 4), "limit_usd": limit,
-            "exhausted": limit is not None and used >= limit}
+            "exhausted": limit is not None and used >= limit - PAGE_RESERVE_USD}
 
 
 def exhausted_message() -> str:

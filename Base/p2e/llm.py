@@ -8,6 +8,7 @@ trace.jsonl; a callback bills each response from the provider's raw usage (Anthr
 """
 from __future__ import annotations
 
+import io
 import json
 import os
 import re
@@ -206,13 +207,39 @@ MAX_IMAGE_SIDE = 1568  # longest side sent to the model (larger images are scale
 
 
 def load_image(path: Path) -> ImageOutput | str:
-    """An image file as PNG (scaled down if large), via macOS `sips`, which also opens PDF, TIFF, BMP, GIF, JPEG."""
+    """An image file as PNG (scaled down if large): with Pillow where it is installed (any OS), else via macOS `sips`,
+    which also opens PDF."""
+    import base64
+
+    if not path.is_file():
+        return f"no such file: {path.name}"
+    try:
+        from PIL import Image, UnidentifiedImageError
+    except ImportError:
+        return _load_image_sips(path)
+    try:
+        with Image.open(path) as im:
+            im.load()
+            dims = im.size
+            if max(dims) > MAX_IMAGE_SIDE:
+                im.thumbnail((MAX_IMAGE_SIDE, MAX_IMAGE_SIDE))
+            buf = io.BytesIO()
+            im.convert("RGBA" if im.mode in ("RGBA", "LA", "P") else "RGB").save(buf, "PNG")
+    except (UnidentifiedImageError, OSError, ValueError) as e:
+        return f"cannot open {path.name} as an image ({type(e).__name__}); convert it to PNG first (e.g. re-save the figure as PNG)"
+    data = buf.getvalue()
+    if len(data) > 4_500_000:
+        return f"{path.name} is too large to view even scaled down"
+    scale = min(1.0, MAX_IMAGE_SIDE / max(dims))
+    return ImageOutput(f"image {path.name} ({dims[0]}x{dims[1]} px{', scaled down' if scale < 1 else ''})",
+                       base64.b64encode(data).decode())
+
+
+def _load_image_sips(path: Path) -> ImageOutput | str:
     import base64
     import subprocess
     import tempfile
 
-    if not path.is_file():
-        return f"no such file: {path.name}"
     info = subprocess.run(["sips", "-g", "pixelWidth", "-g", "pixelHeight", str(path)], capture_output=True, text=True)
     dims = [int(x) for x in re.findall(r"pixel(?:Width|Height): (\d+)", info.stdout)]
     if info.returncode or len(dims) != 2:

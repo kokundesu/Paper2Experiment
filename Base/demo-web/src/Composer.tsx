@@ -78,6 +78,34 @@ function FolderGlyph() {
   </svg>;
 }
 
+const sizeText = (mb: number) => mb >= 1000 ? `${(mb / 1000).toFixed(1)} GB` : `${Math.round(mb)} MB`;
+
+/** On a shared server: the person's own folder, its run sub-folders and when each is cleaned up (fetched on open). */
+function OwnFolder({workdir, onChange}: {workdir: Workdir; onChange: (w: Workdir) => void}) {
+  const {L} = useLang();
+  useEffect(() => { api.workdir(true).then(onChange, () => undefined); }, []);  // run folders, sizes and countdowns as of now
+  const n = workdir.cleanup_min;
+  const runs = workdir.runs ?? [];
+  return <div className="folder-panel">
+    <div className="popup-head">{L('Your run folder', '你的运行目录')}</div>
+    <p className="popup-text">{n != null
+      ? L(`Your runs work in this folder, named after you. ${n} minutes after a run ends, its sub-folder (code, environment, files it wrote) is deleted to free space; the run's record, logs and answers stay.`,
+          `你的运行都放在这个以你名字命名的文件夹里。每次运行结束 ${n} 分钟后，它的子目录（代码、环境、写出的文件）会被删掉，腾出空间；运行记录、日志和答案会保留。`)
+      : L('Your runs work in this folder, named after you.', '你的运行都放在这个以你名字命名的文件夹里。')}</p>
+    <code className="folder-path">{workdir.path}</code>
+    <div className="folder-runs">
+      {!runs.length ? <div className="popup-empty">{L('No run sub-folders right now', '现在没有运行子目录')}</div>
+        : runs.map(r => <div key={r.run} className="folder-run">
+          <FolderGlyph/>
+          <span className="folder-run-main"><b>{r.title}</b><small>{sizeText(r.size_mb)} · {r.run}</small></span>
+          <span className={`folder-run-when${r.live ? ' is-live' : ''}`}>{r.live ? L('running', '运行中')
+            : r.cleans_in_s == null ? '' : r.cleans_in_s < 60 ? L('cleaning up', '即将清理')
+            : L(`cleaned in ${Math.ceil(r.cleans_in_s / 60)} min`, `${Math.ceil(r.cleans_in_s / 60)} 分钟后清理`)}</span>
+        </div>)}
+    </div>
+  </div>;
+}
+
 function RunFolder({workdir, onChange}: {workdir: Workdir | null; onChange: (w: Workdir) => void}) {
   const {L} = useLang();
   const [path, setPath] = useState('');
@@ -89,8 +117,8 @@ function RunFolder({workdir, onChange}: {workdir: Workdir | null; onChange: (w: 
     catch (e) { setError((e as Error).message); } finally { setBusy(false); }
   };
   return <Popup trigger={(open, toggle) => <button type="button" className={`tray-btn${open ? ' is-open' : ''}`} onClick={toggle}
-    title={workdir?.path}><FolderGlyph/><span>{workdir?.chosen ? workdir.name : L('Run in a folder', '选择运行目录')}</span></button>}>
-    {close => <div className="folder-panel">
+    title={workdir?.path}><FolderGlyph/><span>{workdir?.chosen || workdir?.fixed ? workdir.name : L('Run in a folder', '选择运行目录')}</span></button>}>
+    {close => workdir?.fixed ? <OwnFolder workdir={workdir} onChange={onChange}/> : <div className="folder-panel">
       <div className="popup-head">{L('Run folder', '运行目录')}</div>
       <p className="popup-text">{L('Each reproduction gets its own sub-folder here: the cloned code, its environment and everything it writes.', '每次复现都会在这里建一个子目录，存放 clone 下来的代码、它的环境和它写出的所有文件。')}</p>
       <code className="folder-path">{workdir?.path ?? '…'}</code>

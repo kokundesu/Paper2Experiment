@@ -28,11 +28,11 @@ const START_WORDS = /^(start|go|yes|ok|okay|run|run it|开始|开始吧|好|好�
 
 export const SUGGESTIONS: Record<Lang, {label: string; text: string}[]> = {
   en: [
-    {label: 'KalmanNet, Table I (signal processing, ~5 min)', text: 'Using the official code https://github.com/KalmanNet/KalmanNet_TSP on CPU, reproduce the Test T = 20 row of Table I of the KalmanNet paper: linear 2x2 state-space model (F in canonical form, H = I, full information, nu = 0 dB, 1/r^2 = 20 dB), trained and tested on trajectories of length T = 20. Report the test MSE (dB) of KalmanNet and of the Kalman filter with the true F, H, Q, R.'},
+    {label: 'KalmanNet, Table I (signal processing, 8–16 min)', text: 'Using the official code https://github.com/KalmanNet/KalmanNet_TSP on CPU, reproduce the Test T = 20 row of Table I of the KalmanNet paper: linear 2x2 state-space model (F in canonical form, H = I, full information, nu = 0 dB, 1/r^2 = 20 dB), trained and tested on trajectories of length T = 20. Report the test MSE (dB) of KalmanNet and of the Kalman filter with the true F, H, Q, R.'},
     {label: 'A request without the code’s address', text: 'Reproduce the T = 20 row of Table I of the KalmanNet paper: the test MSE of KalmanNet and of the Kalman filter.'},
   ],
   zh: [
-    {label: 'KalmanNet 表 I（信号处理，约 5 分钟）', text: '用官方代码 https://github.com/KalmanNet/KalmanNet_TSP 在 CPU 上复现 KalmanNet 论文表 I 中 Test T = 20 这一行：线性 2x2 状态空间模型（F 为标准型，H = I，full information，nu = 0 dB，1/r^2 = 20 dB），训练和测试轨迹长度都是 T = 20。报告 KalmanNet 和使用真实 F、H、Q、R 的 Kalman filter 的测试 MSE（dB）。'},
+    {label: 'KalmanNet 表 I（信号处理，8–16 分钟）', text: '用官方代码 https://github.com/KalmanNet/KalmanNet_TSP 在 CPU 上复现 KalmanNet 论文表 I 中 Test T = 20 这一行：线性 2x2 状态空间模型（F 为标准型，H = I，full information，nu = 0 dB，1/r^2 = 20 dB），训练和测试轨迹长度都是 T = 20。报告 KalmanNet 和使用真实 F、H、Q、R 的 Kalman filter 的测试 MSE（dB）。'},
     {label: '一个没给代码地址的请求', text: '复现 KalmanNet 论文表 I 中 T = 20 这一行：KalmanNet 和 Kalman filter 的测试 MSE。'},
   ],
 };
@@ -276,7 +276,11 @@ function Results({job, jobKey}: {job: JobState; jobKey: string}) {
     <div className={`results-summary is-${overall}`}>
       <div className="results-score">
         <b>{compared ? `${matched} / ${compared}` : `${answered} / ${answers.length}`}</b>
-        <span>{compared ? L(`match the ${corebench ? 'reference answers' : 'paper'}`, corebench ? '与参考答案一致' : '与论文一致') : L('answered (nothing to compare with)', '已回答（没有可比较的值）')}</span>
+        <span>{answered === 0 ? L('no answers: the run did not produce the values', '没有答案：运行没有得出数值')
+          : !compared ? L('answered (nothing to compare with)', '已回答（没有可比较的值）')
+          : matched === 0 ? L(`none match the ${corebench ? 'reference answers' : 'paper'}`, corebench ? '都与参考答案不符' : '都与论文不符')
+          : matched === compared ? L(`all match the ${corebench ? 'reference answers' : 'paper'}`, corebench ? '全部与参考答案一致' : '全部与论文一致')
+          : L(`match the ${corebench ? 'reference answers' : 'paper'}`, corebench ? '与参考答案一致' : '与论文一致')}</span>
       </div>
       <div className="results-facts">
         <span><i>{L('Answered', '已回答')}</i>{answered} / {answers.length}</span>
@@ -360,7 +364,7 @@ function RunMessage({msg, job, wall, selectedId, onSelect, onStop}: {msg: Extrac
   else if (live) status = <><Loader2 size={13} className="spin"/><span>{job.nodes[0]?.status === 'waiting'
     ? L(`${job.nodes[0].role} is waiting for its workers and commands…`, `${job.nodes[0].role} 正在等待 worker 和命令…`) : L('The agent is thinking…', 'Agent 正在思考…')}</span></>;
   else if (job.phase === 'done') status = <><Check size={13}/><span>{L('Finished. The results are below.', '已完成，结果在下方。')}</span></>;
-  else status = <><X size={13}/><span>{job.phase === 'stopped' ? L('Stopped', '已停止') : `${L('The run failed', '运行失败')}${job.error ? `: ${job.error.slice(0, 200)}` : ''}`}</span></>;
+  else status = <><X size={13}/><span>{job.phase === 'stopped' ? L('Stopped', '已停止') : `${L('The run failed', '运行失败')}${job.error ? `: ${job.error.trim().slice(-200)}` : ''}`}</span></>;
   return <div className="bubble run-bubble">
     <p>{L(<>Reproducing “{job.spec?.title ?? ''}”. The window shows every agent and the step it is on; click a card to see all its steps.</>,
       <>正在复现“{job.spec?.title ?? ''}”。窗口里显示每个 agent 和它正在做的步骤；点击卡片可以查看它的全部步骤。</>)}</p>

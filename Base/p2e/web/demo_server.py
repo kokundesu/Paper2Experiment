@@ -6,7 +6,8 @@ subprocess, and the page follows the run through its trace as a graph of agents.
                                                   GitHub URL in the prompt; without one (and no capsule): {need: repo_url}
     POST /api/start   {spec, workflow, model}               launch `p2e demo run`; returns the job key
     GET  /api/history                     the runs started from the page, newest first
-    GET  /api/workdir                     the run folder: where runs clone, install and run (each in its own sub-folder)
+    GET  /api/workdir                     the run folder: where runs clone, install and run (each in its own sub-folder);
+                                          on a shared server the person's own folder, its runs and when each is cleaned
     POST /api/workdir {path} | /api/workdir/choose   set it, from a path or the macOS folder dialog
     GET  /api/examples                    every task that some earlier run finished quickly, once each
     POST /api/example {case}              that task as a fresh user spec plus the values to compare with
@@ -42,7 +43,7 @@ from .. import corebench, demo, spend
 from . import access
 from ..models import load_profiles
 from ..runner import RUNS
-from ..sandbox import PROJECT_ROOT, workspace_root
+from ..sandbox import PROJECT_ROOT, remove_workspace, workspace_root
 from ..spec import ReproSpec
 
 DIST = Path(__file__).resolve().parents[2] / "demo-web" / "dist"
@@ -52,7 +53,10 @@ WORKFLOWS = [  # the three versions of the comparison (A, B, D)
     {"id": "planner_workers", "letter": "D", "name": "Planner + workers",
      "desc": "A planner hands out tasks as needed: workers set up, the runtime runs commands, failures are retried"},
 ]
+SPEC_ID = re.compile(r"^user-\d{8}-\d{6}$")  # an id from demo.new_spec_id
 KEY = re.compile(r"^user-\d{8}-\d{6}_(single|fixed|planner_workers)$")  # a run launched from the page
+SERVER_STARTED = time.time()  # runs this process did not start and that wrote nothing since cannot be running
+MAX_BODY = 1_000_000  # a request body larger than this is refused (the gate is reachable before signing in)
 RUN_NAME = re.compile(r"^\d{8}-\d{6}_[\w.-]+$")  # any run directory (examples come from these)
 GITHUB = re.compile(r"https?://(?:www\.)?github\.com/[\w.-]+/[\w.-]+")
 EXAMPLE_MAX_WALL_S = 600  # without a curated list, an example is a task some run answered in under 10 minutes
@@ -75,16 +79,125 @@ def _settings() -> dict:
         return {}
 
 
-def run_folder() -> Path:
-    """Where the page's runs work: the folder chosen on the page, else the default workspace root."""
+def fixed_workdir() -> bool:
+    """A shared server (P2E_DEMO_FIXED_WORKDIR): its operator sets the run folder; each signed-in person gets a
+    sub-folder of it named after them, and finished runs' workspaces are cleaned up."""
+    return bool(os.environ.get("P2E_DEMO_FIXED_WORKDIR"))
+
+
+def cleanup_after_s() -> float | None:
+    """How long a finished run's workspace stays (P2E_DEMO_CLEANUP_MIN; 30 minutes on a shared server by default).
+    None: kept, as on one's own machine. Only the workspace goes; the run's record, logs and answers stay."""
+    raw = os.environ.get("P2E_DEMO_CLEANUP_MIN", "").strip()
+    if raw:
+        return float(raw) * 60
+    return 30 * 60.0 if fixed_workdir() else None
+
+
+def user_folder_name(user: str) -> str:
+    """A folder name for a signed-in name: letters (any script), digits, '.', '-' and '_' kept, the rest '_'."""
+    return re.sub(r"[^\w.-]+", "_", user).strip("._")[:40] or "guest"
+
+
+def run_folder(user: str | None = None) -> Path:
+    """Where the page's runs work: on a shared server the person's own sub-folder; else the folder chosen on the page,
+    else the default workspace root."""
+    if fixed_workdir() and user:
+        return workspace_root() / user_folder_name(user)
     chosen = _settings().get("workspace_root")
     return Path(chosen) if chosen else workspace_root()
 
 
-def workdir_state() -> dict:
-    folder = run_folder()
-    return {"path": str(folder), "name": folder.name, "default": str(workspace_root()),
-            "chosen": bool(_settings().get("workspace_root"))}
+def _size_mb(path: Path) -> float:
+    total = 0
+    for root, _, files in os.walk(path):
+        for f in files:
+            try:
+                total += os.lstat(os.path.join(root, f)).st_size
+            except OSError:
+                pass
+    return round(total / 1e6, 1)
+
+
+def _last_active(run_name: str, home: Path) -> float:
+    """When a run last did something: its trace or summary, else its workspace folder."""
+    times = [p.stat().st_mtime for p in (RUNS / run_name / "trace.jsonl", RUNS / run_name / "summary.json") if p.is_file()]
+    return max(times) if times else home.stat().st_mtime
+
+
+def _run_live(run_name: str) -> bool:
+    return bool(JOBS.alive(run_name.split("_", 1)[1])) if "_" in run_name else False
+
+
+def _is_run_home(p: Path) -> bool:
+    """A run's workspace folder: named like a run directory that exists. A person's folder named like one is not."""
+    return p.is_dir() and bool(RUN_NAME.match(p.name)) and (RUNS / p.name).is_dir()
+
+
+def run_workspaces(folder: Path) -> list[dict]:
+    """The run sub-folders in `folder`, newest first: title, size and when each will be cleaned up."""
+    after = cleanup_after_s()
+    out = []
+    for home in sorted(folder.iterdir(), reverse=True) if folder.is_dir() else []:
+        if not _is_run_home(home):
+            continue
+        try:
+            title = json.loads((RUNS / home.name / "spec.json").read_text()).get("title") or home.name
+        except (OSError, json.JSONDecodeError):
+            title = home.name
+        live = _run_live(home.name)
+        left = None if live or after is None else max(0, round(_last_active(home.name, home) + after - time.time()))
+        out.append({"run": home.name, "title": title, "size_mb": _size_mb(home), "live": live, "cleans_in_s": left})
+    return out
+
+
+def workdir_state(user: str | None = None, with_runs: bool = False) -> dict:
+    """The run folder; with_runs: on a shared server also the person's run sub-folders (walks them for their size)."""
+    folder = run_folder(user)
+    state = {"path": str(folder), "name": folder.name, "default": str(workspace_root()),
+             "chosen": bool(_settings().get("workspace_root")), "fixed": fixed_workdir()}
+    if fixed_workdir():
+        after = cleanup_after_s()
+        state["cleanup_min"] = None if after is None else round(after / 60)
+        if with_runs:
+            state["runs"] = run_workspaces(folder)
+    return state
+
+
+def clean_workspaces(now: float | None = None) -> list[str]:
+    """Delete the workspace of every run that has ended and been idle longer than the cleanup delay, in the run
+    folder or one level down (the people's sub-folders). Returns the runs cleaned."""
+    after = cleanup_after_s()
+    root = workspace_root()
+    if after is None or not root.is_dir():
+        return []
+    now = time.time() if now is None else now
+    homes = []
+    for p in root.iterdir():
+        if _is_run_home(p):
+            homes.append(p)
+        elif p.is_dir():  # a person's folder
+            homes += [c for c in p.iterdir() if _is_run_home(c)]
+    cleaned = []
+    for home in homes:
+        try:
+            if _run_live(home.name) or now - _last_active(home.name, home) < after:
+                continue
+        except OSError:
+            continue
+        remove_workspace(home, RUNS / home.name)
+        cleaned.append(home.name)
+    return cleaned
+
+
+def _clean_forever() -> None:
+    while True:
+        try:
+            for name in clean_workspaces():
+                print(f"cleaned the workspace of {name}", flush=True)
+        except Exception as e:  # a cleanup hiccup must not take the server down
+            print(f"workspace cleanup: {type(e).__name__}: {e}", flush=True)
+        time.sleep(60)
 
 
 def set_run_folder(path: str) -> dict:
@@ -128,12 +241,13 @@ class Jobs:
 
     def __init__(self):
         self.procs: dict[str, subprocess.Popen] = {}
-        self.queue: list[tuple[str, list[str], Path]] = []  # (key, command, output file), first in line first
+        # (key, command, output file, run folder), first in line first
+        self.queue: list[tuple[str, list[str], Path, Path]] = []
         self.cancelled: set[str] = set()  # stopped while still in the queue
         self.lock = threading.Lock()
         threading.Thread(target=self._dispatch_forever, daemon=True).start()
 
-    def start(self, spec: ReproSpec, workflow: str, model: str) -> str:
+    def start(self, spec: ReproSpec, workflow: str, model: str, folder: Path | None = None) -> str:
         demo.DRAFTS.mkdir(parents=True, exist_ok=True)
         path = demo.DRAFTS / f"{spec.id}.json"
         path.write_text(spec.model_dump_json(indent=1))
@@ -142,7 +256,7 @@ class Jobs:
         cmd = [sys.executable, "-m", "p2e.cli", "demo", "run", str(path), "--workflow", workflow, "--model", model]
         with self.lock:
             self.cancelled.discard(key)
-            self.queue.append((key, cmd, out))
+            self.queue.append((key, cmd, out, folder or run_folder()))
             self._dispatch()
         return key
 
@@ -153,21 +267,26 @@ class Jobs:
         """Start queued runs while there is a free slot (the caller holds the lock)."""
         limit = max_runs()
         while self.queue and (limit is None or self._running() < limit):
-            key, cmd, out = self.queue.pop(0)
-            env = {**os.environ, "P2E_WORKSPACE_ROOT": str(run_folder())}
-            self.procs[key] = subprocess.Popen(cmd, cwd=RUNS.parent, stdout=out.open("w"), stderr=subprocess.STDOUT,
-                                               start_new_session=True, env=env)
+            key, cmd, out, folder = self.queue.pop(0)
+            folder.mkdir(parents=True, exist_ok=True)  # setgid parent on a server: the command user can write in it
+            env = {**os.environ, "P2E_WORKSPACE_ROOT": str(folder)}
+            with out.open("w") as f:  # the child keeps its own handle
+                self.procs[key] = subprocess.Popen(cmd, cwd=RUNS.parent, stdout=f, stderr=subprocess.STDOUT,
+                                                   start_new_session=True, env=env)
 
     def _dispatch_forever(self) -> None:
         while True:
             time.sleep(2)
-            with self.lock:
-                self._dispatch()
+            try:
+                with self.lock:
+                    self._dispatch()
+            except Exception as e:  # one run that cannot start must not stop the queue
+                print(f"run dispatch: {type(e).__name__}: {e}", flush=True)
 
     def position(self, key: str) -> int | None:
         """1 for the next run to start, None when the run is not waiting."""
         with self.lock:
-            return next((i + 1 for i, (k, _, _) in enumerate(self.queue) if k == key), None)
+            return next((i + 1 for i, q in enumerate(self.queue) if q[0] == key), None)
 
     def was_cancelled(self, key: str) -> bool:
         with self.lock:
@@ -179,7 +298,7 @@ class Jobs:
 
     def alive(self, key: str) -> bool | None:
         with self.lock:
-            if any(k == key for k, _, _ in self.queue):
+            if any(q[0] == key for q in self.queue):
                 return True
             proc = self.procs.get(key)
         return None if proc is None else proc.poll() is None
@@ -239,8 +358,12 @@ def _runnable(spec: dict) -> bool:
 def curated_examples() -> list[dict] | None:
     """The hand-picked examples ({case, demo_s: [seconds of each run on the demo server], ...}), None without a list."""
     try:
-        return json.loads(EXAMPLES_FILE.read_text())["examples"]
+        listed = json.loads(EXAMPLES_FILE.read_text())["examples"]
+        return [{**c, "demo_s": list(c.get("demo_s") or [])} for c in listed]
     except FileNotFoundError:
+        return None
+    except (OSError, ValueError, KeyError, TypeError) as e:
+        print(f"{EXAMPLES_FILE.name} is unreadable ({type(e).__name__}: {e}); offering every quick task", flush=True)
         return None
 
 
@@ -573,7 +696,8 @@ def build_state(key: str) -> dict:
     total = summary["llm"]["cost_usd"] if finished else sum(n["cost"] for n in g.nodes.values()
                                                              if not (workflow == "fixed" and n["id"] == "runner"))
     phase = "done" if finished and not summary.get("error") else "failed" if finished else \
-        "running" if alive or (alive is None and events and time.time() - events[-1]["t"] < 1800) else "stopped"
+        "running" if alive or (alive is None and events and events[-1]["t"] > SERVER_STARTED
+                               and time.time() - events[-1]["t"] < 1800) else "stopped"
     return {"phase": phase, "workflow": workflow, "run": d.name, "spec": spec, "model": model_name,
             "profile": start.get("profile"),
             "vendor": vendor_of(prof.model, prof.provider, prof.base_url) if prof else "anthropic", "started": _iso(start.get("t")), "nodes": nodes, "answers": answers,
@@ -608,7 +732,8 @@ class BudgetError(Exception):
 
 def _launch_error(key: str) -> str:
     out = demo.DRAFTS / f"{key}.out"
-    return out.read_text(errors="replace")[-2000:] if out.is_file() else "the run did not start"
+    return out.read_text(errors="replace")[-2000:] if out.is_file() else \
+        "the run did not start: the server was restarted while it waited in line. Start it again."
 
 
 VENDORS = [  # (pattern in the model id or endpoint, vendor), first match wins
@@ -705,7 +830,7 @@ class Handler(BaseHTTPRequestHandler):
             if parts == ["api", "options"]:
                 return self._json(options())
             if parts == ["api", "workdir"]:
-                return self._json(workdir_state())
+                return self._json(workdir_state(self._user(), with_runs="runs" in parse_qs(url.query)))
             if parts == ["api", "history"]:
                 return self._json({"runs": list_history()})
             if parts == ["api", "examples"]:
@@ -719,6 +844,10 @@ class Handler(BaseHTTPRequestHandler):
             return self._static(parts)
         except Exception as e:  # keep the page alive on a bad run directory
             return self._json({"error": f"{type(e).__name__}: {e}"}, 500)
+
+    def _user(self) -> str | None:
+        """The signed-in name, where the page asks for one."""
+        return access.session_name(self.headers.get("Cookie")) if access.required() else None
 
     def _file(self, key: str, rel: str):
         d = run_dir_of(key)
@@ -748,8 +877,11 @@ class Handler(BaseHTTPRequestHandler):
         url = urlparse(self.path)
         parts = [p for p in url.path.split("/") if p]
         try:
-            body = json.loads(self.rfile.read(int(self.headers.get("Content-Length") or 0)) or b"{}")
-        except json.JSONDecodeError:
+            length = int(self.headers.get("Content-Length") or 0)
+            if length > MAX_BODY:
+                return self._json({"error": "request too large"}, 413)
+            body = json.loads(self.rfile.read(length) or b"{}")
+        except (json.JSONDecodeError, ValueError):
             return self._json({"error": "bad json"}, 400)
         try:
             if parts == ["api", "auth"]:
@@ -794,12 +926,14 @@ class Handler(BaseHTTPRequestHandler):
                 workflow, model = body.get("workflow"), body.get("model") or "haiku55"
                 if spec.origin.source != "user" or workflow not in {w["id"] for w in WORKFLOWS}:
                     return self._json({"error": "unknown workflow or not a user spec"}, 400)
+                if not SPEC_ID.match(spec.id):  # the id names files under runs/: only ids this server handed out
+                    return self._json({"error": "not a spec of this page"}, 400)
                 prof = load_profiles().get(model)
                 if prof is None or not os.environ.get(prof.api_key_env):
                     return self._json({"error": f"No API key is set for model {model}"}, 400)
                 if spend.status()["exhausted"]:
                     return self._json({"error": spend.exhausted_message(), "budget": spend.status()}, 402)
-                return self._json({"key": JOBS.start(spec, workflow, model)})
+                return self._json({"key": JOBS.start(spec, workflow, model, run_folder(self._user()))})
             if parts[:2] == ["api", "jobs"] and len(parts) == 4 and parts[3] == "stop" and KEY.match(parts[2]):
                 return self._json({"stopped": JOBS.stop(parts[2])})
             return self._json({"error": "not found"}, 404)
@@ -809,6 +943,8 @@ class Handler(BaseHTTPRequestHandler):
 
 def serve(host: str = "127.0.0.1", port: int = 8780) -> int:
     server = ThreadingHTTPServer((host, port), Handler)
+    if cleanup_after_s() is not None:
+        threading.Thread(target=_clean_forever, daemon=True).start()
     print(f"p2e demo at http://{host}:{port}/  (runs in {RUNS}; Ctrl+C to stop)", flush=True)
     try:
         server.serve_forever()

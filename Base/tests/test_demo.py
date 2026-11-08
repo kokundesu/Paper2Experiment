@@ -79,10 +79,15 @@ def test_the_graph_of_a_planner_run_nests_retries_and_maps_workers_onto_their_ta
         _event("runtime", "task/running", t + 12, task_id="run2"),
     ]))
     monkeypatch.setattr(demo_server, "run_dir_of", lambda key: d)
+    monkeypatch.setattr(demo_server, "SERVER_STARTED", t - 1)  # the run wrote its trace after this server started
     state = demo_server.build_state("user-20261106-120000_planner_workers")
     nodes = {n["id"]: n for n in state["nodes"]}
 
     assert state["phase"] == "running" and list(nodes) == ["planner", "task:setup", "task:run", "task:run2"]
+    # a run nobody here started and that has written nothing since the server came up was killed with the old
+    # server (systemd stops the whole group): it is not shown as running for another half hour
+    monkeypatch.setattr(demo_server, "SERVER_STARTED", t + 100)
+    assert demo_server.build_state("user-20261106-120000_planner_workers")["phase"] == "stopped"
     assert nodes["planner"]["status"] == "waiting" and nodes["planner"]["cost"] > 0
     assert nodes["planner"]["steps"][0] | {"status": "done", "label": "List directory", "target": "code"} == nodes["planner"]["steps"][0]
     setup = nodes["task:setup"]

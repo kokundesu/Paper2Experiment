@@ -78,6 +78,7 @@ def test_runs_beyond_the_limit_wait_in_line_and_start_in_order(tmp_path, monkeyp
     from p2e.web import demo_server
 
     monkeypatch.setenv("P2E_DEMO_MAX_RUNS", "1")
+    monkeypatch.setenv("P2E_WORKSPACE_ROOT", str(tmp_path / "work"))
     monkeypatch.setattr(demo, "DRAFTS", tmp_path)
 
     class FakeProc:
@@ -107,3 +108,78 @@ def test_runs_beyond_the_limit_wait_in_line_and_start_in_order(tmp_path, monkeyp
     with jobs.lock:
         jobs._dispatch()
     assert len(started) == 2 and jobs.position(b) is None and jobs.counts()["queued"] == 0
+
+
+def test_each_person_runs_in_a_folder_named_after_them(code, tmp_path, monkeypatch):
+    from p2e.web import demo_server
+
+    monkeypatch.setenv("P2E_WORKSPACE_ROOT", str(tmp_path / "work"))
+    monkeypatch.delenv("P2E_DEMO_FIXED_WORKDIR", raising=False)
+    monkeypatch.setattr(demo_server, "SETTINGS", tmp_path / "settings.json")
+    assert demo_server.run_folder("Allen") == tmp_path / "work"  # on one's own machine: one folder for every run
+    assert demo_server.cleanup_after_s() is None
+    monkeypatch.setenv("P2E_DEMO_FIXED_WORKDIR", "1")
+    assert demo_server.run_folder("Allen Hu") == tmp_path / "work" / "Allen_Hu"
+    assert demo_server.run_folder("张三").name == "张三"
+    assert demo_server.run_folder("../../etc").parent == tmp_path / "work"  # a name never leads out of the root
+    assert demo_server.cleanup_after_s() == 30 * 60
+    state = demo_server.workdir_state("Allen Hu", with_runs=True)
+    assert state["fixed"] and state["name"] == "Allen_Hu" and state["cleanup_min"] == 30 and state["runs"] == []
+    assert "runs" not in demo_server.workdir_state("Allen Hu")  # the page load does not walk the folders
+    with pytest.raises(ValueError, match="fixed"):
+        demo_server.set_run_folder(str(tmp_path / "elsewhere"))
+
+
+def test_a_finished_runs_workspace_is_cleaned_after_the_delay_and_a_live_one_never(tmp_path, monkeypatch):
+    import os
+    import time
+
+    from p2e.web import demo_server
+
+    work, runs = tmp_path / "work", tmp_path / "runs"
+    monkeypatch.setenv("P2E_WORKSPACE_ROOT", str(work))
+    monkeypatch.setenv("P2E_DEMO_FIXED_WORKDIR", "1")
+    monkeypatch.setattr(demo_server, "RUNS", runs)
+    live_key = "user-20261108-120000_planner_workers"
+
+    class Alive:
+        def alive(self, key):
+            return key == live_key
+
+    monkeypatch.setattr(demo_server, "JOBS", Alive())
+    now = time.time()
+
+    def run(folder, name, idle_min):
+        home = folder / name
+        (home / "workspace" / ".venv").mkdir(parents=True)
+        (home / "workspace" / ".venv" / "big.bin").write_bytes(b"x" * 2_000_000)
+        d = runs / name
+        d.mkdir(parents=True)
+        (d / "spec.json").write_text('{"title": "Some task"}')
+        (d / "trace.jsonl").write_text("{}")
+        os.utime(d / "trace.jsonl", (now - idle_min * 60,) * 2)
+        (d / "workspace").symlink_to(home / "workspace")
+        return home, d
+
+    old, old_dir = run(work / "Allen", "20261108-100000_user-20261108-100000_planner_workers", idle_min=45)
+    recent, _ = run(work / "Allen", "20261108-110000_user-20261108-110000_planner_workers", idle_min=10)
+    live, _ = run(work / "Bo", f"20261108-120001_{live_key}", idle_min=90)  # a long silent training step
+    flat, _ = run(work, "20261107-090000_user-20261107-090000_single", idle_min=600)  # from before per-person folders
+    # a person whose name looks like a run name: their folder is not a run's workspace, so never cleaned as one
+    odd_person = work / "20261108-130000_x"
+    odd, _ = run(odd_person, "20261108-130001_user-20261108-130001_single", idle_min=10)
+    os.utime(odd_person, (now - 600 * 60,) * 2)
+    stray = work / "Allen" / "20261108-140000_user-20261108-140000_single"  # no run record: not ours to judge
+    stray.mkdir()
+
+    listed = demo_server.workdir_state("Allen", with_runs=True)["runs"]
+    assert [r["run"] for r in listed] == [recent.name, old.name] and listed[0]["size_mb"] == 2.0
+    assert 19 * 60 < listed[0]["cleans_in_s"] <= 20 * 60 and listed[1]["cleans_in_s"] == 0
+    assert demo_server.workdir_state("Bo", with_runs=True)["runs"][0]["live"] is True
+
+    cleaned = demo_server.clean_workspaces(now)
+    assert sorted(cleaned) == sorted([old.name, flat.name])
+    assert not old.exists() and not flat.exists() and recent.exists() and live.exists()
+    assert odd.exists() and odd_person.exists() and stray.exists()
+    assert old_dir.is_dir() and not (old_dir / "workspace").exists()  # the record stays, only the workspace goes
+    assert sorted(demo_server.clean_workspaces(now + 25 * 60)) == sorted([recent.name, odd.name])  # both 35 min idle now

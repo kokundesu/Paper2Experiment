@@ -438,3 +438,14 @@ code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .
 .dark .gate-ok-badge { box-shadow: 0 0 0 5px #14532d; }
 .gate-ok p { font-size: 15px; font-weight: 600; color: #16a34a; }
 @media (max-width: 420px) { .gate-digit { width: 50px; height: 58px; } .gate-card { padding: 28px 20px 22px; } }
+
+/* the person's own run folder on a shared server: its run sub-folders and their cleanup countdowns */
+.folder-runs { display: flex; flex-direction: column; gap: 2px; max-height: 260px; overflow-y: auto; margin-top: 4px; }
+.folder-run { display: flex; align-items: center; gap: 10px; padding: 7px 8px; border-radius: 8px; }
+.folder-run:hover { background: var(--btn-collapse-hover); }
+.folder-run > svg { flex: none; }
+.folder-run-main { display: flex; flex-direction: column; min-width: 0; flex: 1; }
+.folder-run-main b { font-weight: 500; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.folder-run-main small { font-size: 11px; color: var(--p2e-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.folder-run-when { flex: none; font-size: 11.5px; color: var(--p2e-muted); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.folder-run-when.is-live { color: var(--dg-link); }
