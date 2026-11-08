@@ -37,6 +37,7 @@ import {
 import { twMerge } from "tailwind-merge";
 import { ReasoningEffortTrack } from "./reasoning-effort";
 import { ModelInfoHover, type ModelInput } from "../../../../lib/model-info-card";
+import { useLang } from "../../../../../i18n";
 
 function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -614,6 +615,7 @@ export function ModelPicker({
   promptStyle = false,
   className,
 }: ModelPickerProps) {
+  const { L } = useLang();
   const listId = useId();
   const rails = useMemo(() => visibleProviders(providers), [providers]);
   const [internalOpen, setInternalOpen] = useState(defaultOpen);
@@ -870,7 +872,7 @@ export function ModelPicker({
           }}
         >
           {rails.length === 0 || !activeProvider ? (
-            <p className="px-4 py-6 text-sm text-muted-foreground">No models available</p>
+            <p className="px-4 py-6 text-sm text-muted-foreground">{L("No models available", "没有可用的模型")}</p>
           ) : (
             <div className="flex min-h-0 min-w-0 flex-1 flex-col">
              
@@ -946,8 +948,8 @@ export function ModelPicker({
                   value={query}
                   onChange={(event) => setQuery(event.target.value)}
                   onKeyDown={onSearchKeyDown}
-                  placeholder="Search models"
-                  aria-label="Search models"
+                  placeholder={L("Search models", "搜索模型")}
+                  aria-label={L("Search models", "搜索模型")}
                   aria-controls={listId}
                   autoComplete="off"
                   spellCheck={false}
@@ -983,7 +985,7 @@ export function ModelPicker({
                   <div
                     role="listbox"
                     id={listId}
-                    aria-label={searching ? "Search results" : `${activeProvider.name} models`}
+                    aria-label={searching ? L("Search results", "搜索结果") : L(`${activeProvider.name} models`, `${activeProvider.name} 模型`)}
                     className={cn(
                       "-mr-1 flex min-h-0 min-w-0 flex-1 flex-col gap-0.5 overflow-y-auto overscroll-contain pr-1",
                       THIN_SCROLLBAR,

@@ -11,6 +11,7 @@ import {Check, ChevronDown, Square, X} from 'lucide-react';
 // and the visible text is in English (the demo's language); the structure and behaviour are unchanged.
 export type ToolStatus = 'running' | 'awaiting_approval' | 'done' | 'error' | 'denied';
 import './agent-run.css';
+import {useLang} from '../i18n';
 
 export type RunStep = {
  id: string;
@@ -40,7 +41,8 @@ export type RunOutcome = 'done' | 'error' | 'stopped' | 'partial' | 'denied';
 
 const MAX_ROWS = 5;
 const MAX_SEGMENTS = 12;
-const STATUS_TEXT: Record<ToolStatus, string> = {running: 'Running', awaiting_approval: 'Awaiting approval', done: 'Done', error: 'Error', denied: 'Denied / stopped'};
+const STATUS_TEXT: Record<ToolStatus, [string, string]> = {running: ['Running', '运行中'], awaiting_approval: ['Awaiting approval', '等待批准'],
+  done: ['Done', '完成'], error: ['Error', '出错'], denied: ['Denied / stopped', '被拒绝 / 已停止']};
 
 const ms = (iso?: string) => (iso ? new Date(iso).getTime() : NaN);
 /** 总计时：m:ss */
@@ -105,6 +107,7 @@ export function AgentRun({steps, live, outcome = 'done', badge, meta, iconFor, o
  approval?: RunApproval;
 }) {
  const reduce = useReducedMotion();
+ const {L} = useLang();
  // 默认展开（跑完也不自动收起），点标题收成胶囊；又跑起来或有审批时自动展开
  const [collapsed, setCollapsed] = useState(false);
  useEffect(() => { if (live || approval) setCollapsed(false); }, [live, !!approval]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -124,14 +127,15 @@ export function AgentRun({steps, live, outcome = 'done', badge, meta, iconFor, o
 
  const state = live ? (waiting ? 'approval' : 'running') : outcome === 'done' || outcome === 'partial' ? 'done' : 'failed';
  const title = live
-  ? waiting ? {key: `wait-${waiting.id}`, icon: waiting.name, text: `Awaiting approval: ${stepText(waiting)}`, primary: true}
+  ? waiting ? {key: `wait-${waiting.id}`, icon: waiting.name, text: `${L('Awaiting approval', '等待批准')}: ${stepText(waiting)}`, primary: true}
    : current ? {key: `run-${current.id}`, icon: current.name, text: stepText(current), primary: false}
-   : {key: 'think', icon: '', text: liveText ?? 'Thinking…', primary: false}
+   : {key: 'think', icon: '', text: liveText ?? L('Thinking…', '思考中…'), primary: false}
   : {key: `end-${outcome}`, icon: '', primary: true, text: [
-   outcome === 'stopped' ? 'Stopped' : outcome === 'error' ? 'Error' : outcome === 'partial' ? 'Partly done' : outcome === 'denied' ? 'An action was denied' : 'Done',
-   `${steps.length} ${steps.length === 1 ? 'step' : 'steps'}`,
-   ...(Number.isFinite(total) && total >= 1 ? [`took ${span(total)}`] : []),
-   ...(failed && outcome === 'done' ? [`${failed} failed`] : []),
+   outcome === 'stopped' ? L('Stopped', '已停止') : outcome === 'error' ? L('Error', '出错') : outcome === 'partial' ? L('Partly done', '部分完成')
+    : outcome === 'denied' ? L('An action was denied', '有操作被拒绝') : L('Done', '完成'),
+   L(`${steps.length} ${steps.length === 1 ? 'step' : 'steps'}`, `${steps.length} 步`),
+   ...(Number.isFinite(total) && total >= 1 ? [L(`took ${span(total)}`, `用时 ${span(total)}`)] : []),
+   ...(failed && outcome === 'done' ? [L(`${failed} failed`, `${failed} 步失败`)] : []),
   ].join(' · ')};
 
  // 列表：跑的时候新的一步出现就滚到最下面；用户往上翻过就不再跟
@@ -152,10 +156,10 @@ export function AgentRun({steps, live, outcome = 'done', badge, meta, iconFor, o
   });
  }, [steps]);
 
- return <section className={`arp is-${state}${collapsed ? ' is-collapsed' : ''}${className ? ` ${className}` : ''}`} aria-label="Run"
+ return <section className={`arp is-${state}${collapsed ? ' is-collapsed' : ''}${className ? ` ${className}` : ''}`} aria-label={L('Run', '运行')}
   onClick={collapsed ? () => setCollapsed(false) : undefined} role={collapsed ? 'button' : undefined} tabIndex={collapsed ? 0 : undefined}
   onKeyDown={collapsed ? e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setCollapsed(false); } } : undefined}>
-  <header className="arp-head" title={collapsed ? undefined : live ? undefined : 'Click to collapse'} onClick={collapsed ? undefined : () => { if (!live && !approval) setCollapsed(true); }}>
+  <header className="arp-head" title={collapsed ? undefined : live ? undefined : L('Click to collapse', '点击收起')} onClick={collapsed ? undefined : () => { if (!live && !approval) setCollapsed(true); }}>
    <span className="arp-badge">
     <svg className="arp-ring" viewBox="0 0 24 24" aria-hidden><circle className="arp-ring-track" cx="12" cy="12" r="10.5"/><circle className="arp-ring-spin" cx="12" cy="12" r="10.5"/></svg>
     <span className="arp-badge-icon">{badge}</span>
@@ -188,7 +192,7 @@ export function AgentRun({steps, live, outcome = 'done', badge, meta, iconFor, o
       <HoverCard.Trigger asChild>
        <div className={`arp-row is-${step.status}`} tabIndex={0} onClick={() => setOpenRow(r => (r === step.id ? null : step.id))}>
         <span className="arp-row-icon">{iconFor(step.name)}</span>
-        <span className="arp-row-label">{step.status === 'awaiting_approval' ? `Awaiting approval: ${stepText(step)}` : stepText(step)}{step.summary && !isLive(step) && <span className="arp-row-summary"> · {step.summary}</span>}</span>
+        <span className="arp-row-label">{step.status === 'awaiting_approval' ? `${L('Awaiting approval', '等待批准')}: ${stepText(step)}` : stepText(step)}{step.summary && !isLive(step) && <span className="arp-row-summary"> · {step.summary}</span>}</span>
         {step.status === 'error' || step.status === 'denied' ? <X className="arp-row-mark" size={12}/> : null}
         <span className="arp-row-time">{span(seconds)}</span>
        </div>
@@ -196,13 +200,13 @@ export function AgentRun({steps, live, outcome = 'done', badge, meta, iconFor, o
       <HoverCard.Portal><HoverCard.Content className="arp-detail" side={narrow ? 'bottom' : 'right'} align="start" sideOffset={narrow ? 6 : 10} collisionPadding={12}>
        <div className="arp-detail-head"><span className="arp-detail-icon">{iconFor(step.name)}</span><b>{step.label}</b><code>{step.name}</code></div>
        <dl>
-        {step.target && <><dt>Target</dt><dd>{step.target}</dd></>}
-        <dt>Status</dt><dd className={`is-${step.status}`}>{STATUS_TEXT[step.status]}</dd>
-        {Number.isFinite(start) && <><dt>Time</dt><dd>{new Date(start).toLocaleTimeString('en-GB', {hour12: false})}{Number.isFinite(seconds) ? ` · took ${span(seconds)}` : ''}</dd></>}
-        {step.summary && <><dt>{step.status === 'error' ? 'Error' : 'Result'}</dt><dd>{step.summary}</dd></>}
+        {step.target && <><dt>{L('Target', '目标')}</dt><dd>{step.target}</dd></>}
+        <dt>{L('Status', '状态')}</dt><dd className={`is-${step.status}`}>{L(...STATUS_TEXT[step.status])}</dd>
+        {Number.isFinite(start) && <><dt>{L('Time', '时间')}</dt><dd>{new Date(start).toLocaleTimeString('en-GB', {hour12: false})}{Number.isFinite(seconds) ? ` · ${L('took', '用时')} ${span(seconds)}` : ''}</dd></>}
+        {step.summary && <><dt>{step.status === 'error' ? L('Error', '错误') : L('Result', '结果')}</dt><dd>{step.summary}</dd></>}
        </dl>
-       {args.length > 0 && <div className="arp-detail-args"><div className="arp-detail-label">Arguments</div>{args.map(([k, v]) => <div key={k} className="arp-arg"><span>{k}</span><code>{argValue(v)}</code></div>)}</div>}
-       {step.savedNote && onOpenNote && <button type="button" className="arp-detail-link" onClick={() => { setOpenRow(null); onOpenNote(step.savedNote!.id, step.savedNote!.title); }}>Open “{step.savedNote.title || step.savedNote.id.split('/').pop()}”</button>}
+       {args.length > 0 && <div className="arp-detail-args"><div className="arp-detail-label">{L('Arguments', '参数')}</div>{args.map(([k, v]) => <div key={k} className="arp-arg"><span>{k}</span><code>{argValue(v)}</code></div>)}</div>}
+       {step.savedNote && onOpenNote && <button type="button" className="arp-detail-link" onClick={() => { setOpenRow(null); onOpenNote(step.savedNote!.id, step.savedNote!.title); }}>{L('Open', '打开')} “{step.savedNote.title || step.savedNote.id.split('/').pop()}”</button>}
       </HoverCard.Content></HoverCard.Portal>
      </HoverCard.Root>;
     })}

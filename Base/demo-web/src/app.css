@@ -357,3 +357,16 @@ code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .
   .app-topbar { padding: 0 16px; }
   .topbar-sub, .stat-agents, .stat-running { display: none; }
 }
+
+/* a plan being drafted: its steps tick off, then the card fills in */
+.plan-steps { list-style: none; margin: 6px 0 0; padding: 0; display: grid; gap: 5px; font-size: 13px; color: var(--p2e-muted); }
+.plan-steps li { display: flex; align-items: center; gap: 7px; animation: popup-in .25s ease both; }
+.plan-steps li.is-done { color: var(--text-task); }
+.plan-steps li.is-done svg { color: var(--p2e-accent); }
+.plan-note { margin-top: 8px; font-size: 12px; color: var(--p2e-muted); }
+.reveal-in { animation: popup-in .3s ease both; }
+.typing-caret::after { content: '▍'; margin-left: 1px; color: var(--p2e-accent); animation: caret-blink 1s steps(1) infinite; }
+@keyframes caret-blink { 50% { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .plan-steps li, .reveal-in { animation: none; } .typing-caret::after { animation: none; } }
+/* the changelog's big dates: Chinese breaks only at the spaces ("2026年 10月4–5日"), never inside a date */
+.changelog-page h3 { word-break: keep-all; }

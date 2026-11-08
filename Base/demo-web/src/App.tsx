@@ -4,38 +4,47 @@
 // results against the paper. The message box (Composer) picks the workflow, the model, the run folder and the example
 // tasks; the top bar reopens the user's earlier runs. AI messages carry the model vendor's logo, as in Alex.
 import {useCallback, useEffect, useRef, useState, type ReactNode} from 'react';
-import {Check, ChevronDown, FlaskConical, Github, History, ListChecks, Loader2, Maximize2, Minimize2, Moon, Package, Play, Square, Sun, X} from 'lucide-react';
+import {Check, ChevronDown, FlaskConical, Github, History, Languages, ListChecks, Loader2, Maximize2, Minimize2, Moon, Package, Play, Square, Sun, X} from 'lucide-react';
 import {api} from './api';
 import {AgentRun, type RunOutcome} from './agent-run/agent-run';
 import {OrchestrationGraph} from './graph/OrchestrationGraph';
 import {Avatar, ROLE_ICONS, toolIcon} from './icons';
 import {VendorLogo} from './provider-logos';
-import {Composer, VENDOR_NAME, WF_LABEL} from './Composer';
+import {Composer, VENDOR_NAME, wfLabel} from './Composer';
+import {useLang, type Lang} from './i18n';
 import {ChangelogPage} from './Changelog';
 import {ProviderGlyph} from './alex/modules/chat/components/ui/model-picker';
 import {Loader} from './alex/modules/chat/components/ui/loader';
 import {ShiningText} from './alex/modules/chat/components/ui/shining-text';
 import type {Answer, Comparison, ExampleTask, GraphNode, HistoryRun, JobState, Options, PaperValues, Spec, Workdir} from './types';
 
-const PROVENANCE: Record<string, string> = {produced: 'Produced by this run', typed: 'Only in text the agent wrote itself',
-  preexisting_only: 'Only in files shipped with the code', not_found: 'Not found in the run’s output'};
+const PROVENANCE: Record<string, [string, string]> = {produced: ['Produced by this run', '由本次运行产生'],
+  typed: ['Only in text the agent wrote itself', '只出现在 agent 自己写的文字里'],
+  preexisting_only: ['Only in files shipped with the code', '只出现在代码自带的文件里'], not_found: ['Not found in the run’s output', '运行输出中找不到']};
 const IMAGE = /\.(png|jpe?g|gif|svg|webp)$/i;
 const FIGURE = /\.(png|jpe?g|gif|svg|webp|pdf)$/i;
 const GITHUB = /https?:\/\/(?:www\.)?github\.com\/[\w.-]+\/[\w.-]+/;
-const START_WORDS = /^(start|go|yes|ok|okay|run|run it|开始|好|确认)[.!。！]?$/i;
+const START_WORDS = /^(start|go|yes|ok|okay|run|run it|开始|开始吧|好|好的|可以|确认|运行)[.!。！]?$/i;
 
-export const SUGGESTIONS = [
-  {label: 'KalmanNet, Table I (signal processing, ~5 min)', text: 'Using the official code https://github.com/KalmanNet/KalmanNet_TSP on CPU, reproduce the Test T = 20 row of Table I of the KalmanNet paper: linear 2x2 state-space model (F in canonical form, H = I, full information, nu = 0 dB, 1/r^2 = 20 dB), trained and tested on trajectories of length T = 20. Report the test MSE (dB) of KalmanNet and of the Kalman filter with the true F, H, Q, R.'},
-  {label: 'A request without the code’s address', text: 'Reproduce the T = 20 row of Table I of the KalmanNet paper: the test MSE of KalmanNet and of the Kalman filter.'},
-];
+export const SUGGESTIONS: Record<Lang, {label: string; text: string}[]> = {
+  en: [
+    {label: 'KalmanNet, Table I (signal processing, ~5 min)', text: 'Using the official code https://github.com/KalmanNet/KalmanNet_TSP on CPU, reproduce the Test T = 20 row of Table I of the KalmanNet paper: linear 2x2 state-space model (F in canonical form, H = I, full information, nu = 0 dB, 1/r^2 = 20 dB), trained and tested on trajectories of length T = 20. Report the test MSE (dB) of KalmanNet and of the Kalman filter with the true F, H, Q, R.'},
+    {label: 'A request without the code’s address', text: 'Reproduce the T = 20 row of Table I of the KalmanNet paper: the test MSE of KalmanNet and of the Kalman filter.'},
+  ],
+  zh: [
+    {label: 'KalmanNet 表 I（信号处理，约 5 分钟）', text: '用官方代码 https://github.com/KalmanNet/KalmanNet_TSP 在 CPU 上复现 KalmanNet 论文表 I 中 Test T = 20 这一行：线性 2x2 状态空间模型（F 为标准型，H = I，full information，nu = 0 dB，1/r^2 = 20 dB），训练和测试轨迹长度都是 T = 20。报告 KalmanNet 和使用真实 F、H、Q、R 的 Kalman filter 的测试 MSE（dB）。'},
+    {label: '一个没给代码地址的请求', text: '复现 KalmanNet 论文表 I 中 T = 20 这一行：KalmanNet 和 Kalman filter 的测试 MSE。'},
+  ],
+};
 
 // every AI message records the vendor of the model that wrote it, for its author line
 type Msg =
   | {id: number; role: 'user'; text: string}
-  | {id: number; role: 'assistant'; by: string; type: 'thinking'}
+  | {id: number; role: 'assistant'; by: string; type: 'thinking'; steps?: string[]; note?: string}
   | {id: number; role: 'assistant'; by: string; type: 'text'; text: string}
   | {id: number; role: 'assistant'; by: string; type: 'ask_url'; prompt: string; resolved?: boolean}
-  | {id: number; role: 'assistant'; by: string; type: 'spec'; spec: Spec; paper: PaperValues; cost: number; started?: boolean}
+  | {id: number; role: 'assistant'; by: string; type: 'spec'; spec: Spec; paper: PaperValues; cost: number; started?: boolean;
+      example?: boolean; reveal?: boolean}
   | {id: number; role: 'assistant'; by: string; type: 'run'; key: string};
 type NewMsg = Msg extends infer M ? M extends Msg ? Omit<M, 'id' | 'by'> : never : never;
 
@@ -57,9 +66,31 @@ function current(nodes: GraphNode[]) {
   return live.length ? {node: live[live.length - 1], t: 0} : null;
 }
 
+// How a plan appears: the drafting steps tick off one by one, then the card fills in (title, task typed out, questions,
+// then the paper's values). Without motion (prefers-reduced-motion) it appears at once.
+const PLAN_STEP_MS = 900;
+const reducedMotion = () => { try { return window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch { return false; } };
+const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
+
+/** When each part of a plan card appears, in ms after the card does. */
+function revealTimeline(spec: Spec, paper: PaperValues) {
+  const chips = 250, task = 550;
+  const typeMs = Math.min(2600, Math.max(900, spec.task_prompt.length * 4));
+  const q0 = task + typeMs + 250, qStep = 450;
+  const refs = spec.questions.filter(q => paper.values[q.id]).length;
+  const r0 = q0 + spec.questions.length * qStep + 300, rStep = 400;
+  const note = r0 + refs * rStep + 200;
+  return {chips, task, typeMs, q0, qStep, r0, rStep, note, end: note + 350};
+}
+
 const isLive = (job: JobState | null) => !!job && (job.phase === 'running' || job.phase === 'preparing');
-const minutes = (s: number) => s < 60 ? `${Math.round(s)} s` : `${(s / 60).toFixed(s < 600 ? 1 : 0)} min`;
-const ago = (t: number) => { const s = Date.now() / 1000 - t; return s < 3600 ? `${Math.max(1, Math.round(s / 60))} min ago` : s < 86400 ? `${Math.round(s / 3600)} h ago` : `${Math.round(s / 86400)} d ago`; };
+export const minutes = (s: number, lang: Lang = 'en') => s < 60 ? `${Math.round(s)} ${lang === 'zh' ? '秒' : 's'}`
+  : `${(s / 60).toFixed(s < 600 ? 1 : 0)} ${lang === 'zh' ? '分钟' : 'min'}`;
+const ago = (t: number, lang: Lang) => {
+  const s = Date.now() / 1000 - t, zh = lang === 'zh';
+  return s < 3600 ? `${Math.max(1, Math.round(s / 60))} ${zh ? '分钟前' : 'min ago'}` : s < 86400 ? `${Math.round(s / 3600)} ${zh ? '小时前' : 'h ago'}`
+    : `${Math.round(s / 86400)} ${zh ? '天前' : 'd ago'}`;
+};
 
 /** A value for display: numbers to 6 significant digits (scientific when tiny or huge), anything else as is. */
 function show(v: unknown): string {
@@ -93,19 +124,20 @@ function Menu({label, title, up, wide, children}: {label: ReactNode; title?: str
 }
 
 function HistoryMenu({runs, onOpen, onRefresh}: {runs: HistoryRun[] | null; onOpen: (r: HistoryRun) => void; onRefresh: () => void}) {
+  const {lang, L} = useLang();
   return <div onMouseDown={onRefresh}>
-    <Menu wide label={<><History size={14}/><span>History</span></>}>
+    <Menu wide label={<><History size={14}/><span>{L('History', '历史记录')}</span></>}>
       {close => <>
-        <div className="menu-head">Your reproductions, newest first. Open one to see its graph and results again.</div>
+        <div className="menu-head">{L('Your reproductions, newest first. Open one to see its graph and results again.', '你的复现记录，最新的在前。打开一条可以重新查看它的 agent 图和结果。')}</div>
         <div className="menu-scroll">
           {!runs ? <div className="menu-empty"><Loader2 size={14} className="spin"/></div>
-            : !runs.length ? <div className="menu-empty">Nothing yet: ask for a reproduction or pick an example</div>
+            : !runs.length ? <div className="menu-empty">{L('Nothing yet: ask for a reproduction or pick an example', '还没有记录：发一个复现请求，或者选一个示例任务')}</div>
             : runs.map(r => <button type="button" key={r.key} role="menuitem" className="menu-item" onClick={() => { close(); onOpen(r); }}>
               <span className={`menu-dot is-${r.status}`} title={r.status}/>
               <span className="menu-main"><b>{r.title}</b>
-                <small>{WF_LABEL[r.workflow] ?? r.workflow} · {r.profile}{r.wall_s ? ` · ${minutes(r.wall_s)}` : ''}{r.cost ? ` · $${r.cost.toFixed(3)}` : ''}
-                  {r.answered !== null && r.answered !== undefined ? ` · ${r.answered}/${r.questions} answered` : ''}</small></span>
-              <span className="menu-meta">{r.status === 'running' ? 'running' : r.started ? ago(r.started) : ''}</span>
+                <small>{wfLabel(r.workflow, lang)} · {r.profile}{r.wall_s ? ` · ${minutes(r.wall_s, lang)}` : ''}{r.cost ? ` · $${r.cost.toFixed(3)}` : ''}
+                  {r.answered !== null && r.answered !== undefined ? ` · ${L(`${r.answered}/${r.questions} answered`, `已回答 ${r.answered}/${r.questions}`)}` : ''}</small></span>
+              <span className="menu-meta">{r.status === 'running' ? L('running', '运行中') : r.started ? ago(r.started, lang) : ''}</span>
             </button>)}
         </div>
       </>}
@@ -113,7 +145,19 @@ function HistoryMenu({runs, onOpen, onRefresh}: {runs: HistoryRun[] | null; onOp
   </div>;
 }
 
+/** The language of the whole site, English or Chinese; remembered in this browser. */
+function LanguageMenu() {
+  const {lang, setLang} = useLang();
+  const choices: [Lang, string][] = [['en', 'English'], ['zh', '中文']];
+  return <Menu label={<><Languages size={14}/><span>{lang === 'zh' ? '中文' : 'English'}</span></>} title={lang === 'zh' ? '语言' : 'Language'}>
+    {close => choices.map(([id, name]) => <button type="button" key={id} role="menuitemradio" aria-checked={lang === id}
+      className={`menu-item menu-lang${lang === id ? ' is-on' : ''}`} onClick={() => { setLang(id); close(); }}>
+      <span className="menu-main"><b>{name}</b></span>{lang === id && <Check size={14}/>}</button>)}
+  </Menu>;
+}
+
 function TopBar({dark, onTheme, children}: {dark: boolean; onTheme: () => void; children: ReactNode}) {
+  const {L} = useLang();
   return <header className="topbar app-topbar">
     <div className="topbar-left">
       <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
@@ -121,11 +165,12 @@ function TopBar({dark, onTheme, children}: {dark: boolean; onTheme: () => void; 
         <path d="M14.5 11.8C14.6 13.2 15.1 13.7 16.5 13.8C15.1 13.9 14.6 14.4 14.5 15.8C14.4 14.4 13.9 13.9 12.5 13.8C13.9 13.7 14.4 13.2 14.5 11.8Z" fill="#76A9FA"/>
       </svg>
       <span className="agents-title">Paper2Exp</span>
-      <span className="topbar-sub">reproduction demo</span>
+      <span className="topbar-sub">{L('reproduction demo', '论文复现演示')}</span>
     </div>
     <div className="topbar-right">
       {children}
-      <button type="button" className="icon-btn" onClick={onTheme} aria-label="Toggle dark mode">{dark ? <Sun size={15}/> : <Moon size={15}/>}</button>
+      <LanguageMenu/>
+      <button type="button" className="icon-btn" onClick={onTheme} aria-label={L('Toggle dark mode', '切换深色模式')}>{dark ? <Sun size={15}/> : <Moon size={15}/>}</button>
     </div>
   </header>;
 }
@@ -143,14 +188,15 @@ function Author({vendor, name}: {vendor: string; name?: string}) {
 /* ---------------------------------------------------------------- results */
 
 /** match / close / mismatch / unknown for one answer, and how to say it: against the paper, or CORE-Bench's grade. */
-function verdictOf(a: Answer): {status: Comparison['status']; label: string} {
+function verdictOf(a: Answer, lang: Lang): {status: Comparison['status']; label: string} {
+  const zh = lang === 'zh';
   const corebench = a.reference?.source === 'corebench';
-  if (a.answer === null || a.answer === undefined) return {status: 'unknown', label: 'No answer'};
+  if (a.answer === null || a.answer === undefined) return {status: 'unknown', label: zh ? '没有答案' : 'No answer'};
   if (corebench && a.correct !== undefined && a.correct !== null)
-    return a.correct ? {status: 'match', label: 'Matches reference'} : {status: 'mismatch', label: 'Differs from reference'};
+    return a.correct ? {status: 'match', label: zh ? '与参考答案一致' : 'Matches reference'} : {status: 'mismatch', label: zh ? '与参考答案不符' : 'Differs from reference'};
   const status = a.comparison?.status ?? 'unknown';
-  return {status, label: {match: 'Matches paper', close: 'Close to paper', mismatch: 'Differs from paper',
-    unknown: a.reference ? 'Cannot compare' : 'Not in paper'}[status]};
+  return {status, label: (zh ? {match: '与论文一致', close: '接近论文', mismatch: '与论文不符', unknown: a.reference ? '无法比较' : '论文中没有'}
+    : {match: 'Matches paper', close: 'Close to paper', mismatch: 'Differs from paper', unknown: a.reference ? 'Cannot compare' : 'Not in paper'})[status]};
 }
 
 function gap(c?: Comparison, unit = '') {
@@ -162,10 +208,11 @@ function gap(c?: Comparison, unit = '') {
 /** The reproduction's results: a summary, one table row per question (answer, reference, gap, verdict) with its
  *  details folded under it, then the figures the run made. */
 function Results({job, jobKey}: {job: JobState; jobKey: string}) {
+  const {lang, L} = useLang();
   const answers = job.answers ?? [];
   const corebench = answers.some(a => a.reference?.source === 'corebench');
-  const refName = corebench ? 'Reference' : 'Paper';
-  const verdicts = answers.map(verdictOf);
+  const refName = corebench ? L('Reference', '参考答案') : L('Paper', '论文');
+  const verdicts = answers.map(a => verdictOf(a, lang));
   const compared = answers.filter(a => a.reference).length;
   const matched = verdicts.filter(v => v.status === 'match').length;
   const answered = answers.filter(a => a.answer !== null && a.answer !== undefined).length;
@@ -177,21 +224,21 @@ function Results({job, jobKey}: {job: JobState; jobKey: string}) {
     <div className={`results-summary is-${overall}`}>
       <div className="results-score">
         <b>{compared ? `${matched} / ${compared}` : `${answered} / ${answers.length}`}</b>
-        <span>{compared ? `match the ${corebench ? 'reference answers' : 'paper'}` : 'answered (nothing to compare with)'}</span>
+        <span>{compared ? L(`match the ${corebench ? 'reference answers' : 'paper'}`, corebench ? '与参考答案一致' : '与论文一致') : L('answered (nothing to compare with)', '已回答（没有可比较的值）')}</span>
       </div>
       <div className="results-facts">
-        <span><i>Answered</i>{answered} / {answers.length}</span>
-        {job.summary && <span><i>Time</i>{minutes(job.summary.wall_s)}</span>}
-        <span><i>Cost</i>${(job.cost ?? 0).toFixed(3)}</span>
-        <span><i>Workflow</i>{WF_LABEL[job.workflow] ?? job.workflow}</span>
-        <span><i>Model</i>{job.profile}</span>
-        {arxiv && <span><i>Paper</i><a href={`https://arxiv.org/abs/${arxiv}`} target="_blank" rel="noreferrer">arXiv {arxiv}</a></span>}
+        <span><i>{L('Answered', '已回答')}</i>{answered} / {answers.length}</span>
+        {job.summary && <span><i>{L('Time', '用时')}</i>{minutes(job.summary.wall_s, lang)}</span>}
+        <span><i>{L('Cost', '费用')}</i>${(job.cost ?? 0).toFixed(3)}</span>
+        <span><i>Workflow</i>{wfLabel(job.workflow, lang)}</span>
+        <span><i>{L('Model', '模型')}</i>{job.profile}</span>
+        {arxiv && <span><i>{L('Paper', '论文')}</i><a href={`https://arxiv.org/abs/${arxiv}`} target="_blank" rel="noreferrer">arXiv {arxiv}</a></span>}
       </div>
     </div>
     <div className="results-wrap">
       <table className="results-table">
         <colgroup><col className="c-id"/><col/><col className="c-num"/><col className="c-num"/><col className="c-num"/><col className="c-verdict"/></colgroup>
-        <thead><tr><th>#</th><th>Question</th><th>Reproduced</th><th>{refName}</th><th>Gap</th><th>Verdict</th></tr></thead>
+        <thead><tr><th>#</th><th>{L('Question', '问题')}</th><th>{L('Reproduced', '复现值')}</th><th>{refName}</th><th>{L('Gap', '差距')}</th><th>{L('Verdict', '结论')}</th></tr></thead>
         <tbody>{answers.map((a, i) => {
           const unit = a.reference?.unit ? ` ${a.reference.unit}` : '';
           const v = verdicts[i];
@@ -206,12 +253,12 @@ function Results({job, jobKey}: {job: JobState; jobKey: string}) {
               <td><span className={`verdict is-${v.status}`}>{v.status === 'match' ? <Check size={12}/> : v.status === 'mismatch' ? <X size={12}/> : null}{v.label}</span></td>
             </tr>,
             <tr key={`${a.id}-d`} className="details-row"><td/><td colSpan={5}>
-              <details><summary>Source, evidence and notes</summary>
+              <details><summary>{L('Source, evidence and notes', '出处、证据和备注')}</summary>
                 <dl>
-                  {a.reference?.location && <><dt>{refName} value</dt><dd>{a.reference.location}{a.reference.quote ? <q>{a.reference.quote}</q> : null}</dd></>}
-                  {a.provenance && <><dt>Answer source</dt><dd><span className={`prov is-${a.provenance.status}`}>{PROVENANCE[a.provenance.status] ?? a.provenance.status}</span></dd></>}
-                  {a.evidence.length > 0 && <><dt>Evidence</dt><dd>{a.evidence.map(e => <code key={e}>{e}</code>)}</dd></>}
-                  {a.note && <><dt>Agent’s note</dt><dd>{a.note}</dd></>}
+                  {a.reference?.location && <><dt>{L(`${refName} value`, `${refName}中的值`)}</dt><dd>{a.reference.location}{a.reference.quote ? <q>{a.reference.quote}</q> : null}</dd></>}
+                  {a.provenance && <><dt>{L('Answer source', '答案来源')}</dt><dd><span className={`prov is-${a.provenance.status}`}>{PROVENANCE[a.provenance.status] ? L(...PROVENANCE[a.provenance.status]) : a.provenance.status}</span></dd></>}
+                  {a.evidence.length > 0 && <><dt>{L('Evidence', '证据')}</dt><dd>{a.evidence.map(e => <code key={e}>{e}</code>)}</dd></>}
+                  {a.note && <><dt>{L('Agent’s note', 'Agent 的备注')}</dt><dd>{a.note}</dd></>}
                 </dl>
               </details>
             </td></tr>,
@@ -220,11 +267,11 @@ function Results({job, jobKey}: {job: JobState; jobKey: string}) {
       </table>
     </div>
     {figures.length > 0 && <div className="results-figs">
-      <div className="results-figs-head">Figures this run made</div>
+      <div className="results-figs-head">{L('Figures this run made', '本次运行生成的图')}</div>
       <div className="results-figs-grid">{figures.map(p => IMAGE.test(p)
         ? <a key={p} href={api.fileUrl(jobKey, p)} target="_blank" rel="noreferrer" className="fig"><img src={api.fileUrl(jobKey, p)} alt={p}
           onError={e => { (e.currentTarget.parentElement as HTMLElement).style.display = 'none'; }}/><span>{p}</span></a>
-        : <a key={p} href={api.fileUrl(jobKey, p)} target="_blank" rel="noreferrer" className="fig is-file"><span>Open {p}</span></a>)}</div>
+        : <a key={p} href={api.fileUrl(jobKey, p)} target="_blank" rel="noreferrer" className="fig is-file"><span>{L(`Open ${p}`, `打开 ${p}`)}</span></a>)}</div>
     </div>}
   </section>;
 }
@@ -233,6 +280,7 @@ function Results({job, jobKey}: {job: JobState; jobKey: string}) {
 
 function RunMessage({msg, job, wall, selectedId, onSelect, onStop}: {msg: Extract<Msg, {type: 'run'}>;
   job: JobState | null; wall: number; selectedId: string | null; onSelect: (id: string | null) => void; onStop: () => void}) {
+  const {lang, L} = useLang();
   const [full, setFull] = useState(false);
   useEffect(() => {
     if (!full) return;
@@ -240,7 +288,7 @@ function RunMessage({msg, job, wall, selectedId, onSelect, onStop}: {msg: Extrac
     window.addEventListener('keydown', esc);
     return () => window.removeEventListener('keydown', esc);
   }, [full]);
-  if (!job) return <div className="bubble"><span className="thinking"><Loader2 size={14} className="spin"/>Starting…</span></div>;
+  if (!job) return <div className="bubble"><span className="thinking"><Loader2 size={14} className="spin"/>{L('Starting…', '正在启动…')}</span></div>;
   const live = isLive(job);
   const c = current(job.nodes);
   const fallback = live ? job.nodes[0] : [...job.nodes].reverse().find(n => n.steps.length) ?? job.nodes[0];
@@ -249,26 +297,28 @@ function RunMessage({msg, job, wall, selectedId, onSelect, onStop}: {msg: Extrac
   const elapsed = job.summary && !live ? job.summary.wall_s : job.started ? Math.max(0, (wall - Date.parse(job.started)) / 1000) : 0;
   const provider = job.vendor ?? 'anthropic';
   let status: ReactNode;
-  if (job.phase === 'preparing') status = <><Loader2 size={13} className="spin"/><span>Preparing the workspace…</span></>;
+  if (job.phase === 'preparing') status = <><Loader2 size={13} className="spin"/><span>{L('Preparing the workspace…', '正在准备工作目录…')}</span></>;
   else if (live && c) status = <><span className="now-live"/>{(() => { const I = ROLE_ICONS[c.node.kind]; return <I size={14}/>; })()}
-    <span><b>{c.node.role}</b>{c.step ? <> · {c.step.label}{c.step.target ? <code>{c.step.target}</code> : null}</> : ' · thinking…'}</span></>;
-  else if (live) status = <><Loader2 size={13} className="spin"/><span>{job.nodes[0]?.status === 'waiting' ? `${job.nodes[0].role} is waiting for its workers and commands…` : 'The agent is thinking…'}</span></>;
-  else if (job.phase === 'done') status = <><Check size={13}/><span>Finished. The results are below.</span></>;
-  else status = <><X size={13}/><span>{job.phase === 'stopped' ? 'Stopped' : `The run failed${job.error ? `: ${job.error.slice(0, 200)}` : ''}`}</span></>;
+    <span><b>{c.node.role}</b>{c.step ? <> · {c.step.label}{c.step.target ? <code>{c.step.target}</code> : null}</> : L(' · thinking…', ' · 思考中…')}</span></>;
+  else if (live) status = <><Loader2 size={13} className="spin"/><span>{job.nodes[0]?.status === 'waiting'
+    ? L(`${job.nodes[0].role} is waiting for its workers and commands…`, `${job.nodes[0].role} 正在等待 worker 和命令…`) : L('The agent is thinking…', 'Agent 正在思考…')}</span></>;
+  else if (job.phase === 'done') status = <><Check size={13}/><span>{L('Finished. The results are below.', '已完成，结果在下方。')}</span></>;
+  else status = <><X size={13}/><span>{job.phase === 'stopped' ? L('Stopped', '已停止') : `${L('The run failed', '运行失败')}${job.error ? `: ${job.error.slice(0, 200)}` : ''}`}</span></>;
   return <div className="bubble run-bubble">
-    <p>Reproducing “{job.spec?.title ?? ''}”. The window shows every agent and the step it is on; click a card to see all its steps.</p>
+    <p>{L(<>Reproducing “{job.spec?.title ?? ''}”. The window shows every agent and the step it is on; click a card to see all its steps.</>,
+      <>正在复现“{job.spec?.title ?? ''}”。窗口里显示每个 agent 和它正在做的步骤；点击卡片可以查看它的全部步骤。</>)}</p>
     <div className={`run-window${full ? ' is-full' : ''}`}>
       <div className="run-window-head">
         <div className={`run-status is-${job.phase}`}>{status}</div>
         <div className="chips">
-          <span className="chip">{WF_LABEL[job.workflow] ?? job.workflow}</span>
+          <span className="chip">{wfLabel(job.workflow, lang)}</span>
           <span className="chip"><VendorLogo vendor={provider} size={12}/>{job.profile}</span>
           {job.spec?.code && <span className="chip">{job.spec.code.capsule ? <Package size={11}/> : <Github size={11}/>}{job.spec.code.capsule ?? job.spec.code.repo_url?.replace('https://github.com/', '')}</span>}
-          <span className="chip clock">{minutes(elapsed)}</span>
+          <span className="chip clock">{minutes(elapsed, lang)}</span>
         </div>
         <div className="row">
-          {live && <button type="button" className="btn ghost sm" onClick={onStop}><Square size={11}/>Stop</button>}
-          <button type="button" className="btn ghost sm" onClick={() => setFull(f => !f)} aria-label={full ? 'Exit full screen' : 'Full screen'}>
+          {live && <button type="button" className="btn ghost sm" onClick={onStop}><Square size={11}/>{L('Stop', '停止')}</button>}
+          <button type="button" className="btn ghost sm" onClick={() => setFull(f => !f)} aria-label={full ? L('Exit full screen', '退出全屏') : L('Full screen', '全屏')}>
             {full ? <Minimize2 size={13}/> : <Maximize2 size={13}/>}</button>
         </div>
       </div>
@@ -279,12 +329,12 @@ function RunMessage({msg, job, wall, selectedId, onSelect, onStop}: {msg: Extrac
             onSelect={id => onSelect(id === selectedId ? null : id)}/>}
         </div>
         {selected && <div className="run-side">
-          <div className="side-label">{selectedId ? <>Selected: {selected.role}<button type="button" className="link" onClick={() => onSelect(null)}>Follow current</button></>
-            : live ? 'Following the current agent' : 'Last agent at work'}</div>
+          <div className="side-label">{selectedId ? <>{L('Selected', '已选中')}: {selected.role}<button type="button" className="link" onClick={() => onSelect(null)}>{L('Follow current', '跟随当前')}</button></>
+            : live ? L('Following the current agent', '正在跟随当前 agent') : L('Last agent at work', '最后工作的 agent')}</div>
           <AgentRun key={selected.id} steps={selected.steps} live={live && (selected.status === 'running' || selected.status === 'waiting')}
             outcome={outcome} badge={<Avatar provider={provider} kind={selected.kind}/>} iconFor={toolIcon}
             meta={<span>{selected.role}{selected.model ? ` · ${selected.model}` : ''}</span>}
-            liveText={selected.status === 'waiting' ? 'Waiting for workers and commands…' : 'Thinking…'}
+            liveText={selected.status === 'waiting' ? L('Waiting for workers and commands…', '正在等待 worker 和命令…') : L('Thinking…', '思考中…')}
             extra={selected.summary ? <p className="side-summary">{selected.summary}</p> : undefined}/>
         </div>}
       </div>
@@ -293,41 +343,91 @@ function RunMessage({msg, job, wall, selectedId, onSelect, onStop}: {msg: Extrac
   </div>;
 }
 
-function SpecMessage({msg, onStart, busy}: {msg: Extract<Msg, {type: 'spec'}>; onStart: () => void; busy: boolean}) {
+function SpecMessage({msg, onStart, busy, onRevealed, onGrow}: {msg: Extract<Msg, {type: 'spec'}>; onStart: () => void;
+  busy: boolean; onRevealed: (id: number) => void; onGrow: () => void}) {
+  const {L} = useLang();
   const {spec} = msg;
-  const refName = msg.paper.source === 'corebench' ? 'Reference' : 'Paper';
+  const refName = msg.paper.source === 'corebench' ? L('Reference', '参考答案') : L('Paper', '论文');
+  const tl = revealTimeline(spec, msg.paper);
+  const [t, setT] = useState(() => msg.reveal && !reducedMotion() ? 0 : Infinity);  // ms since the card appeared
+  useEffect(() => {
+    if (t === Infinity) { onRevealed(msg.id); return; }
+    const t0 = performance.now();
+    let raf = 0;
+    const frame = () => {
+      const e = performance.now() - t0;
+      if (e >= tl.end) { setT(Infinity); onRevealed(msg.id); return; }
+      setT(e);
+      raf = requestAnimationFrame(frame);
+    };
+    raf = requestAnimationFrame(frame);
+    return () => cancelAnimationFrame(raf);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  const revealing = t !== Infinity;
+  useEffect(() => { if (revealing) onGrow(); });  // keep the growing card in view
+  const typed = Math.max(0, Math.min(1, (t - tl.task) / tl.typeMs));
+  const task = revealing ? spec.task_prompt.slice(0, Math.round(spec.task_prompt.length * typed)) : spec.task_prompt;
+  let refIndex = 0;
+  const intro = revealing ? <ShiningText text={L('Writing the plan…', '正在写计划…')}/>
+    : <>{msg.cost ? L(`Here is your request as a task (drafting cost $${msg.cost.toFixed(4)}). `, `这是根据你的请求整理出的任务（起草花费 $${msg.cost.toFixed(4)}）。`)
+        : L('Here is the example task. ', '这是示例任务。')}
+      {msg.started ? L('It has started.', '已经开始运行。') : msg.example && busy ? L('Starting it…', '正在启动…')
+        : L('Press Start or reply “start”; to change it, just say what to change.', '点“开始”或回复“开始”即可运行；想修改的话，直接说要改什么。')}</>;
   return <div className="bubble">
-    <p>{msg.cost ? `Here is your request as a task (drafting cost $${msg.cost.toFixed(4)}). ` : 'Here is the example task. '}
-      {msg.started ? 'It has started.' : 'Press Start or reply “start”; to change it, just say what to change.'}</p>
+    <p>{intro}</p>
     <div className="spec-card">
       <div className="spec-head"><FlaskConical size={15}/><b>{spec.title}</b></div>
-      <div className="chips"><span className="chip">{spec.code.capsule ? <><Package size={11}/>{spec.code.capsule}</> : <><Github size={11}/>{spec.code.repo_url?.replace('https://github.com/', '')}</>}</span>
-        {spec.language && <span className="chip">{spec.language}</span>}</div>
-      <p className="spec-task">{spec.task_prompt}</p>
-      <ol className="spec-qs">{spec.questions.map(q => {
+      {t >= tl.chips && <div className={`chips${revealing ? ' reveal-in' : ''}`}><span className="chip">{spec.code.capsule ? <><Package size={11}/>{spec.code.capsule}</> : <><Github size={11}/>{spec.code.repo_url?.replace('https://github.com/', '')}</>}</span>
+        {spec.language && <span className="chip">{spec.language}</span>}</div>}
+      {t >= tl.task && <p className={`spec-task${revealing && typed < 1 ? ' typing-caret' : ''}`}>{task}</p>}
+      <ol className="spec-qs">{spec.questions.map((q, i) => {
+        if (t < tl.q0 + i * tl.qStep) return null;
         const ref = msg.paper.values[q.id];
-        return <li key={q.id}><code>{q.id}</code>{q.text}<span className="muted"> · {q.answer_type}</span>
-          {ref && <div className="paper-ref">{refName}: <b>{show(ref.value)}{ref.unit ? ` ${ref.unit}` : ''}</b>{ref.location ? <span className="muted"> ({ref.location})</span> : null}</div>}</li>;
+        const showRef = ref && t >= tl.r0 + (refIndex++) * tl.rStep;
+        return <li key={q.id} className={revealing ? 'reveal-in' : undefined}><code>{q.id}</code>{q.text}<span className="muted"> · {q.answer_type}</span>
+          {showRef && <div className={`paper-ref${revealing ? ' reveal-in' : ''}`}>{refName}: <b>{show(ref.value)}{ref.unit ? ` ${ref.unit}` : ''}</b>{ref.location ? <span className="muted"> ({ref.location})</span> : null}</div>}</li>;
       })}</ol>
-      <div className="paper-note">{msg.paper.source === 'corebench'
-        ? <>A CORE-Bench task: the answers are compared with its reference answers (the mean of 3 manual re-runs), which the agents never see.</>
+      {t >= tl.note && <div className={`paper-note${revealing ? ' reveal-in' : ''}`}>{msg.paper.source === 'corebench'
+        ? L(<>A CORE-Bench task: the answers are compared with its reference answers (the mean of 3 manual re-runs), which the agents never see.</>,
+          <>CORE-Bench 任务：答案会和它的参考答案（3 次人工重跑的平均值）比较，agent 看不到这些参考答案。</>)
         : msg.paper.arxiv
-          ? <>Paper <a href={`https://arxiv.org/abs/${msg.paper.arxiv}`} target="_blank" rel="noreferrer">arXiv {msg.paper.arxiv}</a>: found its value for {Object.keys(msg.paper.values).length} of {spec.questions.length} questions; the answers are compared with them at the end. The agents never see these values.</>
-          : <>No paper found (no arXiv link in the message or the README), so the answers cannot be compared. Add an arXiv link to the message to compare.</>}</div>
+          ? L(<>Paper <a href={`https://arxiv.org/abs/${msg.paper.arxiv}`} target="_blank" rel="noreferrer">arXiv {msg.paper.arxiv}</a>: found its value for {Object.keys(msg.paper.values).length} of {spec.questions.length} questions; the answers are compared with them at the end. The agents never see these values.</>,
+            <>论文 <a href={`https://arxiv.org/abs/${msg.paper.arxiv}`} target="_blank" rel="noreferrer">arXiv {msg.paper.arxiv}</a>：{spec.questions.length} 个问题中找到了 {Object.keys(msg.paper.values).length} 个的论文值，最后会拿答案和它们比较。Agent 看不到这些值。</>)
+          : L(<>No paper found (no arXiv link in the message or the README), so the answers cannot be compared. Add an arXiv link to the message to compare.</>,
+            <>没有找到论文（消息和 README 里都没有 arXiv 链接），所以答案无法比较。在消息里加上 arXiv 链接就能比较。</>)}</div>}
     </div>
-    {!msg.started && <div className="actions"><button type="button" className="btn primary sm" disabled={busy} onClick={onStart}>
-      {busy ? <Loader2 size={14} className="spin"/> : <Play size={13}/>}Start</button></div>}
+    {!msg.started && !revealing && !(msg.example && busy) && <div className="actions"><button type="button" className="btn primary sm" disabled={busy} onClick={onStart}>
+      {busy ? <Loader2 size={14} className="spin"/> : <Play size={13}/>}{L('Start', '开始')}</button></div>}
+  </div>;
+}
+
+/** The drafting steps of a plan, ticking off one by one; the last one stays at work until the plan arrives. */
+function PlanSteps({steps, note}: {steps: string[]; note?: string}) {
+  const {L} = useLang();
+  const [at, setAt] = useState(0);
+  useEffect(() => {
+    if (at >= steps.length - 1) return;
+    const t = setTimeout(() => setAt(a => a + 1), PLAN_STEP_MS);
+    return () => clearTimeout(t);
+  }, [at, steps.length]);
+  return <div className="bubble">
+    <div className="thinking-row"><Loader variant="newton" size={28}/><ShiningText text={L('Drafting the plan…', '正在起草计划…')}/></div>
+    <ol className="plan-steps">{steps.slice(0, at + 1).map((s, i) => <li key={s} className={i < at ? 'is-done' : 'is-now'}>
+      {i < at ? <Check size={13}/> : <Loader2 size={13} className="spin"/>}<span>{s}</span></li>)}</ol>
+    {note && <p className="plan-note">{note}</p>}
   </div>;
 }
 
 function AskUrlMessage({msg, onSubmit}: {msg: Extract<Msg, {type: 'ask_url'}>; onSubmit: (url: string) => void}) {
+  const {L} = useLang();
   const [url, setUrl] = useState('');
   const ok = GITHUB.test(url.trim());
   return <div className="bubble">
-    <p>Your request has no code to run. What is the <b>GitHub address</b> of the official code? The agents clone it and reproduce from there. Enter it below, or reply with it.</p>
+    <p>{L(<>Your request has no code to run. What is the <b>GitHub address</b> of the official code? The agents clone it and reproduce from there. Enter it below, or reply with it.</>,
+      <>你的请求里没有可运行的代码。官方代码的 <b>GitHub 地址</b>是什么？Agent 会 clone 它并从那里开始复现。在下面填写，或者直接回复地址。</>)}</p>
     {!msg.resolved && <form className="url-form" onSubmit={e => { e.preventDefault(); if (ok) onSubmit(url.trim()); }}>
       <Github size={15}/><input className="input" placeholder="https://github.com/owner/repo" value={url} onChange={e => setUrl(e.target.value)} autoFocus/>
-      <button type="submit" className="btn primary sm" disabled={!ok}>Continue</button>
+      <button type="submit" className="btn primary sm" disabled={!ok}>{L('Continue', '继续')}</button>
     </form>}
   </div>;
 }
@@ -335,6 +435,7 @@ function AskUrlMessage({msg, onSubmit}: {msg: Extract<Msg, {type: 'ask_url'}>; o
 /* ---------------------------------------------------------------- app */
 
 export function App() {
+  const {lang, L} = useLang();
   const [options, setOptions] = useState<Options | null>(null);
   const [examples, setExamples] = useState<ExampleTask[] | null>(null);
   const [history, setHistory] = useState<HistoryRun[] | null>(null);
@@ -357,8 +458,19 @@ export function App() {
   const vendor = options?.models.find(m => m.id === model)?.vendor ?? 'anthropic';
   const push = useCallback((m: NewMsg, by?: string) => {
     stick.current = true;
-    setMsgs(ms => [...ms.filter(x => !(x.role === 'assistant' && x.type === 'thinking')), {...m, id: newId(), by: by ?? vendor} as Msg]);
+    const id = newId();
+    setMsgs(ms => [...ms.filter(x => !(x.role === 'assistant' && x.type === 'thinking')), {...m, id, by: by ?? vendor} as Msg]);
+    return id;
   }, [vendor]);
+  // a plan card tells the app when it has finished appearing (the example waits for that before it starts the run)
+  const revealWaiters = useRef(new Map<number, () => void>());
+  const revealed = useCallback((id: number) => {
+    revealWaiters.current.get(id)?.();
+    revealWaiters.current.delete(id);
+    setMsgs(ms => ms.map(m => m.id === id && m.role === 'assistant' && m.type === 'spec' && m.reveal ? {...m, reveal: false} : m));
+  }, []);
+  const untilRevealed = (id: number) => new Promise<void>(r => { revealWaiters.current.set(id, r); });
+  const follow = useCallback(() => { const el = thread.current; if (el && stick.current) el.scrollTop = el.scrollHeight; }, []);
   const patch = useCallback((mid: number, f: (m: Msg) => Msg) => setMsgs(ms => ms.map(m => m.id === mid ? f(m) : m)), []);
   const refreshHistory = useCallback(() => { api.history().then(r => setHistory(r.runs), () => setHistory([])); }, []);
 
@@ -418,10 +530,10 @@ export function App() {
     try {
       const r = await api.draft({prompt, model, ...(repoUrl ? {repo_url: repoUrl} : {})});
       if ('need' in r) push({role: 'assistant', type: 'ask_url', prompt});
-      else push({role: 'assistant', type: 'spec', spec: r.spec, paper: r.paper, cost: r.cost});
-    } catch (e) { push({role: 'assistant', type: 'text', text: `Could not draft the task: ${(e as Error).message}`}); }
+      else push({role: 'assistant', type: 'spec', spec: r.spec, paper: r.paper, cost: r.cost, reveal: true});
+    } catch (e) { push({role: 'assistant', type: 'text', text: `${L('Could not draft the task', '无法起草任务')}: ${(e as Error).message}`}); }
     finally { setBusy(false); }
-  }, [push, model]);
+  }, [push, model, L]);
 
   const start = useCallback(async (mid: number, spec: Spec) => {
     setBusy(true);
@@ -430,9 +542,9 @@ export function App() {
       patch(mid, m => ({...m, started: true} as Msg));
       open(r.key);
       refreshHistory();
-    } catch (e) { push({role: 'assistant', type: 'text', text: `Could not start: ${(e as Error).message}`}); }
+    } catch (e) { push({role: 'assistant', type: 'text', text: `${L('Could not start', '无法启动')}: ${(e as Error).message}`}); }
     finally { setBusy(false); }
-  }, [workflow, model, patch, open, push, refreshHistory]);
+  }, [workflow, model, patch, open, push, refreshHistory, L]);
 
   const resolveUrl = useCallback((mid: number, prompt: string, url: string) => {
     patch(mid, m => ({...m, resolved: true} as Msg));
@@ -445,61 +557,73 @@ export function App() {
     const url = GITHUB.exec(text)?.[0];
     if (last?.role === 'assistant' && last.type === 'ask_url' && !last.resolved) {  // the answer to "which repository?"
       if (url) resolveUrl(last.id, last.prompt, url);
-      else push({role: 'assistant', type: 'text', text: 'I could not find a GitHub address in that. Please send a link like https://github.com/owner/repo.'});
+      else push({role: 'assistant', type: 'text', text: L('I could not find a GitHub address in that. Please send a link like https://github.com/owner/repo.', '这条消息里没有找到 GitHub 地址。请发一个类似 https://github.com/owner/repo 的链接。')});
       return;
     }
     if (last?.role === 'assistant' && last.type === 'spec' && !last.started) {
       if (START_WORDS.test(text.trim())) { start(last.id, last.spec); return; }
       // a correction to the drafted task: draft it again with the correction
-      draftSpec(`${last.spec.origin.prompt}\nAlso: ${text}`, url ?? last.spec.code.repo_url ?? undefined);
+      draftSpec(`${last.spec.origin.prompt}\n${L('Also', '另外')}: ${text}`, url ?? last.spec.code.repo_url ?? undefined);
       return;
     }
     draftSpec(text, url);
-  }, [msgs, push, resolveUrl, draftSpec, start]);
+  }, [msgs, push, resolveUrl, draftSpec, start, L]);
 
-  // an example: its task as a new spec, started at once with the workflow and model chosen now
+  // an example: the plan saved from the run that made it a good example, shown the way a plan is drafted (the steps,
+  // then the card filling in), and started with the workflow and model chosen now once it is on screen
   const runExample = useCallback(async (e: ExampleTask) => {
-    push({role: 'user', text: `Run the example “${e.title}” (${WF_LABEL[workflow]} · ${model})`});
+    push({role: 'user', text: L(`Run the example “${e.title}” (${wfLabel(workflow, lang)} · ${model})`, `运行示例“${e.title}”（${wfLabel(workflow, lang)} · ${model}）`)});
     setBusy(true);
+    const corebench = e.source === 'corebench';
+    const code = /^https?:/.test(e.code) ? e.code.replace(/^https?:\/\/(www\.)?github\.com\//, '') : e.code;
+    const steps = [L('Reading the request', '阅读请求'),
+      corebench ? L(`Opening the CORE-Bench capsule ${code}`, `打开 CORE-Bench capsule ${code}`) : L(`Reading the repository ${code}`, `阅读代码仓库 ${code}`),
+      L('Writing the task and its questions', '写出任务和要回答的问题'),
+      corebench ? L('Loading CORE-Bench’s reference answers', '载入 CORE-Bench 的参考答案') : L('Looking up the values the paper reports', '查找论文报告的数值')];
+    push({role: 'assistant', type: 'thinking', steps,
+      note: L('This example’s plan was drafted when it was first run; it is replayed here, without a new model call.', '这个示例的计划是第一次运行时起草的，这里是重放，不会再调用模型。')});
     try {
-      const r = await api.example(e.case);
+      const [r] = await Promise.all([api.example(e.case), reducedMotion() ? null : sleep(steps.length * PLAN_STEP_MS)]);
+      const mid = push({role: 'assistant', type: 'spec', spec: r.spec, paper: r.paper, cost: 0, example: true, reveal: true});
+      await untilRevealed(mid);
       const r2 = await api.start({spec: r.spec, workflow, model});
-      push({role: 'assistant', type: 'spec', spec: r.spec, paper: r.paper, cost: 0, started: true});
+      patch(mid, m => ({...m, started: true} as Msg));
       open(r2.key);
       refreshHistory();
-    } catch (err) { push({role: 'assistant', type: 'text', text: `Could not start: ${(err as Error).message}`}); }
+    } catch (err) { push({role: 'assistant', type: 'text', text: `${L('Could not start', '无法启动')}: ${(err as Error).message}`}); }
     finally { setBusy(false); }
-  }, [push, open, workflow, model, refreshHistory]);
+  }, [push, patch, open, workflow, model, refreshHistory, L, lang]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const stop = useCallback(() => { if (key) api.stop(key).catch(() => undefined); }, [key]);
   const lastRun = [...msgs].reverse().find(m => m.role === 'assistant' && m.type === 'run');
 
   return <div className={`app${page === 'changelog' ? ' is-changelog' : ''}`}>
     <TopBar dark={dark} onTheme={() => setDark(d => !d)}>
-      <HistoryMenu runs={history} onRefresh={refreshHistory} onOpen={r => { leaveChangelog(); push({role: 'user', text: `Open “${r.title}”`}); open(r.key); }}/>
-      <button type="button" className={`menu-trigger${page === 'changelog' ? ' is-open' : ''}`} onClick={showChangelog}><ListChecks size={14}/><span>Changelog</span></button>
+      <HistoryMenu runs={history} onRefresh={refreshHistory} onOpen={r => { leaveChangelog(); push({role: 'user', text: L(`Open “${r.title}”`, `打开“${r.title}”`)}); open(r.key); }}/>
+      <button type="button" className={`menu-trigger${page === 'changelog' ? ' is-open' : ''}`} onClick={showChangelog}><ListChecks size={14}/><span>{L('Changelog', '更新日志')}</span></button>
     </TopBar>
     {page === 'changelog' && <ChangelogPage onBack={leaveChangelog}/>}
-    {error && !options && <div className="error page-error">Cannot reach the server: {error} (start it with <code>p2e demo serve</code>)</div>}
+    {error && !options && <div className="error page-error">{L('Cannot reach the server', '无法连接服务器')}: {error} ({L('start it with', '用这条命令启动')} <code>p2e demo serve</code>)</div>}
     <main className={`layout${msgs.length ? '' : ' is-empty'}${page === 'changelog' ? ' is-hidden' : ''}`}>
       <section className="chat">
         {!msgs.length && <div className="hero">
-          <h1>What should we reproduce?</h1>
-          <p>Name the paper or code and the numbers or figures you want, ideally with the GitHub address. I’ll turn it into a task,
-            run it with the workflow and model below, and compare the results with the paper.</p>
-          <div className="suggest">{SUGGESTIONS.map(x => <button type="button" key={x.label} className="suggest-btn" onClick={() => setDraft(x.text)}>{x.label}</button>)}</div>
+          <h1>{L('What should we reproduce?', '想复现什么？')}</h1>
+          <p>{L('Name the paper or code and the numbers or figures you want, ideally with the GitHub address. I’ll turn it into a task, run it with the workflow and model below, and compare the results with the paper.',
+            '说出论文或代码，以及想复现的数字或图，最好附上 GitHub 地址。我会把它整理成任务，用下面选的 workflow 和模型运行，再把结果和论文对比。')}</p>
+          <div className="suggest">{SUGGESTIONS[lang].map(x => <button type="button" key={x.label} className="suggest-btn" onClick={() => setDraft(x.text)}>{x.label}</button>)}</div>
         </div>}
         <div className="thread" ref={thread} onScroll={e => { const el = e.currentTarget; stick.current = el.scrollHeight - el.scrollTop - el.clientHeight < 80; }}>
           {msgs.map(m => m.role === 'user'
             ? <div key={m.id} className="msg user"><div className="bubble">{m.text}</div></div>
             : <div key={m.id} className={`msg assistant${m.type === 'run' ? ' is-wide' : ''}`}>
               <Author vendor={m.type === 'run' && m.id === lastRun?.id && job?.vendor ? job.vendor : m.by}/>
-              {m.type === 'thinking' ? <div className="bubble"><div className="thinking-row"><Loader variant="newton" size={28}/><ShiningText text="Drafting the task and looking up the paper’s values…"/></div></div>
+              {m.type === 'thinking' && m.steps ? <PlanSteps steps={m.steps} note={m.note}/>
+                : m.type === 'thinking' ? <div className="bubble"><div className="thinking-row"><Loader variant="newton" size={28}/><ShiningText text={L('Drafting the task and looking up the paper’s values…', '正在起草任务，并查找论文中的数值…')}/></div></div>
                 : m.type === 'text' ? <div className="bubble"><p>{m.text}</p></div>
                 : m.type === 'ask_url' ? <AskUrlMessage msg={m} onSubmit={u => { push({role: 'user', text: u}); resolveUrl(m.id, m.prompt, u); }}/>
-                : m.type === 'spec' ? <SpecMessage msg={m} busy={busy} onStart={() => start(m.id, m.spec)}/>
+                : m.type === 'spec' ? <SpecMessage msg={m} busy={busy} onStart={() => start(m.id, m.spec)} onRevealed={revealed} onGrow={follow}/>
                 : m.id === lastRun?.id ? <RunMessage msg={m} job={job} wall={wall} selectedId={selectedId} onSelect={setSelectedId} onStop={stop}/>
-                : <div className="bubble"><p className="muted">An earlier run; open it again from History.</p></div>}
+                : <div className="bubble"><p className="muted">{L('An earlier run; open it again from History.', '较早的一次运行；可以从“历史记录”重新打开。')}</p></div>}
             </div>)}
         </div>
         {options && <Composer options={options} examples={examples} workdir={workdir} onWorkdir={setWorkdir} onSend={send}

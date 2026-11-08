@@ -7,16 +7,31 @@ import {ModelPicker, type ModelPickerProvider} from './alex/modules/chat/compone
 import {api} from './api';
 import {ROLE_ICONS} from './icons';
 import {VendorLogo} from './provider-logos';
-import type {ExampleTask, ModelOption, Options, Workdir} from './types';
+import type {ExampleTask, ModelOption, Options, Workdir, Workflow} from './types';
+import {useLang, type Lang} from './i18n';
 
-export const WF_LABEL: Record<string, string> = {single: 'A · Single agent', fixed: 'B · Fixed pipeline', planner_workers: 'D · Planner + workers'};
+// The three workflows' names and descriptions in both languages (the server sends English); unknown ids keep the server's.
+const WF_TEXT: Record<string, {letter: string; name: [string, string]; desc: [string, string]}> = {
+  single: {letter: 'A', name: ['Single agent', '单 agent'],
+    desc: ['One agent does it all: sets up, runs the code, reads the output, answers', '一个 agent 包揽全部：搭环境、运行代码、读输出、回答问题']},
+  fixed: {letter: 'B', name: ['Fixed pipeline', '固定 pipeline'],
+    desc: ['A fixed pipeline: environment agent → planner → executor → answerer', '固定流程：环境 agent → planner → executor → answerer']},
+  planner_workers: {letter: 'D', name: ['Planner + workers', 'Planner + workers'],
+    desc: ['A planner hands out tasks as needed: workers set up, the runtime runs commands, failures are retried', '由 planner 按需分派任务：worker 搭环境，runtime 执行命令，失败的任务会重试']},
+};
+const pick = (pair: [string, string], lang: Lang) => pair[lang === 'zh' ? 1 : 0];
+export const wfName = (w: Workflow, lang: Lang) => WF_TEXT[w.id] ? pick(WF_TEXT[w.id].name, lang) : w.name;
+export const wfDesc = (w: Workflow, lang: Lang) => WF_TEXT[w.id] ? pick(WF_TEXT[w.id].desc, lang) : w.desc;
+/** "D · Planner + workers": the letter and name of a workflow id, in the page's language. */
+export const wfLabel = (id: string, lang: Lang) => WF_TEXT[id] ? `${WF_TEXT[id].letter} · ${pick(WF_TEXT[id].name, lang)}` : id;
 export const VENDOR_NAME: Record<string, string> = {
   anthropic: 'Anthropic', openai: 'OpenAI', google: 'Google', xai: 'xAI', deepseek: 'DeepSeek', qwen: 'Qwen', kimi: 'Kimi',
   moonshot: 'Moonshot', zai: 'Z.ai', minimax: 'MiniMax', mistral: 'Mistral', meta: 'Meta', openrouter: 'OpenRouter', groq: 'Groq',
 };
 const BUILT_IN_GLYPHS = new Set(['anthropic', 'openai', 'google', 'xai']);  // Alex's ProviderGlyph draws these itself
 
-const minutes = (s: number) => s < 60 ? `${Math.round(s)} s` : `${(s / 60).toFixed(s < 600 ? 1 : 0)} min`;
+const minutes = (s: number, lang: Lang) => s < 60 ? `${Math.round(s)} ${lang === 'zh' ? '秒' : 's'}`
+  : `${(s / 60).toFixed(s < 600 ? 1 : 0)} ${lang === 'zh' ? '分钟' : 'min'}`;
 
 /** "claude-haiku-5-5" -> "Claude Haiku 5.5", "gpt-6-luna" -> "GPT-6 Luna" */
 function modelName(id: string) {
@@ -64,6 +79,7 @@ function FolderGlyph() {
 }
 
 function RunFolder({workdir, onChange}: {workdir: Workdir | null; onChange: (w: Workdir) => void}) {
+  const {L} = useLang();
   const [path, setPath] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
@@ -73,42 +89,44 @@ function RunFolder({workdir, onChange}: {workdir: Workdir | null; onChange: (w: 
     catch (e) { setError((e as Error).message); } finally { setBusy(false); }
   };
   return <Popup trigger={(open, toggle) => <button type="button" className={`tray-btn${open ? ' is-open' : ''}`} onClick={toggle}
-    title={workdir?.path}><FolderGlyph/><span>{workdir?.chosen ? workdir.name : 'Run in a folder'}</span></button>}>
+    title={workdir?.path}><FolderGlyph/><span>{workdir?.chosen ? workdir.name : L('Run in a folder', '选择运行目录')}</span></button>}>
     {close => <div className="folder-panel">
-      <div className="popup-head">Run folder</div>
-      <p className="popup-text">Each reproduction gets its own sub-folder here: the cloned code, its environment and everything it writes.</p>
+      <div className="popup-head">{L('Run folder', '运行目录')}</div>
+      <p className="popup-text">{L('Each reproduction gets its own sub-folder here: the cloned code, its environment and everything it writes.', '每次复现都会在这里建一个子目录，存放 clone 下来的代码、它的环境和它写出的所有文件。')}</p>
       <code className="folder-path">{workdir?.path ?? '…'}</code>
       <button type="button" className="btn primary sm wide" disabled={busy} onClick={() => act(api.chooseWorkdir, close)}>
-        {busy ? <Loader2 size={13} className="spin"/> : <FolderGlyph/>}Choose a folder…</button>
+        {busy ? <Loader2 size={13} className="spin"/> : <FolderGlyph/>}{L('Choose a folder…', '选择文件夹…')}</button>
       <form className="folder-form" onSubmit={e => { e.preventDefault(); if (path.trim()) act(() => api.setWorkdir(path.trim()), close); }}>
-        <input className="input" placeholder="or paste a path, e.g. ~/reproductions" value={path} onChange={e => setPath(e.target.value)}/>
-        <button type="submit" className="btn ghost sm" disabled={busy || !path.trim()}>Use</button>
+        <input className="input" placeholder={L('or paste a path, e.g. ~/reproductions', '或者粘贴路径，例如 ~/reproductions')} value={path} onChange={e => setPath(e.target.value)}/>
+        <button type="submit" className="btn ghost sm" disabled={busy || !path.trim()}>{L('Use', '使用')}</button>
       </form>
-      {workdir?.chosen && <button type="button" className="link" onClick={() => act(() => api.setWorkdir(workdir.default), close)}>Back to the default ({workdir.default})</button>}
+      {workdir?.chosen && <button type="button" className="link" onClick={() => act(() => api.setWorkdir(workdir.default), close)}>{L('Back to the default', '恢复默认')} ({workdir.default})</button>}
       {error && <div className="error">{error}</div>}
     </div>}
   </Popup>;
 }
 
 function ExampleTasks({examples, workflow, model, onPick}: {examples: ExampleTask[] | null; workflow: string; model: string; onPick: (e: ExampleTask) => void}) {
+  const {lang, L} = useLang();
   return <Popup align="right" trigger={(open, toggle) => <button type="button" className={`tray-btn${open ? ' is-open' : ''}`} onClick={toggle}>
-    <span>Example tasks</span>
+    <span>{L('Example tasks', '示例任务')}</span>
     <span className="tray-marks" aria-hidden="true">
       <span className="mark is-flask"><FlaskConical size={11} strokeWidth={2.4}/></span>
       <span className="mark is-github"><Github size={11} strokeWidth={2.4}/></span>
       <span className="mark is-package"><Package size={11} strokeWidth={2.4}/></span>
     </span></button>}>
     {close => <div className="examples-panel">
-      <div className="popup-head">Example tasks</div>
-      <p className="popup-text">{examples?.length ?? '…'} tasks an earlier run answered in under 10 minutes. Pick one to run it from scratch with <b>{WF_LABEL[workflow]} · {model}</b>.</p>
+      <div className="popup-head">{L('Example tasks', '示例任务')}</div>
+      <p className="popup-text">{L(<>{examples?.length ?? '…'} tasks an earlier run answered in under 10 minutes. Pick one to run it from scratch with <b>{wfLabel(workflow, lang)} · {model}</b>.</>,
+        <>以前的运行在 10 分钟内答完的 {examples?.length ?? '…'} 个任务。选一个，会用 <b>{wfLabel(workflow, lang)} · {model}</b> 从头运行。</>)}</p>
       <div className="popup-scroll">
         {!examples ? <div className="popup-empty"><Loader2 size={14} className="spin"/></div>
-          : !examples.length ? <div className="popup-empty">No quick tasks yet</div>
+          : !examples.length ? <div className="popup-empty">{L('No quick tasks yet', '还没有能快速跑完的任务')}</div>
           : examples.map(e => <button type="button" key={e.case} role="menuitem" className="popup-item" onClick={() => { close(); onPick(e); }}>
             <span className="popup-icon">{e.code.startsWith('http') ? <Github size={14}/> : <Package size={14}/>}</span>
             <span className="popup-main"><b>{e.title}</b>
-              <small>{e.code.replace('https://github.com/', '')}{e.language ? ` · ${e.language}` : ''} · {e.questions} {e.questions === 1 ? 'question' : 'questions'}</small></span>
-            <span className="popup-meta">{minutes(e.fastest_s)}</span>
+              <small>{e.code.replace('https://github.com/', '')}{e.language ? ` · ${e.language}` : ''} · {L(`${e.questions} ${e.questions === 1 ? 'question' : 'questions'}`, `${e.questions} 个问题`)}</small></span>
+            <span className="popup-meta">{minutes(e.fastest_s, lang)}</span>
           </button>)}
       </div>
     </div>}
@@ -116,11 +134,12 @@ function ExampleTasks({examples, workflow, model, onPick}: {examples: ExampleTas
 }
 
 function WorkflowPicker({options, value, onChange}: {options: Options; value: string; onChange: (id: string) => void}) {
+  const {lang, L} = useLang();
   const w = options.workflows.find(x => x.id === value);
   const iconOf = (id: string) => ROLE_ICONS[id === 'single' ? 'agent' : id === 'fixed' ? 'pipeline' : 'planner'];
   const Icon = iconOf(value);
-  return <Popup trigger={(open, toggle) => <button type="button" className={`flat-btn${open ? ' is-open' : ''}`} onClick={toggle} title={w?.desc}>
-    <Icon size={19} strokeWidth={1.6}/><span>{w ? w.name : 'Workflow'}</span></button>}>
+  return <Popup trigger={(open, toggle) => <button type="button" className={`flat-btn${open ? ' is-open' : ''}`} onClick={toggle} title={w ? wfDesc(w, lang) : undefined}>
+    <Icon size={19} strokeWidth={1.6}/><span>{w ? wfName(w, lang) : 'Workflow'}</span></button>}>
     {close => <div className="workflow-panel">
       <div className="popup-head">Workflow</div>
       {options.workflows.map(x => {
@@ -128,7 +147,7 @@ function WorkflowPicker({options, value, onChange}: {options: Options; value: st
         return <button type="button" key={x.id} role="menuitemradio" aria-checked={x.id === value} className={`popup-item${x.id === value ? ' is-on' : ''}`}
           onClick={() => { onChange(x.id); close(); }}>
           <span className="popup-icon"><I size={15}/></span>
-          <span className="popup-main"><b>{x.letter} · {x.name}</b><small>{x.desc}</small></span>
+          <span className="popup-main"><b>{x.letter} · {wfName(x, lang)}</b><small>{wfDesc(x, lang)}</small></span>
           {x.id === value && <Check size={14} className="popup-check"/>}
         </button>;
       })}
@@ -143,6 +162,7 @@ export function Composer({options, examples, workdir, onWorkdir, onSend, onExamp
   workflow: string; setWorkflow: (w: string) => void; model: string; setModel: (m: string) => void;
   draft: string; setDraft: (t: string) => void;
 }) {
+  const {L} = useLang();
   const ref = useRef<HTMLTextAreaElement>(null);
   useEffect(() => { const el = ref.current; if (el) { el.style.height = 'auto'; el.style.height = `${Math.min(220, Math.max(64, el.scrollHeight))}px`; } }, [draft]);
   const send = () => { const t = draft.trim(); if (t && !busy) { onSend(t); setDraft(''); } };
@@ -152,26 +172,26 @@ export function Composer({options, examples, workdir, onWorkdir, onSend, onExamp
   };
   return <div className="composer">
     <div className="composer-field">
-      <textarea ref={ref} rows={2} value={draft} placeholder="Start by typing… e.g. reproduce Table 2 of the paper at https://github.com/…"
+      <textarea ref={ref} rows={2} value={draft} placeholder={L('Start by typing… e.g. reproduce Table 2 of the paper at https://github.com/…', '输入你的请求… 例如：复现 https://github.com/… 这篇论文的表 2')}
         onChange={e => setDraft(e.target.value)}
         onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) { e.preventDefault(); send(); } }}/>
       <div className="composer-row">
-        <Popup trigger={(open, toggle) => <button type="button" className={`icon-flat${open ? ' is-open' : ''}`} onClick={toggle} aria-label="Add a link">
+        <Popup trigger={(open, toggle) => <button type="button" className={`icon-flat${open ? ' is-open' : ''}`} onClick={toggle} aria-label={L('Add a link', '添加链接')}>
           <Plus size={20} strokeWidth={1.6}/></button>}>
           {close => <div className="plus-panel">
-            <button type="button" className="popup-item" onClick={() => { insert('Code: https://github.com/'); close(); }}>
-              <span className="popup-icon"><Github size={14}/></span><span className="popup-main"><b>GitHub repository</b><small>The code to reproduce with</small></span></button>
-            <button type="button" className="popup-item" onClick={() => { insert('Paper: https://arxiv.org/abs/'); close(); }}>
-              <span className="popup-icon"><BookOpen size={14}/></span><span className="popup-main"><b>arXiv paper</b><small>Its numbers are what the answers are compared with</small></span></button>
+            <button type="button" className="popup-item" onClick={() => { insert(`${L('Code', '代码')}: https://github.com/`); close(); }}>
+              <span className="popup-icon"><Github size={14}/></span><span className="popup-main"><b>{L('GitHub repository', 'GitHub 仓库')}</b><small>{L('The code to reproduce with', '用来复现的代码')}</small></span></button>
+            <button type="button" className="popup-item" onClick={() => { insert(`${L('Paper', '论文')}: https://arxiv.org/abs/`); close(); }}>
+              <span className="popup-icon"><BookOpen size={14}/></span><span className="popup-main"><b>{L('arXiv paper', 'arXiv 论文')}</b><small>{L('Its numbers are what the answers are compared with', '答案会和论文里的数字比较')}</small></span></button>
           </div>}
         </Popup>
         <WorkflowPicker options={options} value={workflow} onChange={setWorkflow}/>
         <span className="composer-spacer"/>
-        <ModelPicker compact promptStyle providers={pickerProviders(options.models)} value={model} placeholder="No model configured"
+        <ModelPicker compact promptStyle providers={pickerProviders(options.models)} value={model} placeholder={L('No model configured', '没有配置模型')}
           onValueChange={id => setModel(id)} side="top" align="end" className="min-w-0 max-w-[220px] text-[15px]"/>
         {onStop
-          ? <button type="button" className="send-btn is-stop" onClick={onStop} aria-label="Stop the run"><Square size={13} fill="currentColor"/></button>
-          : <button type="button" className="send-btn" disabled={!draft.trim() || busy} onClick={send} aria-label="Send"><ArrowUp size={19} strokeWidth={2}/></button>}
+          ? <button type="button" className="send-btn is-stop" onClick={onStop} aria-label={L('Stop the run', '停止运行')}><Square size={13} fill="currentColor"/></button>
+          : <button type="button" className="send-btn" disabled={!draft.trim() || busy} onClick={send} aria-label={L('Send', '发送')}><ArrowUp size={19} strokeWidth={2}/></button>}
       </div>
     </div>
     <div className="composer-tray">

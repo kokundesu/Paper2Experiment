@@ -10,27 +10,28 @@ import type {RunStep} from '../agent-run/agent-run';
 import {Avatar, ROLE_ICONS, toolIcon} from '../icons';
 import type {GraphNode, NodeStatus} from '../types';
 import './graph.css';
+import {useLang} from '../i18n';
 
 const W = 324, H = 168, COL = 385, ROW_GAP = 61, INDENT = 48, MAX_COLS = 4, R = 10;
 const SW = W - INDENT, SH = 50, SP = 60, GAP = 18, STEPS_SHOWN = 3;
 const PAD = 8;  // room around the drawing for the current card's ring
 const MIN_SCALE = 0.6;  // below this the cards' text is too small to read: the window scrolls instead
 
-const BADGE: Record<NodeStatus, {cls: string; label: string; icon: ReactNode}> = {
-  running: {cls: 'running', label: 'Running', icon: <svg className="spinner-svg" width="12" height="12" viewBox="0 0 14 14" fill="none">
+const BADGE: Record<NodeStatus, {cls: string; label: [string, string]; icon: ReactNode}> = {
+  running: {cls: 'running', label: ['Running', '运行中'], icon: <svg className="spinner-svg" width="12" height="12" viewBox="0 0 14 14" fill="none">
     <circle cx="7" cy="7" r="5.2" stroke="var(--badge-running-track)" strokeWidth="1.8"/>
     <path d="M7 1.8A5.2 5.2 0 0 1 12.2 7" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/></svg>},
-  done: {cls: 'done', label: 'Done', icon: <svg width="12" height="12" viewBox="0 0 14 14" fill="none">
+  done: {cls: 'done', label: ['Done', '完成'], icon: <svg width="12" height="12" viewBox="0 0 14 14" fill="none">
     <path d="M2.8 7.3L5.6 10.1L11.2 4.2" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"/></svg>},
-  waiting: {cls: 'needs-you', label: 'Waiting', icon: <svg width="12" height="12" viewBox="0 0 14 14" fill="none">
+  waiting: {cls: 'needs-you', label: ['Waiting', '等待中'], icon: <svg width="12" height="12" viewBox="0 0 14 14" fill="none">
     <circle cx="7" cy="7" r="5.3" stroke="currentColor" strokeWidth="1.5"/>
     <path d="M7 4.2V7.2L8.8 8.6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>},
-  failed: {cls: 'failed', label: 'Failed', icon: <svg width="12" height="12" viewBox="0 0 14 14" fill="none">
+  failed: {cls: 'failed', label: ['Failed', '失败'], icon: <svg width="12" height="12" viewBox="0 0 14 14" fill="none">
     <path d="M6.02 2.3L1.5 10.2C1.1 10.9 1.6 11.8 2.42 11.8H11.58C12.4 11.8 12.9 10.9 12.5 10.2L7.98 2.3C7.57 1.6 6.43 1.6 6.02 2.3Z" stroke="currentColor" strokeWidth="1.35" strokeLinecap="round" strokeLinejoin="round"/>
     <path d="M7 5.5V7.8" stroke="currentColor" strokeWidth="1.35" strokeLinecap="round"/><circle cx="7" cy="9.7" r="0.65" fill="currentColor"/></svg>},
-  stopped: {cls: 'stopped', label: 'Stopped', icon: <svg width="11" height="11" viewBox="0 0 12 12" fill="none">
+  stopped: {cls: 'stopped', label: ['Stopped', '已停止'], icon: <svg width="11" height="11" viewBox="0 0 12 12" fill="none">
     <rect x="2.2" y="2.2" width="7.6" height="7.6" rx="1.8" stroke="currentColor" strokeWidth="1.45"/></svg>},
-  pending: {cls: 'stopped', label: 'Queued', icon: <svg width="11" height="11" viewBox="0 0 12 12" fill="none">
+  pending: {cls: 'stopped', label: ['Queued', '排队中'], icon: <svg width="11" height="11" viewBox="0 0 12 12" fill="none">
     <circle cx="6" cy="6" r="4.4" stroke="currentColor" strokeWidth="1.4" strokeDasharray="2 2"/></svg>},
 };
 
@@ -168,11 +169,12 @@ function Card({node, provider, pos, now, current, selected, branchCount, collaps
   node: GraphNode; provider: string; pos: Pos; now: number; current: boolean; selected: boolean; branchCount: string;
   collapsed: boolean; onToggle: () => void; onSelect: () => void;
 }) {
+  const {L} = useLang();
   const badge = BADGE[node.status] ?? BADGE.running;
   const RoleIcon = ROLE_ICONS[node.kind];
   const tools = [...new Set(node.steps.map(s => s.name))].filter(n => n !== 'submit').slice(-3);
   const isTask = node.kind === 'worker' || node.kind === 'run';
-  const model = isTask ? `${node.kind === 'worker' ? 'Worker' : 'Runtime'}${node.kind === 'worker' && node.model ? ` · ${node.model}` : ''}${node.attempt && node.attempt > 1 ? ` · attempt ${node.attempt}` : ''}` : node.model;
+  const model = isTask ? `${node.kind === 'worker' ? 'Worker' : 'Runtime'}${node.kind === 'worker' && node.model ? ` · ${node.model}` : ''}${node.attempt && node.attempt > 1 ? ` · ${L(`attempt ${node.attempt}`, `第 ${node.attempt} 次尝试`)}` : ''}` : node.model;
   return <article className={`agent-card${node.status === 'stopped' ? ' status-stopped' : ''}${current ? ' is-current' : ''}${selected ? ' is-selected' : ''}`}
     style={{left: pos.x, top: pos.y}} onClick={onSelect} role="button" tabIndex={0}
     onKeyDown={e => { if (e.key === 'Enter') onSelect(); }}>
@@ -184,7 +186,7 @@ function Card({node, provider, pos, now, current, selected, branchCount, collaps
           <div className="agent-model">{model}</div>
         </div>
       </div>
-      <div className={`status-badge ${badge.cls}`}>{badge.icon}<span>{badge.label}</span></div>
+      <div className={`status-badge ${badge.cls}`}>{badge.icon}<span>{L(...badge.label)}</span></div>
     </div>
     <p className="card-task">
       {tools.length > 0 && <span className="tool-stack">{tools.map(t => <span key={t} className="tool-badge" title={t}>{toolIcon(t)}</span>)}</span>}
@@ -192,7 +194,7 @@ function Card({node, provider, pos, now, current, selected, branchCount, collaps
     </p>
     <div className="card-bottom">
       <div className="card-metrics">
-        <span className="metric-cost">{node.kind === 'run' || node.kind === 'executor' ? `${node.steps.length} ${node.steps.length === 1 ? 'command' : 'commands'}` : `$${node.cost.toFixed(node.cost < 0.1 ? 3 : 2)}`}</span>
+        <span className="metric-cost">{node.kind === 'run' || node.kind === 'executor' ? L(`${node.steps.length} ${node.steps.length === 1 ? 'command' : 'commands'}`, `${node.steps.length} 条命令`) : `$${node.cost.toFixed(node.cost < 0.1 ? 3 : 2)}`}</span>
         <span className="metric-dot">·</span>
         <span className="metric-time">{duration(seconds(node, now))}</span>
       </div>
@@ -209,9 +211,10 @@ function Card({node, provider, pos, now, current, selected, branchCount, collaps
 
 /** One step in a card's branch; the running one is lit and says so. */
 function StepCard({item, now, onSelect}: {item: StepItem; now: number; onSelect: () => void}) {
+  const {L} = useLang();
   const s = item.step;
   if (!s) return <div className="step-card is-more" style={{left: item.x, top: item.y, width: SW, height: SH}} onClick={onSelect}>
-    <span className="step-text">{item.more} earlier {item.more === 1 ? 'step' : 'steps'} · click the card for all</span>
+    <span className="step-text">{L(`${item.more} earlier ${item.more === 1 ? 'step' : 'steps'} · click the card for all`, `之前还有 ${item.more} 步 · 点击卡片查看全部`)}</span>
   </div>;
   const secs = stepSeconds(s, now);
   return <div className={`step-card is-${s.status}`} style={{left: item.x, top: item.y, width: SW, height: SH}} onClick={onSelect}
