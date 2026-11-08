@@ -449,3 +449,10 @@ code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .
 .folder-run-main small { font-size: 11px; color: var(--p2e-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .folder-run-when { flex: none; font-size: 11.5px; color: var(--p2e-muted); white-space: nowrap; font-variant-numeric: tabular-nums; }
 .folder-run-when.is-live { color: var(--dg-link); }
+
+/* history: mine / everyone's, on a shared server */
+.menu-head-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+.menu-scope { display: inline-flex; flex: none; border: 1px solid var(--border-card); border-radius: 7px; overflow: hidden; }
+.menu-scope button { padding: 2px 9px; font-size: 11.5px; border: 0; background: none; color: var(--p2e-muted); cursor: pointer; }
+.menu-scope button + button { border-left: 1px solid var(--border-card); }
+.menu-scope button.is-on { background: var(--btn-collapse-hover); color: var(--text-primary); font-weight: 600; }

@@ -28,7 +28,8 @@ export const api = {
   logout: () => fetch('/api/logout', {method: 'POST'}),
   options: () => call<Options>('/api/options'),
   examples: () => call<{examples: ExampleTask[]}>('/api/examples'),
-  history: () => call<{runs: HistoryRun[]}>('/api/history'),
+  // me: the signed-in name on a shared server (runs are then one's own unless `all`), null on one's own machine
+  history: (all = false) => call<{runs: HistoryRun[]; me: string | null}>(all ? '/api/history?all=1' : '/api/history'),
   workdir: (runs = false) => call<Workdir>(runs ? '/api/workdir?runs=1' : '/api/workdir'),
   setWorkdir: (path: string) => call<Workdir>('/api/workdir', {path}),
   /** the macOS folder dialog on the machine the server runs on; `cancelled` when dismissed */

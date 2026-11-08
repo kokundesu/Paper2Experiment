@@ -183,3 +183,23 @@ def test_a_finished_runs_workspace_is_cleaned_after_the_delay_and_a_live_one_nev
     assert odd.exists() and odd_person.exists() and stray.exists()
     assert old_dir.is_dir() and not (old_dir / "workspace").exists()  # the record stays, only the workspace goes
     assert sorted(demo_server.clean_workspaces(now + 25 * 60)) == sorted([recent.name, odd.name])  # both 35 min idle now
+
+
+def test_history_shows_ones_own_runs_unless_everyones_is_asked_for(tmp_path, monkeypatch):
+    import json
+
+    from p2e.web import demo_server
+
+    runs = tmp_path / "runs"
+    monkeypatch.setattr(demo_server, "RUNS", runs)
+    monkeypatch.setattr(demo_server, "JOBS", type("J", (), {"alive": lambda self, k: False})())
+    for stamp, owner in (("20261108-100000", "Allen"), ("20261108-110000", "Bea"), ("20261107-090000", "")):
+        d = runs / f"{stamp}_user-{stamp}_single"
+        d.mkdir(parents=True)
+        (d / "spec.json").write_text(json.dumps({"id": f"user-{stamp}", "title": f"run of {owner or 'nobody'}",
+                                                 "questions": [], "origin": {"source": "user", "owner": owner}}))
+    own = demo_server.list_history(user="Allen")
+    assert [r["title"] for r in own] == ["run of Allen"] and own[0]["owner"] == "Allen"
+    everyone = demo_server.list_history(user="Allen", everyone=True)
+    assert [r["owner"] for r in everyone] == ["Bea", "Allen", ""]  # newest first; the unowned run from before names
+    assert len(demo_server.list_history()) == 3  # one's own machine: no names, every run

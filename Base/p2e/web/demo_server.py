@@ -5,7 +5,8 @@ subprocess, and the page follows the run through its trace as a graph of agents.
     POST /api/draft   {prompt, capsule?, model}   the request as a ReproSpec (one LLM call); the repository is the
                                                   GitHub URL in the prompt; without one (and no capsule): {need: repo_url}
     POST /api/start   {spec, workflow, model}               launch `p2e demo run`; returns the job key
-    GET  /api/history                     the runs started from the page, newest first
+    GET  /api/history[?all]               the runs started from the page, newest first: on a shared server one's own,
+                                          with ?all everyone's
     GET  /api/workdir                     the run folder: where runs clone, install and run (each in its own sub-folder);
                                           on a shared server the person's own folder, its runs and when each is cleaned
     POST /api/workdir {path} | /api/workdir/choose   set it, from a path or the macOS folder dialog
@@ -762,8 +763,10 @@ def options() -> dict:
             "examples": demo.examples(), "budget": spend.status()}
 
 
-def list_history(limit: int = 50) -> list[dict]:
-    """Runs started from the page (demo requests), newest first, with how they ended."""
+def list_history(limit: int = 50, user: str | None = None, everyone: bool = False) -> list[dict]:
+    """Runs started from the page (demo requests), newest first, with how they ended. On a shared server (`user` is
+    the signed-in name) only the person's own runs, unless `everyone`; runs from before names were recorded have no
+    owner and show only under `everyone`."""
     out = []
     for d in sorted(RUNS.glob("*_user-*"), reverse=True):
         if not (d.is_dir() and RUN_NAME.match(d.name) and (d / "spec.json").is_file()):
@@ -773,12 +776,15 @@ def list_history(limit: int = 50) -> list[dict]:
             s = json.loads((d / "summary.json").read_text()) if (d / "summary.json").is_file() else None
         except (OSError, json.JSONDecodeError):
             continue
+        owner = (spec.get("origin") or {}).get("owner") or ""
+        if user is not None and not everyone and owner != user:
+            continue
         start = next((json.loads(l) for l in (d / "trace.jsonl").read_text().splitlines()[:3]
                       if '"event": "start"' in l and '"agent": "runner"' in l), {}) if (d / "trace.jsonl").is_file() else {}
         status = "running" if s is None and JOBS.alive(f"{spec['id']}_{d.name.rsplit(spec['id'] + '_', 1)[-1]}") else \
             "stopped" if s is None else "failed" if s.get("error") else "done"
         out.append({"key": d.name, "title": spec.get("title") or spec.get("id"), "workflow": d.name.rsplit(spec["id"] + "_", 1)[-1],
-                    "profile": start.get("profile"), "started": start.get("t"), "status": status,
+                    "owner": owner, "profile": start.get("profile"), "started": start.get("t"), "status": status,
                     "answered": (s or {}).get("answered"), "questions": len(spec.get("questions") or []),
                     "wall_s": (s or {}).get("wall_s"), "cost": ((s or {}).get("llm") or {}).get("cost_usd")})
         if len(out) >= limit:
@@ -832,7 +838,8 @@ class Handler(BaseHTTPRequestHandler):
             if parts == ["api", "workdir"]:
                 return self._json(workdir_state(self._user(), with_runs="runs" in parse_qs(url.query)))
             if parts == ["api", "history"]:
-                return self._json({"runs": list_history()})
+                me = self._user()
+                return self._json({"runs": list_history(user=me, everyone="all" in parse_qs(url.query)), "me": me})
             if parts == ["api", "examples"]:
                 return self._json({"examples": list_examples()})
             if parts[:2] == ["api", "jobs"] and len(parts) == 3 and valid_key(parts[2]):
@@ -928,6 +935,7 @@ class Handler(BaseHTTPRequestHandler):
                     return self._json({"error": "unknown workflow or not a user spec"}, 400)
                 if not SPEC_ID.match(spec.id):  # the id names files under runs/: only ids this server handed out
                     return self._json({"error": "not a spec of this page"}, 400)
+                spec.origin.owner = self._user() or ""  # whose run this is: the server says, not the page
                 prof = load_profiles().get(model)
                 if prof is None or not os.environ.get(prof.api_key_env):
                     return self._json({"error": f"No API key is set for model {model}"}, 400)

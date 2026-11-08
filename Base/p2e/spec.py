@@ -50,6 +50,7 @@ class SpecOrigin(BaseModel):
     source: Literal["user", "corebench", "case"]
     reference: str = ""  # e.g. the dataset and its sha256
     prompt: str = ""  # the user's request (source=user)
+    owner: str = ""  # on a shared server, the signed-in name that started the run (set by the server, not the page)
     drafted_by: list[str] = Field(default_factory=list)  # models of the intent stage
     checked_by: list[str] = Field(default_factory=list)
     user_confirmed: bool = False

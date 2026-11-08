@@ -123,19 +123,29 @@ function Menu({label, title, up, wide, children}: {label: ReactNode; title?: str
   </div>;
 }
 
-function HistoryMenu({runs, onOpen, onRefresh}: {runs: HistoryRun[] | null; onOpen: (r: HistoryRun) => void; onRefresh: () => void}) {
+/** The runs started from the page. On a shared server (`me` is the signed-in name) one's own by default, and a
+ *  switch shows everyone's, each with the name that started it. */
+function HistoryMenu({runs, me, all, setAll, onOpen, onRefresh}: {runs: HistoryRun[] | null; me: string | null; all: boolean;
+  setAll: (v: boolean) => void; onOpen: (r: HistoryRun) => void; onRefresh: () => void}) {
   const {lang, L} = useLang();
   return <div onMouseDown={onRefresh}>
     <Menu wide label={<><History size={14}/><span>{L('History', '历史记录')}</span></>}>
       {close => <>
-        <div className="menu-head">{L('Your reproductions, newest first. Open one to see its graph and results again.', '你的复现记录，最新的在前。打开一条可以重新查看它的 agent 图和结果。')}</div>
+        <div className="menu-head menu-head-row">
+          <span>{me && all ? L("Everyone's reproductions, newest first.", '所有人的复现记录，最新的在前。')
+            : L('Your reproductions, newest first. Open one to see its graph and results again.', '你的复现记录，最新的在前。打开一条可以重新查看它的 agent 图和结果。')}</span>
+          {me && <span className="menu-scope" role="group">
+            <button type="button" className={!all ? 'is-on' : ''} onClick={() => setAll(false)}>{L('Mine', '我的')}</button>
+            <button type="button" className={all ? 'is-on' : ''} onClick={() => setAll(true)}>{L('Everyone', '全部')}</button>
+          </span>}
+        </div>
         <div className="menu-scroll">
           {!runs ? <div className="menu-empty"><Loader2 size={14} className="spin"/></div>
             : !runs.length ? <div className="menu-empty">{L('Nothing yet: ask for a reproduction or pick an example', '还没有记录：发一个复现请求，或者选一个示例任务')}</div>
             : runs.map(r => <button type="button" key={r.key} role="menuitem" className="menu-item" onClick={() => { close(); onOpen(r); }}>
               <span className={`menu-dot is-${r.status}`} title={r.status}/>
               <span className="menu-main"><b>{r.title}</b>
-                <small>{wfLabel(r.workflow, lang)} · {r.profile}{r.wall_s ? ` · ${minutes(r.wall_s, lang)}` : ''}{r.cost ? ` · $${r.cost.toFixed(3)}` : ''}
+                <small>{me && all ? `${r.owner || L('(unnamed)', '（未署名）')} · ` : ''}{wfLabel(r.workflow, lang)} · {r.profile}{r.wall_s ? ` · ${minutes(r.wall_s, lang)}` : ''}{r.cost ? ` · $${r.cost.toFixed(3)}` : ''}
                   {r.answered !== null && r.answered !== undefined ? ` · ${L(`${r.answered}/${r.questions} answered`, `已回答 ${r.answered}/${r.questions}`)}` : ''}</small></span>
               <span className="menu-meta">{r.status === 'running' ? L('running', '运行中') : r.started ? ago(r.started, lang) : ''}</span>
             </button>)}
@@ -503,6 +513,8 @@ export function App() {
   const [options, setOptions] = useState<Options | null>(null);
   const [examples, setExamples] = useState<ExampleTask[] | null>(null);
   const [history, setHistory] = useState<HistoryRun[] | null>(null);
+  const [historyAll, setHistoryAll] = useState(false);  // on a shared server: everyone's runs instead of one's own
+  const [historyMe, setHistoryMe] = useState<string | null>(null);
   const [error, setError] = useState('');
   const [msgs, setMsgs] = useState<Msg[]>([]);
   const [workdir, setWorkdir] = useState<Workdir | null>(null);
@@ -542,7 +554,9 @@ export function App() {
   const untilRevealed = (id: number) => new Promise<void>(r => { revealWaiters.current.set(id, r); });
   const follow = useCallback(() => { const el = thread.current; if (el && stick.current) el.scrollTop = el.scrollHeight; }, []);
   const patch = useCallback((mid: number, f: (m: Msg) => Msg) => setMsgs(ms => ms.map(m => m.id === mid ? f(m) : m)), []);
-  const refreshHistory = useCallback(() => { api.history().then(r => setHistory(r.runs), () => setHistory([])); }, []);
+  const refreshHistory = useCallback(() => {
+    api.history(historyAll).then(r => { setHistory(r.runs); setHistoryMe(r.me); }, () => setHistory([]));
+  }, [historyAll]);
 
   useEffect(() => {
     api.options().then(setOptions, e => setError((e as Error).message));
@@ -669,7 +683,7 @@ export function App() {
 
   return <div className={`app${page === 'changelog' ? ' is-changelog' : ''}`}>
     <TopBar dark={dark} onTheme={() => setDark(d => !d)}>
-      <HistoryMenu runs={history} onRefresh={refreshHistory} onOpen={r => { leaveChangelog(); push({role: 'user', text: L(`Open “${r.title}”`, `打开“${r.title}”`)}); open(r.key); }}/>
+      <HistoryMenu runs={history} me={historyMe} all={historyAll} setAll={v => { setHistoryAll(v); setHistory(null); }} onRefresh={refreshHistory} onOpen={r => { leaveChangelog(); push({role: 'user', text: L(`Open “${r.title}”`, `打开“${r.title}”`)}); open(r.key); }}/>
       <button type="button" className={`menu-trigger${page === 'changelog' ? ' is-open' : ''}`} onClick={showChangelog}><ListChecks size={14}/><span>{L('Changelog', '更新日志')}</span></button>
     </TopBar>
     {page === 'changelog' && <ChangelogPage onBack={leaveChangelog}/>}

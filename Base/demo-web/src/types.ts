@@ -37,7 +37,7 @@ export type RunWorkspace = {run: string; title: string; size_mb: number; live: b
 export type Workdir = {path: string; name: string; default: string; chosen: boolean; fixed?: boolean;
   cleanup_min?: number | null; runs?: RunWorkspace[]};
 export type HistoryRun = {
-  key: string; title: string; workflow: string; profile: string | null; started: number | null;
+  key: string; title: string; workflow: string; owner: string; profile: string | null; started: number | null;
   status: 'running' | 'done' | 'failed' | 'stopped'; answered: number | null; questions: number;
   wall_s: number | null; cost: number | null;
 };
