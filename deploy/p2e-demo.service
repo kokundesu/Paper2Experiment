@@ -9,14 +9,25 @@ Group=p2e
 WorkingDirectory=/home/p2e/Paper2Exp
 # Only Caddy on this machine talks to the demo; it is never exposed directly.
 ExecStart=/home/p2e/Paper2Exp/.venv/bin/p2e demo serve --host 127.0.0.1 --port 8780
-# Agents call uv and micromamba from their shell.
-Environment=PATH=/home/p2e/.local/bin:/home/p2e/.p2e-mamba/bin:/usr/local/bin:/usr/bin:/bin
+Environment=PATH=/srv/p2e/mamba/bin:/usr/local/bin:/usr/bin:/bin
 Environment=PYTHONUNBUFFERED=1
+# The agents' commands run as p2e-run (sudo), which cannot read this project or this process; everything they touch
+# lives in /srv/p2e. Settings here win over Base/.env.
+Environment=P2E_RUN_AS=p2e-run
+Environment=P2E_RUN_HOME=/srv/p2e/home
+Environment=P2E_WORKSPACE_ROOT=/srv/p2e/work
+Environment=P2E_UV_CACHE=/srv/p2e/cache/uv
+Environment=P2E_MAMBA_ROOT=/srv/p2e/mamba
+Environment=P2E_DEMO_FIXED_WORKDIR=1
+# Every LLM call of the demo and its runs together: at most this much per calendar month (UTC).
+Environment=P2E_MONTHLY_BUDGET_USD=5
+# Files the server and the command user both work on stay group-writable (group p2e-shared on /srv/p2e).
+UMask=0002
 Restart=on-failure
 RestartSec=5
 # Stop the server and every run it started.
 KillMode=control-group
-NoNewPrivileges=true
+# No NoNewPrivileges: sudo (to p2e-run only, see /etc/sudoers.d/p2e-run) needs it off.
 PrivateTmp=true
 
 [Install]

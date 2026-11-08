@@ -370,3 +370,7 @@ code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .
 @media (prefers-reduced-motion: reduce) { .plan-steps li, .reveal-in { animation: none; } .typing-caret::after { animation: none; } }
 /* the changelog's big dates: Chinese breaks only at the spaces ("2026年 10月4–5日"), never inside a date */
 .changelog-page h3 { word-break: keep-all; }
+
+/* this month's LLM spend against the demo's cap, in the composer tray */
+.tray-budget { margin-left: auto; margin-right: 10px; font-size: 12px; color: var(--p2e-muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.tray-budget.is-out { color: #d4483b; }

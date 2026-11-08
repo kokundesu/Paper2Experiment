@@ -49,6 +49,24 @@ MAMBA_ROOT = Path(os.environ.get("P2E_MAMBA_ROOT", Path.home() / ".p2e-mamba")).
 # per job slot in a parallel batch, like UV_CACHE; unset: micromamba's own pkgs/ under MAMBA_ROOT
 MAMBA_PKGS = Path(os.environ["P2E_MAMBA_PKGS"]).expanduser() if os.environ.get("P2E_MAMBA_PKGS") else None
 
+# On a shared server (the public demo), commands run as a separate, unprivileged user (P2E_RUN_AS), through
+# `sudo -n -u <user>`: the code being reproduced can then read neither the project (its .env holds the API keys)
+# nor this process's memory or environment, whatever it does. The command guard below only catches honest mistakes;
+# this is the boundary. The workspace root, caches and P2E_RUN_HOME must be in a group both users share, setgid and
+# group-writable (deploy/server-setup.sh sets this up); commands run with umask 002 so this process can still read
+# and clean up what they write. Unset (the default, a researcher's own machine): commands run as this user.
+RUN_AS = os.environ.get("P2E_RUN_AS") or None
+RUN_HOME = os.environ.get("P2E_RUN_HOME") or None
+
+
+def as_runner(argv: list[str], env: dict[str, str] | None = None) -> list[str]:
+    """`argv` as the command user would run it: unchanged locally, through sudo with exactly `env` on a server."""
+    if not RUN_AS:
+        return argv
+    pairs = [f"{k}={v}" for k, v in (env or {"PATH": "/usr/local/bin:/usr/bin:/bin"}).items()]
+    return ["sudo", "-n", "-u", RUN_AS, "--", "/usr/bin/env", "-i", *pairs, *argv]
+
+
 _BLOCKED = [
     (re.compile(r"case\.ya?ml"), "ground-truth files are off limits"),
     (re.compile(re.escape(str(PROJECT_ROOT / "benchmark"))), "the benchmark directory is off limits"),
@@ -117,7 +135,7 @@ class Sandbox:
                if not k.startswith(("ANTHROPIC", "OPENAI", "CONDA", "VIRTUAL_ENV", "PYTHON"))
                and not k.endswith("_API_KEY") and k not in secrets}
         env.update({
-            "HOME": os.environ.get("HOME", str(self.workspace)),
+            "HOME": RUN_HOME or os.environ.get("HOME", str(self.workspace)),
             "UV_CACHE_DIR": str(UV_CACHE),
             "PYTHONUNBUFFERED": "1",
             "MPLBACKEND": "Agg",
@@ -170,8 +188,10 @@ class Sandbox:
             return CommandResult(command, 2, 0.0, f"ERROR: {problem}", log_path)
         timeout_s = timeout_s or self.default_timeout_s
         start = time.monotonic()
+        env = self._env()
+        argv = ["/bin/bash", "-c", f"umask 002\n{command}" if RUN_AS else command]
         proc = subprocess.Popen(
-            ["/bin/bash", "-c", command], cwd=cwd, env=self._env(),
+            as_runner(argv, env), cwd=cwd, env=None if RUN_AS else env,
             stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True,
             errors="replace", start_new_session=True,
         )
@@ -179,13 +199,24 @@ class Sandbox:
             output, _ = proc.communicate(timeout=timeout_s)
             exit_code: int | None = proc.returncode
         except subprocess.TimeoutExpired:
-            os.killpg(proc.pid, signal.SIGKILL)
+            self._kill(proc.pid)
             output, _ = proc.communicate()
             output += f"\n[killed after {timeout_s}s timeout]"
             exit_code = None
         duration = time.monotonic() - start
         self._write_log(log_path, f"$ cd {workdir} && {command}\n# exit={exit_code} duration={duration:.1f}s\n{output}")
         return CommandResult(command, exit_code, duration, output, log_path)
+
+    @staticmethod
+    def _kill(session: int) -> None:
+        """Kill everything the command started: its session (start_new_session made the command's process its leader).
+        Processes of the command user can only be signalled as that user, so on a server pkill runs through sudo."""
+        if RUN_AS:
+            subprocess.run(as_runner(["pkill", "-KILL", "-s", str(session)]), capture_output=True, timeout=30)
+        try:
+            os.killpg(session, signal.SIGKILL)
+        except (ProcessLookupError, PermissionError):
+            pass
 
     def _write_log(self, path: Path, text: str) -> None:
         path.write_text(text)
@@ -194,6 +225,8 @@ class Sandbox:
     def discard_workspace(self) -> None:
         """Delete the workspace (cloned repo, venv, data: often over 1 GB per run) once the run is scored.
         logs/ stays in run_dir, and logs/ plus the run's json files are all the evaluator reads."""
+        if RUN_AS:  # what the command user wrote with its own permissions, it removes itself
+            subprocess.run(as_runner(["rm", "-rf", "--", str(self.home)]), capture_output=True, timeout=600)
         shutil.rmtree(self.home, ignore_errors=True)  # the logs link inside is removed, not followed
         link = self.run_dir / "workspace"
         if link.is_symlink():

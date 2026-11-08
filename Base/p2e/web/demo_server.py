@@ -32,7 +32,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, unquote, urlparse
 
-from .. import corebench, demo
+from .. import corebench, demo, spend
 from ..models import load_profiles
 from ..runner import RUNS
 from ..sandbox import PROJECT_ROOT, workspace_root
@@ -79,6 +79,8 @@ def workdir_state() -> dict:
 def set_run_folder(path: str) -> dict:
     """Make `path` the run folder: absolute, outside the project (agents must not reach the code that grades them),
     created if missing and writable. Raises ValueError with the reason otherwise."""
+    if os.environ.get("P2E_DEMO_FIXED_WORKDIR"):  # a shared server: the run folder is set by its operator
+        raise ValueError("the run folder is fixed on this server")
     folder = Path(path).expanduser()
     if not folder.is_absolute():
         raise ValueError("the run folder must be an absolute path")
@@ -512,6 +514,8 @@ def draft(body: dict) -> dict:
     if not capsule and not repo:
         return {"need": "repo_url"}
     model = body.get("model") or "haiku55"
+    if spend.status()["exhausted"]:
+        raise BudgetError(spend.exhausted_message())
     spec, cost = demo.draft_spec(prompt, capsule=capsule, repo_url=repo, model=model)
     try:
         paper, c = demo.paper_values(spec, model=model)
@@ -520,6 +524,10 @@ def draft(body: dict) -> dict:
         paper = {"arxiv": None, "values": {}, "error": f"{type(e).__name__}: {e}"}
     demo.save_paper_values(spec.id, paper)
     return {"spec": spec.model_dump(mode="json"), "paper": paper, "cost": round(cost, 4)}
+
+
+class BudgetError(Exception):
+    """The month's API budget is used up: the page shows this message as it is."""
 
 
 def _launch_error(key: str) -> str:
@@ -550,7 +558,7 @@ def options() -> dict:
             "models": [{"id": name, "model": p.model, "provider": p.provider,
                         "vendor": vendor_of(p.model, p.provider, p.base_url),
                         "available": bool(os.environ.get(p.api_key_env))} for name, p in profiles.items()],
-            "examples": demo.examples()}
+            "examples": demo.examples(), "budget": spend.status()}
 
 
 def list_history(limit: int = 50) -> list[dict]:
@@ -620,8 +628,10 @@ class Handler(BaseHTTPRequestHandler):
         d = run_dir_of(key)
         if d is None or not rel or rel.startswith("/") or ".." in Path(rel).parts:
             return self._json({"error": "not allowed"}, 403)
-        f = (d / "workspace" / rel).resolve()
-        if not f.is_file() or f.stat().st_size > 20_000_000:
+        root = (d / "workspace").resolve()
+        f = (root / rel).resolve()
+        # resolve() follows symlinks: one the run made (to .env, say) must not take the request outside its workspace
+        if not f.is_relative_to(root) or not f.is_file() or f.stat().st_size > 20_000_000:
             return self._json({"error": "no such file"}, 404)
         ctype = mimetypes.guess_type(f.name)[0] or "text/plain"
         if not (ctype.startswith("image/") or ctype.startswith("text/") or ctype == "application/pdf"):
@@ -649,7 +659,10 @@ class Handler(BaseHTTPRequestHandler):
             if parts == ["api", "draft"]:
                 if not (body.get("prompt") or "").strip():
                     return self._json({"error": "Say what to reproduce first"}, 400)
-                return self._json(draft(body))
+                try:
+                    return self._json(draft(body))
+                except BudgetError as e:
+                    return self._json({"error": str(e), "budget": spend.status()}, 402)
             if parts == ["api", "workdir"]:
                 try:
                     return self._json(set_run_folder(body.get("path") or ""))
@@ -670,6 +683,8 @@ class Handler(BaseHTTPRequestHandler):
                 prof = load_profiles().get(model)
                 if prof is None or not os.environ.get(prof.api_key_env):
                     return self._json({"error": f"No API key is set for model {model}"}, 400)
+                if spend.status()["exhausted"]:
+                    return self._json({"error": spend.exhausted_message(), "budget": spend.status()}, 402)
                 return self._json({"key": JOBS.start(spec, workflow, model)})
             if parts[:2] == ["api", "jobs"] and len(parts) == 4 and parts[3] == "stop" and KEY.match(parts[2]):
                 return self._json({"stopped": JOBS.stop(parts[2])})

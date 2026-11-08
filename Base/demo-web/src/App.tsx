@@ -456,6 +456,12 @@ export function App() {
   const stick = useRef(true);  // the thread follows new content while the user is at its bottom
 
   const vendor = options?.models.find(m => m.id === model)?.vendor ?? 'anthropic';
+  // the server's "budget used up" message, in the page's language
+  const why = useCallback((e: unknown) => {
+    const m = (e as Error).message;
+    const cap = /This month's API budget \(\$([\d.]+)\)/.exec(m);
+    return cap ? L(m, `本月的 API 额度（$${cap[1]}）已经用完，下个月 1 日（UTC）重置。`) : m;
+  }, [L]);
   const push = useCallback((m: NewMsg, by?: string) => {
     stick.current = true;
     const id = newId();
@@ -517,7 +523,7 @@ export function App() {
         if (stop) return;
         setJob(s);
         if (isLive(s)) timer = window.setTimeout(tick, 1000);
-        else { refreshHistory(); api.examples().then(r => setExamples(r.examples), () => undefined); }
+        else { refreshHistory(); api.examples().then(r => setExamples(r.examples), () => undefined); api.options().then(setOptions, () => undefined); }
       } catch (e) { if (!stop) { setError((e as Error).message); timer = window.setTimeout(tick, 3000); } }
     };
     tick();
@@ -531,9 +537,9 @@ export function App() {
       const r = await api.draft({prompt, model, ...(repoUrl ? {repo_url: repoUrl} : {})});
       if ('need' in r) push({role: 'assistant', type: 'ask_url', prompt});
       else push({role: 'assistant', type: 'spec', spec: r.spec, paper: r.paper, cost: r.cost, reveal: true});
-    } catch (e) { push({role: 'assistant', type: 'text', text: `${L('Could not draft the task', '无法起草任务')}: ${(e as Error).message}`}); }
+    } catch (e) { push({role: 'assistant', type: 'text', text: `${L('Could not draft the task', '无法起草任务')}: ${why(e)}`}); }
     finally { setBusy(false); }
-  }, [push, model, L]);
+  }, [push, model, L, why]);
 
   const start = useCallback(async (mid: number, spec: Spec) => {
     setBusy(true);
@@ -542,9 +548,9 @@ export function App() {
       patch(mid, m => ({...m, started: true} as Msg));
       open(r.key);
       refreshHistory();
-    } catch (e) { push({role: 'assistant', type: 'text', text: `${L('Could not start', '无法启动')}: ${(e as Error).message}`}); }
+    } catch (e) { push({role: 'assistant', type: 'text', text: `${L('Could not start', '无法启动')}: ${why(e)}`}); }
     finally { setBusy(false); }
-  }, [workflow, model, patch, open, push, refreshHistory, L]);
+  }, [workflow, model, patch, open, push, refreshHistory, L, why]);
 
   const resolveUrl = useCallback((mid: number, prompt: string, url: string) => {
     patch(mid, m => ({...m, resolved: true} as Msg));
@@ -590,9 +596,9 @@ export function App() {
       patch(mid, m => ({...m, started: true} as Msg));
       open(r2.key);
       refreshHistory();
-    } catch (err) { push({role: 'assistant', type: 'text', text: `${L('Could not start', '无法启动')}: ${(err as Error).message}`}); }
+    } catch (err) { push({role: 'assistant', type: 'text', text: `${L('Could not start', '无法启动')}: ${why(err)}`}); }
     finally { setBusy(false); }
-  }, [push, patch, open, workflow, model, refreshHistory, L, lang]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [push, patch, open, workflow, model, refreshHistory, L, lang, why]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const stop = useCallback(() => { if (key) api.stop(key).catch(() => undefined); }, [key]);
   const lastRun = [...msgs].reverse().find(m => m.role === 'assistant' && m.type === 'run');

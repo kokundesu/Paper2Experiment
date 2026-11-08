@@ -23,6 +23,7 @@ from langgraph.graph import END, START, StateGraph
 from langgraph.graph.message import add_messages
 from pydantic import BaseModel, ValidationError
 
+from . import spend
 from .models import DEFAULT_PROFILE, Entry, ModelProfile, get_profile, usage_entries
 from .sandbox import Sandbox
 
@@ -130,6 +131,10 @@ class Budget:
     def check(self, who: str) -> None:
         if self.spent_usd >= self.limit_usd - self.reserve_usd:
             raise BudgetExceeded(f"{who}: run budget exhausted (${self.spent_usd:.2f} of ${self.limit_usd:.2f})")
+        # the installation's monthly cap (P2E_MONTHLY_BUDGET_USD), shared by every run and process: the same reserve
+        # keeps the request about to be sent from taking the month over the cap
+        if (cap := spend.monthly_limit()) is not None and (used := spend.spent()) >= cap - self.reserve_usd:
+            raise BudgetExceeded(f"{who}: monthly budget exhausted (${used:.2f} of ${cap:.2f} this month)")
 
 
 class Trace:
@@ -176,6 +181,7 @@ class BillingCallback(BaseCallbackHandler):
                 self.last = entries
                 self.usage.add(entries, self.profile)
                 self.budget.usage.add(entries, self.profile)
+                spend.record(sum(self.profile.cost(e) for e in entries))
                 first_tier = self.profile.prices.first_tier_tokens()
                 for e in entries:
                     if first_tier is not None and e.prompt > first_tier:

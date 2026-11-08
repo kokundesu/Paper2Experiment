@@ -196,6 +196,9 @@ export function Composer({options, examples, workdir, onWorkdir, onSend, onExamp
     </div>
     <div className="composer-tray">
       <RunFolder workdir={workdir} onChange={onWorkdir}/>
+      {options.budget?.limit_usd != null && <span className={`tray-budget${options.budget.exhausted ? ' is-out' : ''}`}
+        title={L('LLM spend of this demo this month (UTC); runs stop when it reaches the cap', '本 demo 本月（UTC）的 LLM 花费；达到上限后不再运行')}>
+        {L('This month', '本月')} ${options.budget.spent_usd.toFixed(2)} / ${options.budget.limit_usd.toFixed(0)}</span>}
       <ExampleTasks examples={examples} workflow={workflow} model={model} onPick={onExample}/>
     </div>
   </div>;

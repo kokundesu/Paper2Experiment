@@ -332,6 +332,7 @@ def shipped_files(workspace: Path, max_depth: int = 3) -> dict[str, Path]:
     """Files of every git repository in the workspace that are tracked and unchanged since the checkout:
     workspace-relative path -> absolute path. These came with the repository, not from a run."""
     import subprocess
+    from .sandbox import as_runner
     out: dict[str, Path] = {}
     if not workspace.is_dir():
         return out
@@ -339,9 +340,11 @@ def shipped_files(workspace: Path, max_depth: int = 3) -> dict[str, Path]:
              if not in_environment(p.relative_to(workspace).as_posix().removesuffix("/.git"))]
     for repo in repos:
         try:
-            tracked = subprocess.run(["git", "-C", str(repo), "ls-files", "-z"], capture_output=True, text=True,
-                                     timeout=60).stdout.split("\0")
-            changed = subprocess.run(["git", "-C", str(repo), "diff", "--name-only", "-z", "HEAD"],
+            # as the command user on a server: the repository (its .git/config included) is theirs, and a hostile
+            # config (core.fsmonitor, diff.external) must not run anything with this process's rights
+            tracked = subprocess.run(as_runner(["git", "-C", str(repo), "ls-files", "-z"]), capture_output=True,
+                                     text=True, timeout=60).stdout.split("\0")
+            changed = subprocess.run(as_runner(["git", "-C", str(repo), "diff", "--name-only", "-z", "HEAD"]),
                                      capture_output=True, text=True, timeout=60).stdout.split("\0")
         except (OSError, subprocess.SubprocessError):
             continue

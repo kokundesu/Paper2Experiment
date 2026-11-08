@@ -4,8 +4,9 @@
 #   bash deploy/deploy.sh                  # full: server setup + frontend + API keys + run records
 #   bash deploy/deploy.sh --app-only       # after a code change: pull, rebuild frontend, restart
 #
-# Settings (environment variables): SSH_HOST (an ~/.ssh/config host, default ovh-vps), DOMAIN (default: the
-# server's IPv4 as <a-b-c-d>.sslip.io, a public DNS name that resolves to that IP so Caddy can get a certificate).
+# Settings (environment variables): SSH_HOST (an ~/.ssh/config host, default ovh-vps), DOMAIN (default:
+# paper2experiment.allenhu.com, an A record in Cloudflare set to "DNS only" so Caddy gets the certificate itself,
+# plus the server's IPv4 as <a-b-c-d>.sslip.io as a fallback address).
 # The site password is generated once and kept in deploy/demo-login.local.txt (git-ignored).
 # The server clones the project from GitHub, so push your commits before deploying.
 set -euo pipefail
@@ -19,7 +20,7 @@ APP_ONLY=false
 
 if [ -z "${DOMAIN:-}" ]; then
   IP=$(ssh -G "$SSH_HOST" | awk '/^hostname /{print $2}')
-  DOMAIN="${IP//./-}.sslip.io"
+  DOMAIN="paper2experiment.allenhu.com, ${IP//./-}.sslip.io"
 fi
 
 echo "== build frontend"
@@ -31,7 +32,7 @@ rsync -a --delete --exclude '*.local*' "$ROOT/deploy/" "$SSH_HOST:p2e-deploy/"
 
 if ! $APP_ONLY; then
   if [ ! -f "$LOGIN" ]; then
-    printf 'url=https://%s\nuser=demo\npassword=%s\n' "$DOMAIN" "$(openssl rand -base64 18 | tr -d '/+=')" > "$LOGIN"
+    printf 'url=https://%s\nuser=demo\npassword=%s\n' "${DOMAIN%%,*}" "$(openssl rand -base64 18 | tr -d '/+=')" > "$LOGIN"
     chmod 600 "$LOGIN"
   fi
   PASSWORD=$(sed -n 's/^password=//p' "$LOGIN")
@@ -68,4 +69,4 @@ ssh "$SSH_HOST" "sudo bash -c '
 echo "== check"
 sleep 3
 ssh "$SSH_HOST" 'systemctl is-active p2e-demo && curl -s -o /dev/null -w "local demo: HTTP %{http_code}\n" http://127.0.0.1:8780/'
-echo "Site: https://$DOMAIN  (login in deploy/demo-login.local.txt)"
+echo "Site: https://${DOMAIN%%,*}  (login in deploy/demo-login.local.txt)"

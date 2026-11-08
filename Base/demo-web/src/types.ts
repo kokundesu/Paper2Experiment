@@ -4,7 +4,8 @@ import type {RunStep} from './agent-run/agent-run';
 export type Workflow = {id: string; letter: string; name: string; desc: string};
 export type ModelOption = {id: string; model: string; provider: string; vendor: string; available: boolean};
 export type Example = {capsule: string; title: string; language: string; task_prompt: string; questions: string[]};
-export type Options = {workflows: Workflow[]; models: ModelOption[]; examples: Example[]};
+export type Budget = {month: string; spent_usd: number; limit_usd: number | null; exhausted: boolean};
+export type Options = {workflows: Workflow[]; models: ModelOption[]; examples: Example[]; budget?: Budget};
 
 export type Question = {id: string; text: string; answer_type: string; locator: string};
 export type Spec = {
