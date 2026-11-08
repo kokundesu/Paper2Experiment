@@ -78,3 +78,68 @@ def test_read_log_tool_reads_only_logs(tmp_path, monkeypatch):
     tool = next(t for t in wf._read_tools() if t.name == "read_log")
     assert "AUC 0.957" in tool.fn({"name": "logs/cmd_001_exp_main.log"})
     assert tool.fn({"name": "../trace.jsonl"}).startswith("no such log")
+
+
+# A run that ran to the end but whose metric_regex matched nothing is re-read, not run again: a demo run once spent six
+# more minutes of training because the value printed as tensor(-21.86) and the regex expected a bare number.
+WRONG_REGEX = {**RUN, "metric_regex": r"AUC=([0-9.]+)"}  # main.py prints "AUC 0.957"
+
+
+def test_a_run_whose_regex_missed_is_reparsed_not_rerun(tmp_path, monkeypatch):
+    cid = make_spec_case(tmp_path, monkeypatch)
+    fake = FakeClient({KEY: [
+        [patch(add_tasks=[SETUP])],
+        [("submit", SETUP_REPORT)],
+        [patch(add_tasks=[WRONG_REGEX])],
+        [patch(reparse=[{"task_id": "main", "metric_regex": r"AUC ([0-9.]+)"}])],
+        [patch(finish={"answers": ans(q3=False), "not_measured": {"q3": "no run prints it"}})],
+    ]})
+    use_fake(monkeypatch, fake)
+    ctx = corebench.new_run(cid, "planner")
+    run_c(ctx)
+    ev = events(ctx)
+    failed = next(e for e in ev if e["event"] == "task/failed")
+    assert failed["problems"] == ["no parsable metric value"]
+    wake = [e for e in ev if e["agent"] == "planner" and e["event"] == "start"][3]["task"]
+    assert "AUC 0.957" in wake  # the tail the Planner fixes the regex from
+    done = next(e for e in ev if e["event"] == "task/done" and e.get("task_id") == "main")
+    assert done["value"] == 0.957 and done["reparsed_from"]["metric_regex"] == "AUC=([0-9.]+)"
+    assert len(list(ctx.sandbox.log_dir.glob("cmd_*_exp_main.log"))) == 1  # the experiment ran once
+
+
+def _runtime_after_a_run(tmp_path, monkeypatch, task):
+    from p2e.runtime import ExperimentPatch, Runtime
+    cid = make_spec_case(tmp_path, monkeypatch)
+    use_fake(monkeypatch, FakeClient({}))
+    ctx = corebench.new_run(cid, "planner")
+    rt = Runtime(ctx)
+    assert rt.apply(ExperimentPatch(reasoning="r", add_tasks=[{**task, "depends_on": []}])) == []
+    rt.step(lambda t, r: (True, {}, ""))
+    return rt, ExperimentPatch
+
+
+def test_reparse_refuses_a_run_that_did_not_exit_cleanly(tmp_path, monkeypatch):
+    rt, Patch = _runtime_after_a_run(tmp_path, monkeypatch, {**WRONG_REGEX, "command": "python3 code/main.py; exit 3"})
+    assert rt.tasks["main"]["problems"] == ["exit code 3", "no parsable metric value"]
+    problems = rt.apply(Patch(reasoning="r", reparse=[{"task_id": "main", "metric_regex": r"AUC ([0-9.]+)"}]))
+    assert problems and "replace it instead" in problems[0] and rt.tasks["main"]["status"] == "failed"
+
+
+def test_reparse_refuses_a_log_changed_after_the_run_and_a_regex_that_still_misses(tmp_path, monkeypatch):
+    rt, Patch = _runtime_after_a_run(tmp_path, monkeypatch, WRONG_REGEX)
+    still_wrong = rt.apply(Patch(reasoning="r", reparse=[{"task_id": "main", "metric_regex": r"ROC ([0-9.]+)"}]))
+    assert "also finds no value" in still_wrong[0]
+    log = rt.ctx.run_dir / rt.tasks["main"]["log"]
+    log.write_text(log.read_text() + "AUC 0.999\n")  # an agent appending the number it wants
+    tampered = rt.apply(Patch(reasoning="r", reparse=[{"task_id": "main", "metric_regex": r"AUC ([0-9.]+)"}]))
+    assert "not the one the sandbox wrote" in tampered[0] and rt.tasks["main"]["status"] == "failed"
+
+
+def test_tasks_blocked_on_the_failed_run_go_again_after_its_reparse(tmp_path, monkeypatch):
+    rt, Patch = _runtime_after_a_run(tmp_path, monkeypatch, WRONG_REGEX)
+    after = {**RUN, "task_id": "after", "depends_on": ["main"]}
+    assert rt.apply(Patch(reasoning="r", add_tasks=[after])) == []
+    rt.ready()  # its dependency failed: blocked
+    assert rt.tasks["after"]["status"] == "blocked"
+    assert rt.apply(Patch(reasoning="r", reparse=[{"task_id": "main", "metric_regex": r"AUC ([0-9.]+)"}])) == []
+    assert rt.tasks["main"]["status"] == "done" and rt.ready() == ["after"]

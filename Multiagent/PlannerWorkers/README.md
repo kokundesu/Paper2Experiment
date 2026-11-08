@@ -11,6 +11,11 @@ dependencies), cancel or replace, ledger updates, or a finish proposal. The runt
 returns its problems, executes ready tasks, and wakes the Planner on a failure, a finished agent task, or when nothing
 is left, with only what changed plus computed progress fields.
 
+**Reparse.** A run that exited 0 and failed only because its `metric_regex` matched nothing is not run again: the
+Planner submits a `reparse` with a corrected regex, and the runtime reads the same log, after checking its sha256
+against the sandbox's manifest. Added on 2026-11-08 after a demo run re-trained for six minutes only because the value
+printed as `tensor(-21.86)`; runs before that date may have rerun in this situation instead.
+
 **Tasks.** `run`: one experiment run. `agent`: setup, debug or diagnose, written as a delegation (objective, tools and
 sources, boundaries, context references, done criteria, effort). Each agent task goes to a fresh worker that sees
 only the delegation and returns a structured report (SetupReport, DebugReport, ClaimDiagnosis); diagnosis tasks run

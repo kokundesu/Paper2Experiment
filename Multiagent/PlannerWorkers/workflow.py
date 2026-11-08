@@ -38,7 +38,7 @@ from p2e import corebench
 from p2e.llm import REVIEW_EFFORT, Agent, Tool, Usage, sandbox_tools
 from p2e.prompts import RUNTIME_RULES, SETUP_CHECK_RULES
 from p2e.runner import DIAGNOSIS_RULES, RunContext, finish
-from p2e.runtime import (MAX_PARALLEL_DIAGNOSE, STALL_LIMIT, AgentTask, ExperimentPatch, RunTask, Runtime)
+from p2e.runtime import (MAX_PARALLEL_DIAGNOSE, REPARSABLE, STALL_LIMIT, AgentTask, ExperimentPatch, RunTask, Runtime)
 from p2e.schemas import ClaimDiagnosis, DiscrepancyReport, EvalResult
 from p2e.spec import AnswerItem, Answers
 
@@ -70,7 +70,10 @@ Tasks you can add:
   Write the delegation fully: objective, tools_and_sources, boundaries, context_refs (paths of logs and files to read),
   done_criteria, effort_turns. Results come back to you as a structured report.
 Use depends_on for order (runs depend on the setup task). A failed task can be replaced: add the corrected task and a
-`replace` entry old -> new; tasks waiting on the old one are moved to the new one.
+`replace` entry old -> new; tasks waiting on the old one are moved to the new one. A run that exited 0 and failed only
+with "no parsable metric value" ran to the end and only the regex missed: never run it again. Fix the regex from how
+the value appears in its output (the update shows the tail of it) and submit a `reparse` entry with the task id and the
+corrected metric_regex; the runtime parses the same log.
 
 Task ledger (keep it current through `ledger`): facts given or verified, facts to look up (and where), facts to derive,
 assumptions, and the plan. Every setting the paper does not state that you or a task infer goes into `assumptions`
@@ -106,7 +109,10 @@ Tasks you can add:
   Write the delegation fully: objective, tools_and_sources, boundaries, context_refs (paths of logs and files to read),
   done_criteria, effort_turns. Results come back to you as a structured report.
 Use depends_on for order (runs depend on the setup task). A failed task can be replaced: add the corrected task and a
-`replace` entry old -> new; tasks waiting on the old one are moved to the new one.
+`replace` entry old -> new; tasks waiting on the old one are moved to the new one. A run that exited 0 and failed only
+with "no parsable metric value" ran to the end and only the regex missed: never run it again. Fix the regex from how
+the value appears in its output (the update shows the tail of it) and submit a `reparse` entry with the task id and the
+corrected metric_regex; the runtime parses the same log.
 
 Task ledger (keep it current through `ledger`): facts given or verified, facts to look up, assumptions, and the plan.
 
@@ -340,7 +346,8 @@ class PlannerRuntimeWorkflow:
             task = rt.tasks[c["task_id"]]
             if task["spec"]["kind"] == "agent" and task.get("artifact"):
                 item["report"] = task["artifact"]
-            if self.is_spec and task["spec"]["kind"] == "run" and task.get("log"):
+            # a paper run's tail too when only its regex missed: the Planner fixes the regex from it (reparse)
+            if task["spec"]["kind"] == "run" and task.get("log") and (self.is_spec or task.get("problems") == REPARSABLE):
                 item["output_tail"] = self._tail(task["log"])
             changed.append(item)
         flags = {k: view[k] for k in ("is_progress_being_made", "is_in_loop")}

@@ -20,6 +20,10 @@ AutoReproduce: dry-run before full training; Magentic-One: progress ledger and s
   progress ledger minus the fields the Planner decides: what to do next and how to ask for it).
 * Only the Runtime ends a run: a finish proposal is accepted when every claim has enough validated values or a
   stated not-measured reason backed by attempts.
+* A run that exited 0 and failed only because its metric_regex matched nothing can be re-read: the Planner submits a
+  `reparse` with a corrected regex, and the runtime parses the same log again (after checking it is the log the sandbox
+  wrote) instead of running the experiment a second time. A demo run once spent six more minutes of training only
+  because the value printed as `tensor(-21.86)` and the first regex expected a bare number.
 * Spec runs (a ReproSpec, e.g. CORE-Bench): runs need no metric regex and no training progress (the program may be a
   notebook or an analysis script), and the finish proposal carries the answers. With gates on, the finish gate checks
   where each answer came from: it must appear in this run's output, not only in files the capsule shipped with or
@@ -37,7 +41,9 @@ from typing import Annotated, Any, Callable, Literal, Union
 
 from pydantic import BaseModel, Field
 
+from .capsule import split_log
 from .runner import RunContext, parse_metric
+from .sandbox import file_sha256
 from .schemas import ClaimMeasurement, Metrics
 from .spec import AnswerItem, answer_problems
 
@@ -119,6 +125,17 @@ class Replacement(BaseModel):
     new_task_id: str = Field(description="A task in add_tasks of the same patch")
 
 
+class Reparse(BaseModel):
+    """Read a finished run's log again with a corrected regex, instead of running it again."""
+    task_id: str = Field(description="A failed run task whose only problem was 'no parsable metric value'")
+    metric_regex: str = Field(description="Corrected Python regex with ONE capture group; the last match is used")
+    scale: float | None = Field(None, description="Multiply the parsed value by this; omit to keep the task's scale")
+
+
+# the only problem a reparse can fix: the command ran to the end, only the regex missed
+REPARSABLE = ["no parsable metric value"]
+
+
 class FinishProposal(BaseModel):
     not_measured: dict[str, str] = Field(default_factory=dict,
                                          description="claim or question id -> why it cannot be measured (only after "
@@ -135,6 +152,9 @@ class ExperimentPatch(BaseModel):
     add_tasks: list[Task] = Field(default_factory=list)
     cancel_task_ids: list[str] = Field(default_factory=list)
     replace: list[Replacement] = Field(default_factory=list)
+    reparse: list[Reparse] = Field(default_factory=list,
+                                   description="Failed runs that exited 0 but whose metric_regex matched nothing: the "
+                                               "runtime reads the same log with the new regex. Never rerun those.")
     finish: FinishProposal | None = Field(None, description="Propose to end the run; the runtime checks it")
 
 
@@ -255,6 +275,13 @@ class Runtime:
                 problems.append(f"cancel: unknown task {tid!r}")
             elif self.tasks[tid]["status"] in ("done", "running"):
                 problems.append(f"cancel: {tid!r} is {self.tasks[tid]['status']}")
+        reparsed: dict[str, tuple[float, int]] = {}  # task id -> (value, progress lines), all checked before any change
+        for r in patch.reparse:
+            got = self._reparse_problem(r, patch)
+            if isinstance(got, str):
+                problems.append(f"reparse {r.task_id}: {got}")
+            else:
+                reparsed[r.task_id] = got
         if problems:
             self._log("patch/rejected", problems=problems)
             return problems
@@ -264,6 +291,21 @@ class Runtime:
                 self.state["ledger"][k] = v
         for tid in patch.cancel_task_ids:
             self._set(tid, "cancelled")
+        for r in patch.reparse:
+            spec = self.tasks[r.task_id]["spec"]
+            old = {"metric_regex": spec["metric_regex"], "scale": spec["scale"]}
+            spec["metric_regex"] = r.metric_regex
+            if r.scale is not None:
+                spec["scale"] = r.scale
+            value, progress = reparsed[r.task_id]
+            for k in ("stage", "problems", "signature", "signature_repeats"):
+                self.tasks[r.task_id].pop(k, None)
+            self._set(r.task_id, "done", value=value, log=self.tasks[r.task_id]["log"], exit_code=0,
+                      progress_lines=progress, reparsed_from=old)
+            for tid in self.state["order"]:  # tasks blocked on its failure may go again (ready() re-checks the rest)
+                t = self.tasks[tid]
+                if t["status"] == "blocked" and r.task_id in t["spec"]["depends_on"]:
+                    self._set(tid, "pending", reason=f"{r.task_id} was reparsed")
         for r in patch.replace:
             if self.tasks[r.old_task_id]["status"] != "failed":
                 self._set(r.old_task_id, "cancelled")
@@ -284,8 +326,37 @@ class Runtime:
                     if t["status"] == "blocked":
                         self._set(tid, "pending", reason=f"rewired to {r.new_task_id}")
         self._log("patch/applied", added=new_ids, cancelled=patch.cancel_task_ids,
-                  replaced=[r.model_dump() for r in patch.replace])
+                  replaced=[r.model_dump() for r in patch.replace], reparsed=[r.task_id for r in patch.reparse])
         return []
+
+    def _reparse_problem(self, r: Reparse, patch: ExperimentPatch) -> str | tuple[float, int]:
+        """Why this reparse cannot be applied, else (the value the new regex reads from the run's log, its progress
+        lines). Only a run that ran to the end with exit 0 and missed only its value qualifies, and only from the log
+        the sandbox itself wrote (its sha256 is in the sandbox's in-memory manifest, out of the agents' reach)."""
+        t = self.tasks.get(r.task_id)
+        if t is None:
+            return "unknown task"
+        if t["spec"]["kind"] != "run":
+            return "only run tasks can be reparsed"
+        if t["status"] != "failed" or t.get("stage") != "run" or t.get("problems") != REPARSABLE:
+            return (f"only a run that exited 0 and failed only with {REPARSABLE[0]!r} can be reparsed "
+                    f"(this one is {t['status']}, problems {t.get('problems')}); replace it instead")
+        if t.get("replaced_by") or r.task_id in {x.old_task_id for x in patch.replace}:
+            return "it is being replaced; reparse it or replace it, not both"
+        if p := _regex_problem(r.metric_regex):
+            return p
+        path = self.ctx.run_dir / t["log"]
+        expected = self.ctx.sandbox.manifest.get(path.name)
+        if expected is None or not path.is_file() or file_sha256(path) != expected:
+            return "its log is not the one the sandbox wrote (changed or missing); rerun it instead"
+        _, output = split_log(path.read_text(errors="replace"))
+        value = parse_metric(output, r.metric_regex, t["spec"]["scale"] if r.scale is None else r.scale)
+        if value is None:
+            return f"the new metric_regex also finds no value in {t['log']}; read the log (read_log) and fix the regex"
+        progress = progress_lines(output)
+        if self.gates and self.questions is None and not progress:  # stage 3 holds for a reparse too
+            return "no training progress in the log: the value would not count as evidence"
+        return value, progress
 
     def _run_problems(self, t: RunTask, replaces: str | None) -> list[str]:
         out = []
