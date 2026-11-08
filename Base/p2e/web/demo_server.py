@@ -55,7 +55,11 @@ WORKFLOWS = [  # the three versions of the comparison (A, B, D)
 KEY = re.compile(r"^user-\d{8}-\d{6}_(single|fixed|planner_workers)$")  # a run launched from the page
 RUN_NAME = re.compile(r"^\d{8}-\d{6}_[\w.-]+$")  # any run directory (examples come from these)
 GITHUB = re.compile(r"https?://(?:www\.)?github\.com/[\w.-]+/[\w.-]+")
-EXAMPLE_MAX_WALL_S = 600  # an example is a task some run answered in under 10 minutes
+EXAMPLE_MAX_WALL_S = 600  # without a curated list, an example is a task some run answered in under 10 minutes
+# The examples the demo offers, chosen by hand, each with its run times measured on the demo server. Without this file
+# every quick finished task is offered; with it, only tasks that passed there, once each, so a re-run of an example
+# (which is a new task of its own) does not become another copy of it in the menu.
+EXAMPLES_FILE = Path(__file__).resolve().parents[2] / "demo_examples.json"
 CB_REFERENCE = "CORE-Bench reference answer (mean of 3 manual re-runs)"
 STEP_TARGET = {"run_shell": "command", "read_file": "path", "list_dir": "path", "write_file": "path",
                "view_image": "path", "read_log": "name", "read_skill": "name"}
@@ -232,12 +236,23 @@ def _runnable(spec: dict) -> bool:
     return bool(code.get("repo_url")) or bool(code.get("capsule") and demo.capsule_path(code["capsule"]))
 
 
+def curated_examples() -> list[dict] | None:
+    """The hand-picked examples ({case, demo_s: [seconds of each run on the demo server], ...}), None without a list."""
+    try:
+        return json.loads(EXAMPLES_FILE.read_text())["examples"]
+    except FileNotFoundError:
+        return None
+
+
 def list_examples(max_wall_s: float = EXAMPLE_MAX_WALL_S) -> list[dict]:
-    """Every task (CORE-Bench capsule or demo request) that some run answered in under `max_wall_s` and whose code is
-    still at hand, once each, fastest first: what the menu offers to run again from scratch."""
+    """What the menu offers to run again from scratch. With a curated list: its tasks in its order, each with the times
+    measured on the demo server (`demo_s`). Without one: every task (CORE-Bench capsule or demo request) that some run
+    answered in under `max_wall_s`, once each, fastest first. Either way only tasks whose code is still at hand."""
+    curated = curated_examples()
     by_case: dict[str, dict] = {}
     for d, s, spec in _finished_runs():
-        ok = s.get("verdict") in ("full", "answered") and not s.get("error") and (s.get("wall_s") or 1e9) <= max_wall_s
+        quick = curated is not None or (s.get("wall_s") or 1e9) <= max_wall_s
+        ok = s.get("verdict") in ("full", "answered") and not s.get("error") and quick
         case = s.get("case") or spec.get("id")
         if not ok or not _runnable(spec):
             continue
@@ -248,6 +263,9 @@ def list_examples(max_wall_s: float = EXAMPLE_MAX_WALL_S) -> list[dict]:
         e["workflows"].add(s["workflow"])
         if s["wall_s"] < e["fastest_s"]:
             e.update(fastest_s=s["wall_s"], run=d.name)
+    if curated is not None:
+        return [{**by_case[c["case"]], "workflows": sorted(by_case[c["case"]]["workflows"]), "demo_s": c["demo_s"]}
+                for c in curated if c["case"] in by_case]
     return sorted(({**e, "workflows": sorted(e["workflows"])} for e in by_case.values()), key=lambda e: e["fastest_s"])
 
 

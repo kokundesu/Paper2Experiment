@@ -18,7 +18,7 @@ from .capsule import save_shipped_reads
 from .evaluator import evaluate
 from .llm import Budget, Trace
 from .models import get_profile
-from .sandbox import PROJECT_ROOT, Sandbox
+from .sandbox import MACHINE, PROJECT_ROOT, Sandbox
 from .skills import library_version
 from .schemas import Case, ClaimMeasurement, DiscrepancyReport, EvalResult, Metrics, RunRecord, RunSpec, Task
 
@@ -72,7 +72,7 @@ class RunContext:
                "values with the paper's and report any gap in the diagnosis"
                if any(REFERENCE_TARGET in c for c in self.criteria.values())
                else "the value it refers to is the one the paper reports") + f":\n{claims}\n\n"
-            f"Machine: Apple Silicon Mac, CPU only, no CUDA. `uv` and `git` are available. "
+            f"Machine: {MACHINE}, CPU only, no CUDA. `uv` and `git` are available. "
             f"Keep any single experiment run under 20 minutes."
         )
 

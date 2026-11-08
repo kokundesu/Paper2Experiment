@@ -41,6 +41,7 @@ export type HistoryRun = {
 export type ExampleTask = {
   case: string; title: string; source: 'corebench' | 'user'; code: string; language: string; questions: number;
   fastest_s: number; workflows: string[]; run: string;
+  demo_s?: number[];  // the run times measured on the demo server, when the examples are a curated list
 };
 export type AuthState = {required: boolean; ok: boolean; name: string | null; expired: boolean; expires: string | null};
 export type Presence = {online: number; names: string[]; me: string | null; running: number; queued: number; max_running: number | null};

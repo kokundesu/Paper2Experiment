@@ -135,19 +135,31 @@ def test_a_request_without_code_is_answered_with_a_question_not_a_draft(monkeypa
         "https://github.com/KalmanNet/KalmanNet_TSP"
 
 
-def test_an_example_is_every_quick_task_once_and_runs_as_a_fresh_spec(tmp_path, monkeypatch):
+def _example_runs(tmp_path, monkeypatch, runs_of: dict) -> dict:
+    """Finished runs of user tasks: {task title: [(stamp, workflow, wall_s, verdict), ...]} -> {title: spec}."""
     runs, drafts = tmp_path / "runs", tmp_path / "runs" / "demo_drafts"
     monkeypatch.setattr(demo_server, "RUNS", runs)
     monkeypatch.setattr(demo, "RUNS", runs)
     monkeypatch.setattr(demo, "DRAFTS", drafts)
-    old = _user_spec().model_copy(update={"code": CodeInput(repo_url="https://github.com/a/b")})
-    for name, wf, wall, verdict in (("20261106-120000", "single", 300, "answered"), ("20261106-121000", "fixed", 90, "answered"),
-                                    ("20261106-122000", "planner_workers", 30, "no_answers")):
-        d = runs / f"{name}_{old.id}_{wf}"
-        d.mkdir(parents=True)
-        (d / "spec.json").write_text(old.model_dump_json())
-        (d / "summary.json").write_text(json.dumps({"case": old.id, "source": "user", "workflow": wf, "wall_s": wall,
-                                                    "verdict": verdict}))
+    specs = {}
+    for i, (title, rows) in enumerate(runs_of.items()):
+        spec = _user_spec().model_copy(update={"id": f"user-20261106-00000{i}", "title": title,
+                                               "code": CodeInput(repo_url="https://github.com/a/b")})
+        specs[title] = spec
+        for name, wf, wall, verdict in rows:
+            d = runs / f"{name}_{spec.id}_{wf}"
+            d.mkdir(parents=True)
+            (d / "spec.json").write_text(spec.model_dump_json())
+            (d / "summary.json").write_text(json.dumps({"case": spec.id, "source": "user", "workflow": wf,
+                                                        "wall_s": wall, "verdict": verdict}))
+    return specs
+
+
+def test_an_example_is_every_quick_task_once_and_runs_as_a_fresh_spec(tmp_path, monkeypatch):
+    monkeypatch.setattr(demo_server, "EXAMPLES_FILE", tmp_path / "no_list.json")
+    old = _example_runs(tmp_path, monkeypatch, {"t": [
+        ("20261106-120000", "single", 300, "answered"), ("20261106-121000", "fixed", 90, "answered"),
+        ("20261106-122000", "planner_workers", 30, "no_answers")]})["t"]
     demo.save_paper_values(old.id, {"arxiv": "1705.09412", "values": {"q1": {"question_id": "q1", "value": 0.95}}})
     [ex] = demo_server.list_examples()
     assert ex["case"] == old.id and ex["fastest_s"] == 90 and ex["workflows"] == ["fixed", "single"]  # no_answers is no example
@@ -156,6 +168,23 @@ def test_an_example_is_every_quick_task_once_and_runs_as_a_fresh_spec(tmp_path, 
     assert [q["text"] for q in got["spec"]["questions"]] == [q.text for q in old.questions]
     assert demo.load_paper_values(got["spec"]["id"])["values"]["q1"]["value"] == 0.95
 
+
+
+def test_a_curated_list_picks_the_examples_their_order_and_their_server_times(tmp_path, monkeypatch):
+    specs = _example_runs(tmp_path, monkeypatch, {
+        "slow but chosen": [("20261106-120000", "planner_workers", 900, "answered")],
+        "quick": [("20261106-121000", "planner_workers", 40, "answered")],
+        "not chosen": [("20261106-122000", "planner_workers", 20, "answered")]})
+    listed = tmp_path / "demo_examples.json"
+    listed.write_text(json.dumps({"examples": [
+        {"case": specs["slow but chosen"].id, "demo_s": [498, 548]},
+        {"case": specs["quick"].id, "demo_s": [119]},
+        {"case": "user-20990101-000000", "demo_s": [60]}]}))  # no run of it here: left out, not an error
+    monkeypatch.setattr(demo_server, "EXAMPLES_FILE", listed)
+    got = demo_server.list_examples()
+    assert [e["title"] for e in got] == ["slow but chosen", "quick"]  # over 10 minutes is fine once chosen
+    assert got[0]["demo_s"] == [498, 548] and got[0]["fastest_s"] == 900
+    assert demo_server.example_spec(specs["quick"].id)["example"]["demo_s"] == [119]
 
 def test_the_run_folder_is_outside_the_project_and_reaches_the_runs(tmp_path, monkeypatch):
     from p2e.sandbox import PROJECT_ROOT

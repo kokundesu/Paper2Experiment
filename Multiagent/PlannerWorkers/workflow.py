@@ -37,6 +37,7 @@ from pydantic import BaseModel, Field
 from p2e import corebench
 from p2e.llm import REVIEW_EFFORT, Agent, Tool, Usage, sandbox_tools
 from p2e.prompts import RUNTIME_RULES, SETUP_CHECK_RULES
+from p2e.sandbox import MACHINE
 from p2e.runner import DIAGNOSIS_RULES, RunContext, finish
 from p2e.runtime import (MAX_PARALLEL_DIAGNOSE, REPARSABLE, STALL_LIMIT, AgentTask, ExperimentPatch, RunTask, Runtime)
 from p2e.schemas import ClaimDiagnosis, DiscrepancyReport, EvalResult
@@ -155,7 +156,7 @@ never filtered or redirected: the run's log is the only evidence the evaluator a
 ROLE_GUIDE = {
     "setup": f"""Setup guidance: `git clone <repo> repo` with full history, read the README and the code, create a
 Python environment with `uv venv` (e.g. `uv venv --python 3.11 .venv`) and install what the code needs. Old pinned
-versions often do not exist for this machine (Apple Silicon, CPU only): prefer the closest working modern versions and
+versions often do not exist for this machine ({MACHINE}, CPU only): prefer the closest working modern versions and
 the libraries' own compatibility layers over rewriting code. Make each claim's setting and the seed selectable from
 the command line, patch minimally and list every patch. Smoke-test a short run and report the time per epoch or
 iteration and the projected time of one full run. Do not run the full experiments.
@@ -171,7 +172,7 @@ claim's pre-registered criterion, then explain the gap.
 ROLE_GUIDE_SPEC = {
     "setup": f"""Setup guidance: the code is already in the workspace (do not clone or download it). Read the README and
 the code, create a Python environment with `uv venv` (e.g. `uv venv --python 3.11 .venv`) and install what the code
-needs. Old pinned versions often do not exist for this machine (Apple Silicon, CPU only): prefer the closest working
+needs. Old pinned versions often do not exist for this machine ({MACHINE}, CPU only): prefer the closest working
 modern versions over rewriting code. Patch minimally and list every patch. Smoke-test briefly; do not run the full
 program and do not answer the questions.
 {RUNTIME_RULES}""",

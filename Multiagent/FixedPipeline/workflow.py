@@ -37,6 +37,7 @@ from pydantic import BaseModel, Field
 from p2e import corebench
 from p2e.llm import REVIEW_EFFORT, Agent, BudgetExceeded, Usage, sandbox_tools
 from p2e.prompts import RUNTIME_RULES, SETUP_CHECK_RULES
+from p2e.sandbox import MACHINE
 from p2e.runner import DIAGNOSIS_RULES, RunContext, aggregate, execute, finish
 from p2e.schemas import DiscrepancyReport, EnvReport, EvalResult, ExperimentPlan, PaperSpec, RunRecord, RunSpec
 from p2e.spec import Answers
@@ -57,7 +58,7 @@ ENV = f"""You are the Repo/Environment Engineer in a team reproducing a paper. I
 1. `git clone <repo> repo` (full history: later diagnosis may need older versions of the code).
 2. Read the README and code; find the script that produces the requested claims.
 3. Create a Python environment with `uv venv` (e.g. `uv venv --python 3.11 .venv`) and install what the
-   code needs. Pinned old versions often do not exist for this machine (Apple Silicon, CPU only):
+   code needs. Pinned old versions often do not exist for this machine ({MACHINE}, CPU only):
    prefer the closest working modern versions and the libraries' own compatibility layers over
    rewriting the code.
 4. Make the entrypoint runnable and make sure each claim's setting and the random seed can be chosen
@@ -430,7 +431,7 @@ ENV_SPEC = f"""You are the Environment Engineer in a team testing the computatio
 The authors' code (and data) is already in the workspace; do not clone or download the code from elsewhere.
 1. Read the README and the code; find the scripts or notebooks that produce the results the questions ask about.
 2. Create an environment (for Python, `uv venv --python 3.11 .venv` and `uv pip install`) with what the code needs.
-   Pinned old versions often do not exist for this machine (Apple Silicon, CPU only): prefer the closest working
+   Pinned old versions often do not exist for this machine ({MACHINE}, CPU only): prefer the closest working
    versions and the libraries' own compatibility layers over rewriting the code.
 3. Make the entry points runnable on this machine with minimal patches; list every patch.
 4. Smoke-test: start each entry point briefly and confirm it gets past setup. Report the time a full run will take

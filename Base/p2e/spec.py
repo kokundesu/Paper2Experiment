@@ -17,6 +17,8 @@ from typing import Literal, Union
 
 from pydantic import BaseModel, Field
 
+from .sandbox import MACHINE
+
 AnswerType = Literal["number", "string", "bool", "list", "any"]
 Scalar = Union[bool, int, float, str]
 
@@ -142,7 +144,7 @@ def brief(spec: ReproSpec) -> str:
         parts.append(f"Specifically, you need to: {spec.task_prompt}")
     if spec.language:
         parts.append(f"Language: {spec.language}.")
-    parts.append("Machine: Apple Silicon Mac, CPU only, no CUDA. `uv`, `micromamba` (R and other non-Python environments) and `git` are available. Keep any single "
+    parts.append(f"Machine: {MACHINE}, CPU only, no CUDA. `uv`, `micromamba` (R and other non-Python environments) and `git` are available. Keep any single "
                  "command under 20 minutes.")
     qs = "\n".join(f"- `{q.id}`" + (f" ({q.answer_type})" if q.answer_type != "any" else "") + f": {q.text}"
                    for q in spec.questions)

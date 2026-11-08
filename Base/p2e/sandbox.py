@@ -29,6 +29,20 @@ from pathlib import Path
 
 from .models import secret_env_names
 
+
+def describe_machine() -> str:
+    """The machine the agents are told they run on. It is the real one: the demo server is a Linux x86_64 box, and
+    telling its agents they were on an Apple Silicon Mac made them reach for macOS habits (BSD sed) and assume
+    wheels that exist on Linux did not."""
+    import platform
+    arch = platform.machine()
+    if sys.platform == "darwin":
+        return "Apple Silicon Mac" if arch == "arm64" else f"Intel Mac ({arch})"
+    return f"{platform.system()} {arch} server with {os.cpu_count()} CPU cores"
+
+
+MACHINE = describe_machine()
+
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 
 # Shared across runs so repeated `uv pip install` of the same wheels is fast. A parallel batch gives every job

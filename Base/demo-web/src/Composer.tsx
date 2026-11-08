@@ -106,6 +106,16 @@ function RunFolder({workdir, onChange}: {workdir: Workdir | null; onChange: (w: 
   </Popup>;
 }
 
+/** How long an example takes: what its runs took on the demo server (a range when they differ by a minute or more),
+ * else the fastest earlier run. */
+function exampleTime(e: ExampleTask, lang: Lang) {
+  const s = e.demo_s;
+  if (!s?.length) return minutes(e.fastest_s, lang);
+  const lo = Math.min(...s), hi = Math.max(...s);
+  if (hi - lo < 60) return minutes(s.reduce((a, b) => a + b, 0) / s.length, lang);
+  return `${Math.round(lo / 60)}–${Math.round(hi / 60)} ${lang === 'zh' ? '分钟' : 'min'}`;
+}
+
 function ExampleTasks({examples, workflow, model, onPick}: {examples: ExampleTask[] | null; workflow: string; model: string; onPick: (e: ExampleTask) => void}) {
   const {lang, L} = useLang();
   return <Popup align="right" trigger={(open, toggle) => <button type="button" className={`tray-btn${open ? ' is-open' : ''}`} onClick={toggle}>
@@ -117,8 +127,11 @@ function ExampleTasks({examples, workflow, model, onPick}: {examples: ExampleTas
     </span></button>}>
     {close => <div className="examples-panel">
       <div className="popup-head">{L('Example tasks', '示例任务')}</div>
-      <p className="popup-text">{L(<>{examples?.length ?? '…'} tasks an earlier run answered in under 10 minutes. Pick one to run it from scratch with <b>{wfLabel(workflow, lang)} · {model}</b>.</>,
-        <>以前的运行在 10 分钟内答完的 {examples?.length ?? '…'} 个任务。选一个，会用 <b>{wfLabel(workflow, lang)} · {model}</b> 从头运行。</>)}</p>
+      <p className="popup-text">{examples?.some(e => e.demo_s)
+        ? L(<>{examples.length} tasks that ran through on this server; the time is what they took here. Pick one to run it from scratch with <b>{wfLabel(workflow, lang)} · {model}</b>.</>,
+          <>在这台服务器上实测跑通的 {examples.length} 个任务，右边是在这里的实际用时。选一个，会用 <b>{wfLabel(workflow, lang)} · {model}</b> 从头运行。</>)
+        : L(<>{examples?.length ?? '…'} tasks an earlier run answered in under 10 minutes. Pick one to run it from scratch with <b>{wfLabel(workflow, lang)} · {model}</b>.</>,
+          <>以前的运行在 10 分钟内答完的 {examples?.length ?? '…'} 个任务。选一个，会用 <b>{wfLabel(workflow, lang)} · {model}</b> 从头运行。</>)}</p>
       <div className="popup-scroll">
         {!examples ? <div className="popup-empty"><Loader2 size={14} className="spin"/></div>
           : !examples.length ? <div className="popup-empty">{L('No quick tasks yet', '还没有能快速跑完的任务')}</div>
@@ -126,7 +139,7 @@ function ExampleTasks({examples, workflow, model, onPick}: {examples: ExampleTas
             <span className="popup-icon">{e.code.startsWith('http') ? <Github size={14}/> : <Package size={14}/>}</span>
             <span className="popup-main"><b>{e.title}</b>
               <small>{e.code.replace('https://github.com/', '')}{e.language ? ` · ${e.language}` : ''} · {L(`${e.questions} ${e.questions === 1 ? 'question' : 'questions'}`, `${e.questions} 个问题`)}</small></span>
-            <span className="popup-meta">{minutes(e.fastest_s, lang)}</span>
+            <span className="popup-meta">{exampleTime(e, lang)}</span>
           </button>)}
       </div>
     </div>}
