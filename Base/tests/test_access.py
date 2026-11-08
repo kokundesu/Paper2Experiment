@@ -6,7 +6,7 @@ from p2e.web import access
 
 @pytest.fixture
 def code(tmp_path, monkeypatch):
-    monkeypatch.setenv("P2E_DEMO_CODE", "6008")
+    monkeypatch.setenv("P2E_DEMO_CODE", "2468")
     monkeypatch.setenv("P2E_DEMO_CODE_EXPIRES", "2999-01-01T00:00:00+00:00")
     monkeypatch.setenv("P2E_DEMO_SECRET_FILE", str(tmp_path / "secret"))
 
@@ -41,11 +41,11 @@ def test_the_code_and_its_sessions_stop_at_the_expiry(code, monkeypatch):
     value, _ = access.new_session("Allen")
     monkeypatch.setenv("P2E_DEMO_CODE_EXPIRES", "2000-01-01T00:00:00+00:00")
     assert access.session_name(cookie(value)) is None
-    assert access.check_code(access.Guard(), "1.2.3.4", "6008", "Allen") == (403, {"ok": False, "reason": "expired"})
+    assert access.check_code(access.Guard(), "1.2.3.4", "2468", "Allen") == (403, {"ok": False, "reason": "expired"})
 
 
 def test_a_name_is_needed_and_cleaned(code):
-    assert access.check_code(access.Guard(), "1.2.3.4", "6008", None)[1]["reason"] == "name"
+    assert access.check_code(access.Guard(), "1.2.3.4", "2468", None)[1]["reason"] == "name"
     assert access.clean_name("  Al\x00len   Hu  ") == "Allen Hu"
     assert access.clean_name("   ") is None
     assert len(access.clean_name("x" * 100)) == access.NAME_MAX
@@ -56,9 +56,9 @@ def test_wrong_codes_lock_an_address_out_then_let_it_back(code):
     for left in range(access.FAILS_PER_ADDRESS - 1, -1, -1):
         status, body = access.check_code(guard, "1.2.3.4", "0000", "Allen")
         assert status == 401 and body["tries_left"] == left
-    status, body = access.check_code(guard, "1.2.3.4", "6008", "Allen")  # even the right code waits
+    status, body = access.check_code(guard, "1.2.3.4", "2468", "Allen")  # even the right code waits
     assert status == 429 and body["retry_after"] > 0
-    assert access.check_code(guard, "5.6.7.8", "6008", "Bea")[0] == 200  # another address is not affected
+    assert access.check_code(guard, "5.6.7.8", "2468", "Bea")[0] == 200  # another address is not affected
     assert guard.retry_after("1.2.3.4", now=__import__("time").time() + access.FAIL_WINDOW_S + 1) == 0
 
 
