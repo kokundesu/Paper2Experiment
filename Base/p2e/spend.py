@@ -24,14 +24,22 @@ def ledger_dir() -> Path:
     return Path(os.environ.get("P2E_SPEND_DIR", PROJECT_ROOT / "runs" / ".spend")).expanduser()
 
 
-def monthly_limit() -> float | None:
-    """The monthly cap in USD, or None when there is none (the default: local research batches)."""
-    raw = os.environ.get("P2E_MONTHLY_BUDGET_USD", "").strip()
-    return float(raw) if raw else None
-
-
 def month() -> str:
     return time.strftime("%Y-%m", time.gmtime())
+
+
+def monthly_limit(of_month: str | None = None) -> float | None:
+    """The cap in USD for a month (default: this one), or None when there is none (local research batches).
+
+    P2E_MONTHLY_BUDGET_USD is the usual cap; P2E_MONTHLY_BUDGET_OVERRIDES raises or lowers it for single months,
+    as "2026-11=20,2027-01=10", so a one-off month needs no change to come back afterwards."""
+    target = of_month or month()
+    for item in os.environ.get("P2E_MONTHLY_BUDGET_OVERRIDES", "").split(","):
+        key, _, usd = item.strip().partition("=")
+        if key.strip() == target and usd.strip():
+            return float(usd)
+    raw = os.environ.get("P2E_MONTHLY_BUDGET_USD", "").strip()
+    return float(raw) if raw else None
 
 
 @contextmanager

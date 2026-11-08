@@ -48,7 +48,11 @@ bash deploy/deploy.sh --app-only   # after pushing code changes: pull, rebuild f
 ```
 
 The server clones the project from GitHub, so push before deploying. To change the access code or how long it works,
-edit `deploy/demo-access.local.env` and run `bash deploy/deploy.sh --app-only`.
+or the cap of a single month (`P2E_MONTHLY_BUDGET_OVERRIDES=2026-11=20`), edit `deploy/demo-access.local.env` and run
+`bash deploy/deploy.sh --app-only`.
+
+A deploy restarts the demo, and a restart stops every run it started. deploy.sh refuses while an experiment is running;
+`FORCE=1 bash deploy/deploy.sh ...` overrides that.
 
 ## On the server
 

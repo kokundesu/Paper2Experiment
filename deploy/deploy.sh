@@ -13,6 +13,8 @@
 set -euo pipefail
 
 ROOT=$(cd "$(dirname "$0")/.." && pwd)
+# Restarting the demo stops every run it started (systemd stops the whole service): refuse while any is going,
+# unless FORCE=1. Runs still waiting in the queue are lost on a restart too; their count is in the online pill.
 SSH_HOST=${SSH_HOST:-ovh-vps}
 APP=/home/p2e/Paper2Exp
 ACCESS="$ROOT/deploy/demo-access.local.env"
@@ -22,6 +24,12 @@ APP_ONLY=false
 if [ -z "${DOMAIN:-}" ]; then
   IP=$(ssh -G "$SSH_HOST" | awk '/^hostname /{print $2}')
   DOMAIN="paper2experiment.allenhu.com, ${IP//./-}.sslip.io"
+fi
+
+RUNNING=$(ssh "$SSH_HOST" 'pgrep -fc "p2e[.]cli demo run" || true')
+if [ "${RUNNING:-0}" -gt 0 ] && [ "${FORCE:-0}" != 1 ]; then
+  echo "!! $RUNNING experiment(s) running on the server; deploying would stop them. Wait, or run with FORCE=1." >&2
+  exit 1
 fi
 
 echo "== build frontend"

@@ -42,6 +42,16 @@ def test_the_monthly_cap_stops_requests_before_they_cross_it(ledger, monkeypatch
     assert spend.status()["exhausted"] is True
 
 
+def test_a_month_can_have_its_own_cap(monkeypatch):
+    monkeypatch.setenv("P2E_MONTHLY_BUDGET_USD", "5")
+    monkeypatch.setenv("P2E_MONTHLY_BUDGET_OVERRIDES", "2026-11=20, 2027-01=10")
+    assert spend.monthly_limit("2026-11") == 20.0
+    assert spend.monthly_limit("2027-01") == 10.0
+    assert spend.monthly_limit("2026-12") == 5.0  # back to the usual cap by itself
+    monkeypatch.delenv("P2E_MONTHLY_BUDGET_USD")
+    assert spend.monthly_limit("2026-12") is None
+
+
 def test_commands_run_as_this_user_unless_a_command_user_is_set(monkeypatch):
     monkeypatch.setattr(sandbox, "RUN_AS", None)
     assert sandbox.as_runner(["git", "status"]) == ["git", "status"]
