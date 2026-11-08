@@ -244,11 +244,13 @@ function verdictOf(a: Answer, lang: Lang): {status: Comparison['status']; label:
   const zh = lang === 'zh';
   const corebench = a.reference?.source === 'corebench';
   if (a.answer === null || a.answer === undefined) return {status: 'unknown', label: zh ? '没有答案' : 'No answer'};
+  // the same number as a percentage instead of a fraction (or the reverse): graded wrong, but not a different result
+  if (a.comparison?.status === 'scale') return {status: 'scale', label: zh ? '差 100 倍（百分比 / 小数）' : '×100 off (percent vs fraction)'};
   if (corebench && a.correct !== undefined && a.correct !== null)
     return a.correct ? {status: 'match', label: zh ? '与参考答案一致' : 'Matches reference'} : {status: 'mismatch', label: zh ? '与参考答案不符' : 'Differs from reference'};
   const status = a.comparison?.status ?? 'unknown';
-  return {status, label: (zh ? {match: '与论文一致', close: '接近论文', mismatch: '与论文不符', unknown: a.reference ? '无法比较' : '论文中没有'}
-    : {match: 'Matches paper', close: 'Close to paper', mismatch: 'Differs from paper', unknown: a.reference ? 'Cannot compare' : 'Not in paper'})[status]};
+  return {status, label: (zh ? {match: '与论文一致', close: '接近论文', scale: '', mismatch: '与论文不符', unknown: a.reference ? '无法比较' : '论文中没有'}
+    : {match: 'Matches paper', close: 'Close to paper', scale: '', mismatch: 'Differs from paper', unknown: a.reference ? 'Cannot compare' : 'Not in paper'})[status]};
 }
 
 function gap(c?: Comparison, unit = '') {
@@ -271,7 +273,8 @@ function Results({job, jobKey}: {job: JobState; jobKey: string}) {
   const arxiv = answers.find(a => a.reference?.arxiv)?.reference?.arxiv;
   const figures = [...new Set(answers.flatMap(a => [...a.evidence, ...(a.provenance?.produced_in ?? [])])
     .map(p => p.replace(/ \(viewed figure\)$/, '')).filter(p => FIGURE.test(p) && !p.startsWith('logs/')))].slice(0, 4);
-  const overall = compared === 0 ? 'unknown' : matched === compared ? 'match' : matched === 0 ? 'mismatch' : 'close';
+  const overall = compared === 0 ? 'unknown' : matched === compared ? 'match'
+    : matched === 0 && !verdicts.some(v => v.status === 'scale') ? 'mismatch' : 'close';
   return <section className="results">
     <div className={`results-summary is-${overall}`}>
       <div className="results-score">

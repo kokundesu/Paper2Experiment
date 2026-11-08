@@ -100,6 +100,8 @@ def test_the_graph_of_a_planner_run_nests_retries_and_maps_workers_onto_their_ta
 def test_answers_are_compared_with_the_paper_by_relative_gap():
     assert demo.compare(-21.887, "-21.92")["status"] == "match"
     assert demo.compare(-21.0, -21.92)["status"] == "close"
+    assert demo.compare(59.37, 0.59375)["status"] == "scale"  # a percentage where a fraction was asked for
+    assert demo.compare(0.0, 0.0093)["status"] == "mismatch"
     gap = demo.compare(-1.9214, -21.92)
     assert gap["status"] == "mismatch" and round(gap["diff"], 4) == 19.9986
     assert demo.compare("SCZ ", "scz")["status"] == "match" and demo.compare("HC", "SCZ")["status"] == "mismatch"

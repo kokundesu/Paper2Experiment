@@ -1,0 +1,84 @@
+{
+ "_about": "The tasks the demo page offers as examples, in this order, each with the wall time in seconds of every run on the demo server (paper2experiment.allenhu.com, 6-core Linux VPS, Planner + workers, haiku55). Kept by hand: a task is listed once it ran through there with answers matching the reference.",
+ "examples": [
+  {
+   "case": "cb-5975162",
+   "title": "ExPSO particle swarm optimisation",
+   "demo_s": [
+    33
+   ]
+  },
+  {
+   "case": "cb-6460826",
+   "title": "CULP: classification using link prediction",
+   "demo_s": [
+    72
+   ]
+  },
+  {
+   "case": "cb-1624349",
+   "title": "Feature selection",
+   "demo_s": [
+    101
+   ]
+  },
+  {
+   "case": "cb-5367566",
+   "title": "HyperETA: estimated time of arrival",
+   "demo_s": [
+    107
+   ]
+  },
+  {
+   "case": "cb-6746514",
+   "title": "Diagnosis of epilepsy from EEG",
+   "demo_s": [
+    119
+   ]
+  },
+  {
+   "case": "cb-3894632",
+   "title": "Radiomics survival analysis (leiomyosarcoma)",
+   "demo_s": [
+    132
+   ]
+  },
+  {
+   "case": "cb-0201225",
+   "title": "Atrial fibrillation screening from ECG",
+   "demo_s": [
+    213
+   ]
+  },
+  {
+   "case": "cb-0396930",
+   "title": "GERNERMED German medical NER",
+   "demo_s": [
+    451,
+    55
+   ],
+   "note": "the first run compiled spaCy (now cached); the second answered in percent instead of fractions"
+  },
+  {
+   "case": "cb-9070543",
+   "title": "BRAF melanoma intermittent treatment (R)",
+   "demo_s": [
+    460
+   ]
+  },
+  {
+   "case": "user-20261106-213704",
+   "title": "KalmanNet Table I, linear 2x2, T=20",
+   "demo_s": [
+    498
+   ],
+   "note": "the other KalmanNet variants (548-984 s on the server) are the same task and are not listed"
+  }
+ ],
+ "not_listed": {
+  "user-20261106-175913": "KalmanNet trained from scratch: 79 min on the server and -2.0 dB against -21.9 (NaN during training)",
+  "cb-4098236": "needs the emotions dataset from scikit.ml, which is gone (HTTP 410); passes only when a mirror is found",
+  "cb-3272782": "VisGIN: q2 (a standard deviation) came out 0.0 against 0.0093 in both server runs",
+  "cb-7038571": "K-Core temporal GCN: passes but takes 12 min"
+ }
+}

@@ -135,7 +135,8 @@ def _number(x) -> float | None:
 
 
 def compare(answer, paper) -> dict:
-    """match / close / mismatch / unknown, with the gap for numbers."""
+    """match / close / scale / mismatch / unknown, with the gap for numbers. `scale`: the same number a hundred times
+    larger or smaller (a percentage against a fraction), which a grader counts as wrong but is not a different result."""
     if answer is None or paper is None:
         return {"status": "unknown"}
     a, p = _number(answer), _number(paper)
@@ -143,6 +144,8 @@ def compare(answer, paper) -> dict:
         diff = a - p
         rel = abs(diff) / abs(p) if p else (0.0 if a == 0 else math.inf)
         status = "match" if rel <= MATCH_REL or abs(diff) <= ABS_TOL else "close" if rel <= CLOSE_REL else "mismatch"
+        if status == "mismatch" and p and any(abs(a / (p * k) - 1) <= MATCH_REL for k in (100, 0.01)):
+            status = "scale"
         return {"status": status, "diff": diff, "rel": rel if math.isfinite(rel) else None}
     norm = lambda v: re.sub(r"\s+", " ", json.dumps(v, ensure_ascii=False) if isinstance(v, list) else str(v)).strip().lower()
     return {"status": "match" if norm(answer) == norm(paper) else "mismatch"}

@@ -30,7 +30,7 @@ export type Answer = {
   comparison?: Comparison;
 };
 export type Reference = {source: 'paper' | 'corebench'; value: unknown; unit?: string; location?: string; quote?: string; arxiv?: string | null};
-export type Comparison = {status: 'match' | 'close' | 'mismatch' | 'unknown'; diff?: number; rel?: number | null};
+export type Comparison = {status: 'match' | 'close' | 'scale' | 'mismatch' | 'unknown'; diff?: number; rel?: number | null};
 export type PaperValues = {arxiv: string | null; source?: 'paper' | 'corebench'; values: Record<string, Reference>; error?: string};
 export type RunWorkspace = {run: string; title: string; size_mb: number; live: boolean; cleans_in_s: number | null};
 // fixed: a shared server, where each person's runs go to a folder named after them and are cleaned up after a while
