@@ -15,3 +15,6 @@ Base/benchmark/corebench_v1_train/capsules/
 Base/benchmark/v4/*/paper/
 node_modules/
 Base/demo-web/dist/
+
+# deploy secrets (site login)
+deploy/*.local*

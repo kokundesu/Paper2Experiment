@@ -1,0 +1,12 @@
+{{DOMAIN}} {
+	encode gzip
+
+	# The demo has no accounts of its own and every run spends API credit, so the whole site needs a password.
+	basic_auth {
+		{{AUTH_USER}} {{AUTH_HASH}}
+	}
+
+	reverse_proxy 127.0.0.1:8780 {
+		flush_interval -1
+	}
+}

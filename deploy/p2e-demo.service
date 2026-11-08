@@ -1,0 +1,23 @@
+[Unit]
+Description=Paper2Experiment demo (p2e demo serve)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=p2e
+Group=p2e
+WorkingDirectory=/home/p2e/Paper2Exp
+# Only Caddy on this machine talks to the demo; it is never exposed directly.
+ExecStart=/home/p2e/Paper2Exp/.venv/bin/p2e demo serve --host 127.0.0.1 --port 8780
+# Agents call uv and micromamba from their shell.
+Environment=PATH=/home/p2e/.local/bin:/home/p2e/.p2e-mamba/bin:/usr/local/bin:/usr/bin:/bin
+Environment=PYTHONUNBUFFERED=1
+Restart=on-failure
+RestartSec=5
+# Stop the server and every run it started.
+KillMode=control-group
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
