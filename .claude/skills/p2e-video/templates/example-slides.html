@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Clip 06 · Trusted evaluation</title>
+<link rel="stylesheet" href="base.css">
+<style>
+  .row { display:flex; gap:28px; margin-top:56px; }
+  .chip b { color:var(--blue); }
+  .blocked { color:#ff8a80; font-weight:700; }
+  .cards { display:flex; gap:32px; margin-top:52px; text-align:left; }
+  .file { width:760px; padding:26px 30px; }
+  .file .h { display:flex; justify-content:space-between; font-size:26px; font-weight:700; margin-bottom:18px; }
+  .file .h span { font-weight:400; color:var(--muted); font-size:22px; }
+  .file pre { font-size:25px; line-height:1.6; white-space:pre; }
+  .sha { padding:2px 6px; border-radius:6px; transition:none; }
+  .sha.hl { background:#cfe0f6; color:var(--blue); font-weight:700; }
+  .checks { display:flex; flex-direction:column; gap:26px; margin-top:56px; text-align:left; }
+  .check { font-size:44px; padding:24px 40px; min-width:900px; }
+  .check .mark { display:inline-block; width:56px; color:var(--green); font-weight:800; }
+  .verdict { margin-top:44px; font-size:44px; font-weight:700; padding:16px 44px; border-radius:999px; background:#e7f4e8; color:var(--green); }
+  .note { margin-top:30px; font-size:26px; color:var(--muted); }
+</style>
+</head>
+<body>
+<div id="tag"></div>
+
+<!-- Timeline matched to the recording (354 Alexandra Rd, Alexis 16.m4a): cuts fall in its pauses. -->
+<section class="scene" data-start="0">
+  <div class="big">Can we trust an answer?</div>
+  <div class="note in" data-t="1.2">An agent that wants to pass could read the answers, or type a number with no run behind it.</div>
+</section>
+
+<section class="scene" data-start="3.3" data-tag="<b>06</b>Trusted evaluation · Sandbox">
+  <h2 class="in" data-t="0.3">Every run gets its own sandbox</h2>
+  <div class="row">
+    <div class="chip in" data-t="1.9">① Own <b>workspace</b></div>
+    <div class="chip in" data-t="3.2">② <b>Timeout</b> per command</div>
+    <div class="chip in" data-t="3.7">③ <b>No API keys</b></div>
+  </div>
+  <div class="note in" data-t="4.2">Base/p2e/sandbox.py</div>
+</section>
+
+<section class="scene" data-start="8.25" data-tag="<b>06</b>Trusted evaluation · Command guard">
+  <h2 class="in" data-t="0.2">The answers stay hidden</h2>
+  <div class="term in" data-t="0.6" style="margin-top:50px">
+    <div class="bar mono">sandbox · logs/cmd_002_cmd.log</div>
+    <div class="body mono"><div data-type="1.7">$ cat case.yaml</div><div class="blocked in" data-t="3.4">BLOCKED: ground-truth files are off limits</div></div>
+  </div>
+  <div class="note in" data-t="3.6">The guard checks every command before it runs: case.yaml, the benchmark folder and .env are off limits.</div>
+</section>
+
+<section class="scene" data-start="12.36" data-tag="<b>06</b>Trusted evaluation · sha256">
+  <h2 class="in" data-t="0.2">Every command writes a log</h2>
+  <div class="cards">
+    <div class="card file in" data-t="0.5">
+      <div class="h">logs/cmd_001_cmd.log <span>written by the sandbox</span></div>
+      <pre class="mono">$ cd code &amp;&amp; Rscript run_culp.R wine
+# exit=0 duration=2.1s
+CN accuracy: 97.22</pre>
+    </div>
+    <div class="card file in" data-t="1.6">
+      <div class="h">Manifest <span>kept by the sandbox, not on disk</span></div>
+      <pre class="mono">cmd_001_cmd.log  <span class="sha" data-hl="2.8">9764e702fdc1…744bd0</span>
+cmd_002_cmd.log  <span class="sha" data-hl="2.8">2ed49e535fef…49b381</span></pre>
+    </div>
+  </div>
+  <div class="note in" data-t="2.9">sha256 of each log, recorded the moment it is written</div>
+</section>
+
+<section class="scene" data-start="16.62" data-tag="<b>06</b>Trusted evaluation · Evaluator">
+  <h2 class="in" data-t="0.3">The evaluator accepts an answer only if…</h2>
+  <div class="checks">
+    <div class="card check in" data-t="3.6"><span class="mark">✓</span>it is within the pre-registered tolerance</div>
+    <div class="card check in" data-t="5.9"><span class="mark">✓</span>it comes from an untouched log <span style="color:var(--muted);font-size:30px">(sha256 unchanged)</span></div>
+  </div>
+  <div class="verdict in" data-t="6.3">→ full</div>
+</section>
+
+<div id="sub"></div>
+<script>const END = 24.6;</script>
+<script src="engine.js"></script>
+</body>
+</html>

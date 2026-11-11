@@ -1,0 +1,21 @@
+* { box-sizing:border-box; margin:0; }
+:root { --ink:#16202c; --muted:#6b7380; --line:#dde2e8; --blue:#1565c0; --green:#2e7d32; --red:#c62828; }
+html, body { width:1920px; height:1080px; overflow:hidden; background:#fff; color:var(--ink);
+  font-family:-apple-system, "Segoe UI", "Helvetica Neue", Arial, sans-serif; }
+.scene { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center;
+  text-align:center; padding:0 160px 120px; opacity:0; }
+.in { opacity:0; }
+#tag { position:absolute; top:56px; left:72px; font-size:24px; letter-spacing:.14em; color:var(--muted); text-transform:uppercase; }
+#tag b { color:var(--blue); margin-right:14px; }
+#sub { position:absolute; left:0; right:0; bottom:58px; margin:0 auto; width:max-content; max-width:1560px; text-align:center;
+  font-size:38px; line-height:1.35; font-weight:500; color:#fff; background:rgba(22,32,44,.82);
+  padding:10px 26px; border-radius:12px; display:none; text-wrap:balance; }
+h2 { font-size:72px; font-weight:700; letter-spacing:-.01em; }
+.big { font-size:84px; font-weight:800; letter-spacing:-.02em; line-height:1.2; }
+.card { background:#fff; border:2px solid var(--line); border-radius:20px; }
+.chip { font-size:36px; padding:22px 36px; border-radius:18px; border:2px solid var(--line); background:#fff; }
+.mono { font-family:"SF Mono", Menlo, Consolas, monospace; }
+.term { width:1160px; text-align:left; background:#16202c; border-radius:18px; overflow:hidden; }
+.term .bar { padding:14px 22px; font-size:22px; color:#8a96a8; background:#1f2b3a; }
+.term .body { padding:30px 34px; font-size:36px; line-height:1.6; color:#e8edf3; min-height:230px; }
+.ok { color:var(--green); } .bad { color:var(--red); }
