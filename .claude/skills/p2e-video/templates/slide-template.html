@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Clip NN · Title</title>
+<!-- Copy this file, base.css and engine.js into the clip's work folder. One <section class="scene"> per sentence group.
+     data-start = scene start in seconds of the recording: put it in a PAUSE (pauses.txt), ~0.3 s before speech resumes.
+     .in data-t = when an element appears, in seconds from its scene's start: the word it belongs to (words.csv)
+     minus the scene start, minus ~0.2 s. data-type = typewriter start; data-hl = highlight from (adds class .hl).
+     data-tag on a scene = the small label top-left ("<b>NN</b>Topic"). Keep text big: viewers watch at 1080p or less. -->
+<link rel="stylesheet" href="base.css">
+<style>
+  /* clip-specific styles; base.css has .big h2 .card .chip .term .mono .ok .bad */
+  .row { display:flex; gap:28px; margin-top:56px; }
+  .note { margin-top:30px; font-size:26px; color:var(--muted); }
+</style>
+</head>
+<body>
+<div id="tag"></div>
+
+<section class="scene" data-start="0" data-tag="<b>NN</b>Topic">
+  <div class="big">First sentence's key message</div>
+  <div class="note in" data-t="1.5">A supporting line that appears on its word</div>
+</section>
+
+<section class="scene" data-start="4.2" data-tag="<b>NN</b>Topic · part 2">
+  <h2 class="in" data-t="0.3">Heading for this sentence</h2>
+  <div class="row">
+    <div class="chip in" data-t="1.4">① first item</div>
+    <div class="chip in" data-t="2.6">② second item</div>
+    <div class="chip in" data-t="3.4">③ third item</div>
+  </div>
+</section>
+
+<div id="sub"></div>
+<script>const END = 10;   /* = recording length + ~0.5 s */</script>
+<script src="engine.js"></script>
+</body>
+</html>
